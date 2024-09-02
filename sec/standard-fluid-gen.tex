@@ -5,18 +5,27 @@ The first problem -- and one potentially without any research component -- is to
 to generate \kw{fluid} programs that access the aggregate of data reference by the surrounding text.
 To solve this problem we will need to accumulate some research on code-generation from LLM's.
 
-\subsection{Modules}
+\subsection{Possible Modules}
 We first need to identify the relevant ``tasks'' from the wider body of NLP/LLM literature,
 since each task is likely to comprise a module of the overall system. Here we will attempt
 to describe the modules required to completely characterize a language-model code-generation
 system.
 
-\paragraph*{Pre-Trained Models}
+\paragraph*{Pre-Trained Models and Few-Short Learning}
 Models that are pre-trained on a wide range of unlabelled data have been successful in LLM
 code generation with the most notable pre-trained models being BERT \citep{devlin2019}
 and GPT \citep{radford2018}. One of the starting points is to begin with a pre-trained model
-that has acquired some internal representation of programming concepts. Then we can fine-tune
-it to work with a more specific representation of fluid programs.
+that has acquired some internal representation of programming concepts. Then we may be able
+to fine-tune it to work with a more specific representation of fluid programs.
+
+Fine-tuning for our use-case may not be feasible. Currently there are only 2-3 \kw{fluid}
+programmers in the world, limiting the number of examples we can use to fine-tune a model 
+(unless we can come up with a data augmentation process for fluid programs). In light of this
+it is also possible that we will have to make use of the generalization capability of 
+LLM's -- taking a pre-trained code LLM, and using a combination of annotated code and 
+well engineered prompts -- to coax out better performance from our comparatively small
+set of example programs. The use of a small number of examples is known in the literature
+as ``Few-Shot Learning''. For a survey of this in GPT3, see \citet{brown2020neurips}.
 
 \paragraph*{Representation of \kw{fluid} programs}
 Our tool will need to combine information from a natural language context (a \kw{LinkedText} list)
