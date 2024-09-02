@@ -38,3 +38,7 @@ Our prompts will likely include some combination of the following:
    \item \textit{Source program code:} the natural language context provides context as to the visualization it is helping to describe, the other bit of context is the source file which generates the visualization itself.
    \item \textit{Library code:} source programs very rarely contain the entirety of relevant definitions, so including relevant library code in a prompt seems useful. One key question is how much code should be considered as context for a prompt versus being included in the training of a model. Perhaps this is best to answer empirically when we are further along in the research.
 \end{itemize}
+
+It remains to be seen how we format the above information and pass it to the models API.
+As far I can tell, this process is empirically driven at the moment, so we need
+to get some experiments working first, alongside catching up with the literature.
