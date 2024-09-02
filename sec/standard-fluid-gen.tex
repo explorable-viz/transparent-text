@@ -26,3 +26,15 @@ involving code, code representation learning has revealed itself to be a vitally
 It seems like learning of representations is specific to the task-domain to which the language model
 is being applied. Will leave further investigation of code representation learning until we've 
 established more of the overall structure of the problem we aim to solve.
+
+\paragraph*{Prompt Engineering}
+We need to provide specifications to the language models we employ, in the form of what are called
+``prompts''. Prompt engineering refers to the task of tailoring the format of a query given to a 
+language model. In our case, prompts will consist of a combination of information being sent to the
+language model, the shape of which remains to be chosen.
+Our prompts will likely include some combination of the following:
+\begin{itemize}
+   \item \textit{Natural language context:} source code fragments are to be synthesized and spliced into a natural language context. For now it's best to imagine this context as being a textual description of some visualization.
+   \item \textit{Source program code:} the natural language context provides context as to the visualization it is helping to describe, the other bit of context is the source file which generates the visualization itself.
+   \item \textit{Library code:} source programs very rarely contain the entirety of relevant definitions, so including relevant library code in a prompt seems useful. One key question is how much code should be considered as context for a prompt versus being included in the training of a model. Perhaps this is best to answer empirically when we are further along in the research.
+\end{itemize}
