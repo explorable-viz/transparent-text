@@ -9,7 +9,10 @@ if we are referring to a simple aggregate summary of data, we want to be able
 to synthesize an in-place expression that helps out explanation. For example,
 if we are explaining a bar-chart, we might write code that looks like \figref{synthex-1}.
 In many cases, we can write this ourselves, but would like to be able to
-synthesize the highlighted expression.
+synthesize the highlighted expression. This boils down to training some sort of
+language model to be able to synthesize small fluid programs based on contextual
+explanations, and a currently active environment of functions and values. We cover
+the needs and wants for this in \secref{generate-fluid}.
 
 \paragraph*{Synthesizing string expressions based on those numerical expressions:}
 this is similar to the nombre library in R, once we are able to synthesize references
