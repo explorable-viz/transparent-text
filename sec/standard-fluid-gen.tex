@@ -11,6 +11,13 @@ since each task is likely to comprise a module of the overall system. Here we wi
 to describe the modules required to completely characterize a language-model code-generation
 system.
 
+\paragraph*{Pre-Trained Models}
+Models that are pre-trained on a wide range of unlabelled data have been successful in LLM
+code generation with the most notable pre-trained models being BERT \citep{devlin2019}
+and GPT \citep{radford2018}. One of the starting points is to begin with a pre-trained model
+that has acquired some internal representation of programming concepts. Then we can fine-tune
+it to work with a more specific representation of fluid programs.
+
 \paragraph*{Representation of \kw{fluid} programs}
 Our tool will need to combine information from a natural language context (a \kw{LinkedText} list)
 with a formal model of \kw{fluid} programs. Moreover, the natural language context (NLC) is
