@@ -5,9 +5,14 @@ The first problem -- and one potentially without any research component -- is to
 to generate \kw{fluid} programs that access the aggregate of data reference by the surrounding text.
 To solve this problem we will need to accumulate some research on code-generation from LLM's.
 
-\subsection{Relevant NLP tasks}
-We first need to identify the relevant ``tasks'' from the wider body of NLP/LLM literature.
-Beyond the general problem area of ``LLM's for code generation'', the process of analyzing the
-text, and producing an explanatory expression that is relevant to the text and semantics of \kw{fluid}
-will comprise of several connected stages, some of which are likely to correspond to well-studied
-problems in modern NLP.
+\subsection{Modules}
+We first need to identify the relevant ``tasks'' from the wider body of NLP/LLM literature,
+since each task is likely to comprise a module of the overall system. Here we will attempt
+to describe the modules required to completely characterize a language-model code-generation
+system.
+
+\paragraph*{Representation of \kw{fluid} programs}
+Our tool will need to combine information from a natural language context (a \kw{LinkedText} list)
+with a formal model of \kw{fluid} programs. Moreover, the natural language context (NLC) is
+\textit{is itself a value in a fluid program}. 
+
