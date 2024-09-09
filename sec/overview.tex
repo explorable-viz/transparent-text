@@ -5,21 +5,54 @@ and link to figures, mostly taken from the IPCC AR6 report, working group 1.
 
 \paragraph*{Example: laying out assumptions for the text:} at the start of
 the report in the Summary For Policymakers (SPM), the authors provide a
-quick explanation of some common words used to describe probabilities.
+quick explanation of some common words used to describe probabilities,
+which we show in \figref{good-text-mapping}.
+\begin{figure}
+   \begin{subfigure}{0.49\textwidth}
+      \includegraphics[width=\textwidth]{fig/ipcc-probabilities}
+      \caption{Mapping probabilities onto text}
+      \label{fig:good-text-mapping}
+   \end{subfigure}
+   \begin{subfigure}{0.49\textwidth}
+      \includegraphics[width=\textwidth]{fig/ipcc-text-def-bad}
+      \caption{Less helpful explanation of terminology}
+      \label{fig:bad-text-mapping}
+   \end{subfigure}
+   \caption{Examples of good and bad mapping of numerical meaning onto text}
+   \label{fig:text-mapping}
+\end{figure}
+We contrast this with the explanation given to the terminology ``main driver''
+which the authors also believe merits an explanation, but the explanation they
+give is not as helpful, pictured in \figref{bad-text-mapping}.
 
-
+The explanation for the mapping of probabilities onto the text is simple,
+and hopefully uncontroversial. The explanation contains all the information
+required to understand what the use of a phrase of ``IPCC calibrated language''
+means when it says ``X outcome is \textit{very likely}''. On the other hand,
+the explanation of the meaning of ``main driver'' is poor, since it doesn't explain
+what it means for something to ``be responsible for $50\%$ of the change''. 
 
 \paragraph*{Synthesizing numerical/structural expressions related to data:}
 \input{listings/source-expressions}
 if we are referring to a simple aggregate summary of data, we want to be able
 to synthesize an in-place expression that helps out explanation. For example,
 if we are explaining a bar-chart, we might write code that looks like \figref{synthex-1}.
-In many cases, we can write this ourselves, but would like to be able to
-synthesize the highlighted expression. This boils down to training some sort of
-language model to be able to synthesize small fluid programs based on contextual
-explanations, and a currently active environment of functions and values. We cover
-the needs and wants for this in \secref{generate-fluid}.
 
+If we take a look at more realistic examples, we find something slightly different is
+happening. Attached explanatory text tends to make reference to visual elements directly
+-- for example referring to a chart rather than some data used in the charts creation --
+and so we will need our solution to be able to handle structurally walking through values
+when synthesizing code that references them. In \figref{structural-mappings}, the black
+arrows show simple examples of the type of text that should be automatically linked to
+the constructor of the visual element to which it refers. At this level, it refers to
+\textit{graphs} (in our world: views) and \textit{panels} (in our world multiviews?).
+
+
+\begin{figure}
+   \includegraphics[width=\textwidth]{fig/ipcc-visual-elements.png}
+   \caption{Examples of mapping text directly onto visual elements}
+   \label{fig:structural-mappings}
+\end{figure}
 \paragraph*{Synthesizing string expressions based on those numerical expressions:}
 this is similar to the nombre library in R, once we are able to synthesize references
 to numerical expressions and data, we want to be able to take those, and use them to
