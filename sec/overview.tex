@@ -39,3 +39,24 @@ Here we shall present some examples of the type of policy that we might want to 
 mapped to calibrated terminology. We have already mentioned the term ``virtually certain'' from the IPCC report, but in the beginning
 of that document, they make sure to explain the meaning of terms like ``likely'' and ``very likely'' as well. This
 sort of simple conversion is an example of the simplest form of policy that one might want to synthesize.
+
+\subsection{Challenges}
+Applying language models to the task of code generation is not new, however the aim of generating code that
+itself produces natural language appears to be a novel one. We currently anticipate the following challenges,
+and will add more as the work progresses.
+
+\paragraph{Small number of examples:} as a language, Fluid is incredibly niche, and so we have a very small corpus
+of programs on which to train a language model. Further, we currently only have 2 example programs that actually make
+use of the \kw{LinkedText} construct which we intend to use. The problem then is how to best make use of the capabalities
+of current language models in this context. For example, should we perform some sort of few-shot learning or prompt-engineering
+technique on a large pre-trained model, should we augment our corpus of training examples manually or both? If we take a meta-learning
+perspective (\todo{CITE}), we may run into problems of the model preferring syntax and function names from the languages we use to
+train the model.
+
+\paragraph{Counter-intuitive dependency relation:} at the moment, dependencies that are computed by Fluid can be counter-intuitive.
+Until we revamp the underlying dependency model, we will need to generate code that follows the pattern of ``consuming'' input
+data in order to produce the output text. This may be a problem for things like generating direct references to visual elements.
+
+\paragraph{Potentially complex code:} for many purposes, we want to store the data objects being referred to in variables. This 
+could mean complicated code, and cluttering a source file. We will potentially need to find a general pattern for this sort of thing,
+so that an authors document doesn't get filled with extraneous variable declarations. 
