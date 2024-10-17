@@ -1,62 +1,41 @@
 \section{Problem Overview}
-Authoring scientific articles with interactive visualisations is difficult
-and time-consuming. We provide examples of text we would like to generate
-and link to figures, mostly taken from the IPCC AR6 report, working group 1.
+\label{sec:overview}
 
-\paragraph*{Example: laying out assumptions for the text:} at the start of
-the report in the Summary For Policymakers (SPM), the authors provide a
-quick explanation of some common words used to describe probabilities,
-which we show in \figref{good-text-mapping}.
-\begin{figure}
-   \begin{subfigure}{0.49\textwidth}
-      \includegraphics[width=\textwidth]{fig/ipcc-probabilities}
-      \caption{Mapping probabilities onto text}
-      \label{fig:good-text-mapping}
-   \end{subfigure}
-   \begin{subfigure}{0.49\textwidth}
-      \includegraphics[width=\textwidth]{fig/ipcc-text-def-bad}
-      \caption{Less helpful explanation of terminology}
-      \label{fig:bad-text-mapping}
-   \end{subfigure}
-   \caption{Examples of good and bad mapping of numerical meaning onto text}
-   \label{fig:text-mapping}
-\end{figure}
-We contrast this with the explanation given to the terminology ``main driver''
-which the authors also believe merits an explanation, but the explanation they
-give is not as helpful, pictured in \figref{bad-text-mapping}.
-
-The explanation for the mapping of probabilities onto the text is simple,
-and hopefully uncontroversial. The explanation contains all the information
-required to understand what the use of a phrase of ``IPCC calibrated language''
-means when it says ``X outcome is \textit{very likely}''. On the other hand,
-the explanation of the meaning of ``main driver'' is poor, since it doesn't explain
-what it means for something to ``be responsible for $50\%$ of the change''. 
-
-\paragraph*{Synthesizing numerical/structural expressions related to data:}
-\input{listings/source-expressions}
-if we are referring to a simple aggregate summary of data, we want to be able
-to synthesize an in-place expression that helps out explanation. For example,
-if we are explaining a bar-chart, we might write code that looks like \figref{synthex-1}.
-
-If we take a look at more realistic examples, we find something slightly different is
-happening. Attached explanatory text tends to make reference to visual elements directly
--- for example referring to a chart rather than some data used in the charts creation --
-and so we will need our solution to be able to handle structurally walking through values
-when synthesizing code that references them. In \figref{structural-mappings}, the black
-arrows show simple examples of the type of text that should be automatically linked to
-the constructor of the visual element to which it refers. At this level, it refers to
-\textit{graphs} (in our world: views) and \textit{panels} (in our world multiviews?).
-
+\subsection{The 2 Sorts of Linked Text}
+We begin by breaking down the two sorts of linked text that the developer will
+be interested in generating. 
 
 \begin{figure}
-   \includegraphics[width=\textwidth]{fig/ipcc-visual-elements.png}
-   \caption{Examples of mapping text directly onto visual elements}
-   \label{fig:structural-mappings}
+   \includegraphics[width=0.7\textwidth]{fig/text-viz-types.png}
+   \caption{Two sorts of linked text}
+   \label{fig:linked-text-types}
 \end{figure}
-\paragraph*{Synthesizing string expressions based on those numerical expressions:}
-this is similar to the nombre library in R, once we are able to synthesize references
-to numerical expressions and data, we want to be able to take those, and use them to
-create small strings to splice into an explanation. For example, in \figref{synthex-2}
-we would like the tool to be able to synthesize both the function \kw{leqP}, and
-the expression in situ, which then generates the last word in the caption appearing in
-\figref{mavg}.
+
+\subsubsection{Direct Reference To Visual Elements}
+The first sort of linked text is a direct reference to a visual element. In 
+\figref{linked-text-types}, this corresponds to the text which has been highlighted
+in green, referring to the darker bar in the barchart. In situations like this, the
+developer is likely to know the exact text they want to be linked ahead of time.
+To construct the linking, the system needs to be able to identify the variable that
+represents the visual element in question.  It must then synthesize a function which "describes"
+the visual element in question, ie returns the string of text the author has identified as 
+needing to be linked.
+
+\subsubsection{Indirect Summary of Underlying Data}
+The second sort of linked text is summarizing some underlying data. In \figref{linked-text-types},
+the text that has been highlighted in pink is an example of this. The text has been synthesized
+by comparing a (spoofed) probability against a map of calibrated terminology. By this we mean that
+probabilities within certain ranges are given simple natural language descriptions. ``Virtually certain'
+is a term used by the IPCC to describe probabilities between 99\% and 100\%. The system should be able
+to synthesize such a mapping and insert a call to this mapping into a text field. Once such a mapping
+has been synthesized, the system should be able to reuse it where appropriate, so in this example if
+we wanted to refer to a different probability, we should not synthesize a new mapping, just insert
+a new call to the mapping in the appropriate location. For now, we call these mappings "policies".
+
+\subsection{Kinds of Policy}
+Here we shall present some examples of the type of policy that we might want to synthesize.
+
+\paragraph{Calibrated Terminology:} in scientific reporting, probabilities are often not directly given, but instead
+mapped to calibrated terminology. We have already mentioned the term ``virtually certain'' from the IPCC report, but in the beginning
+of that document, they make sure to explain the meaning of terms like ``likely'' and ``very likely'' as well. This
+sort of simple conversion is an example of the simplest form of policy that one might want to synthesize.
