@@ -1,6 +1,28 @@
 \section{Problem Overview}
 \label{sec:overview}
 
+\subsection{Linking Explanatory Text to Data}
+We are concerned with the problem of taking data, visualisations, and the explanatory text
+that accompanies them, and automatically linking them together to allow a reader to interactively explore
+data analyses. This problem can be broken down into two levels. The first, and more ambitious, level
+is to embed parts of the data analysis into the text itself. The second comprises of linking text
+to visual elements, and the underlying data -- the results of the data analysis -- rather than the
+analysis itself.
+
+
+\subsubsection{Embedding A Data Analysis in Text}
+The second sort of linked text is summarizing some underlying data. In \figref{linked-text-types},
+the text that has been highlighted in pink is an example of this. The text has been synthesized
+by comparing a (spoofed) probability against a map of calibrated terminology. By this we mean that
+probabilities within certain ranges are given simple natural language descriptions. ``Virtually certain'
+is a term used by the IPCC to describe probabilities between 99\% and 100\%. The system should be able
+to synthesize such a mapping and insert a call to this mapping into a text field. Once such a mapping
+has been synthesized, the system should be able to reuse it where appropriate, so in this example if
+we wanted to refer to a different probability, we should not synthesize a new mapping, just insert
+a new call to the mapping in the appropriate location. For now, we call these mappings "policies".
+
+\subsubsection{Linking Text To Visual and Data Objects}
+
 \subsection{The Linguistic Sorts of Linked Text}
 We begin by breaking down the sorts of linked text that the developer may
 be interested in generating. 
@@ -55,18 +77,6 @@ of the linguistic categories we have identified thus far, but this may not be th
 a percentage may be simple: requiring the user to only provide a numerical value, and scaling it
 to be in the range of $0$-$100$, but more complicated expressions, such as a description of a calculation
 may be more difficult to synthesize. 
-
-
-\subsubsection{Indirect Summary of Underlying Data}
-The second sort of linked text is summarizing some underlying data. In \figref{linked-text-types},
-the text that has been highlighted in pink is an example of this. The text has been synthesized
-by comparing a (spoofed) probability against a map of calibrated terminology. By this we mean that
-probabilities within certain ranges are given simple natural language descriptions. ``Virtually certain'
-is a term used by the IPCC to describe probabilities between 99\% and 100\%. The system should be able
-to synthesize such a mapping and insert a call to this mapping into a text field. Once such a mapping
-has been synthesized, the system should be able to reuse it where appropriate, so in this example if
-we wanted to refer to a different probability, we should not synthesize a new mapping, just insert
-a new call to the mapping in the appropriate location. For now, we call these mappings "policies".
 
 \subsection{Applications of Self-Certifying Text}
 Here we shall present some examples of the type of policy that we might want to synthesize.
