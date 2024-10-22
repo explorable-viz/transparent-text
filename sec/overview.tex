@@ -11,17 +11,23 @@ analysis itself.
 
 
 \subsubsection{Embedding A Data Analysis in Text}
-The second sort of linked text is summarizing some underlying data. In \figref{linked-text-types},
-the text that has been highlighted in pink is an example of this. The text has been synthesized
-by comparing a (spoofed) probability against a map of calibrated terminology. By this we mean that
-probabilities within certain ranges are given simple natural language descriptions. ``Virtually certain'
-is a term used by the IPCC to describe probabilities between 99\% and 100\%. The system should be able
-to synthesize such a mapping and insert a call to this mapping into a text field. Once such a mapping
-has been synthesized, the system should be able to reuse it where appropriate, so in this example if
-we wanted to refer to a different probability, we should not synthesize a new mapping, just insert
-a new call to the mapping in the appropriate location. For now, we call these mappings "policies".
+The larger problem of embedding (parts of) ones data analysis into the text is a difficult one. There
+are many questions involved that do not have immediate answers. One of the main issues is scale, 
+modern data analytics employs complex models, and large datasets, and bridging the gap between -- for example
+the results of a regression analysis and the natural language description of the results -- is difficult. 
+Further, with modern approaches such as neural networks, the analytical methods may themselves be close
+to black-boxes.
+In order to automate this process, a system would need to be able to generate code which correctly performs
+a potentially complex data analysis, as well as code that consumes the result of the analysis and produces
+long-form text explaining it. We therefore consider this to be the longer term goal for such a system, 
+and restrict our work to the second level of the problem.
 
 \subsubsection{Linking Text To Visual and Data Objects}
+At this level, we make the assumption that the author of an article has already written the code which performs
+their data analysis, and the code which turns the results into useful visualisations. This then restricts the
+scope of the general problem to that of automatically generating code which references the pre-computed visual
+and data objects. Without having solved this more restricted problem it is difficult to see how one would approach
+the more general problem of embedding data analytics directly into text.
 
 \subsection{The Linguistic Sorts of Linked Text}
 We begin by breaking down the sorts of linked text that the developer may
