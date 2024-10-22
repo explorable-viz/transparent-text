@@ -1,8 +1,8 @@
 \section{Problem Overview}
 \label{sec:overview}
 
-\subsection{The 2 Sorts of Linked Text}
-We begin by breaking down the two sorts of linked text that the developer will
+\subsection{The Linguistic Sorts of Linked Text}
+We begin by breaking down the sorts of linked text that the developer may
 be interested in generating. 
 
 \begin{figure}
@@ -11,15 +11,27 @@ be interested in generating.
    \label{fig:linked-text-types}
 \end{figure}
 
-\subsubsection{Direct Reference To Visual Elements}
-The first sort of linked text is a direct reference to a visual element. In 
-\figref{linked-text-types}, this corresponds to the text which has been highlighted
-in green, referring to the darker bar in the barchart. In situations like this, the
-developer is likely to know the exact text they want to be linked ahead of time.
-To construct the linking, the system needs to be able to identify the variable that
-represents the visual element in question.  It must then synthesize a function which "describes"
-the visual element in question, ie returns the string of text the author has identified as 
-needing to be linked.
+\subsubsection{Graded Adjectives}
+A graded adjective is an adjective that can be modified to make its form stronger or weaker.
+As an example, consider mapping ranges of probabilities onto natural language. If the probability
+of an event occurring is $1$, we can say it is \emph{certain} to occur. If instead it is $0.99$
+or some other value arbitrarily close to $1$, we will \emph{grade} the adjective to weaken it:
+it is \emph{virtually certain} to occur. In \figref{linked-text-types}, this corresponds to the text
+highlighted in pink.
+
+\subsubsection{Indexing Visual Elements: Mereology}
+Often, visualisations are paired with descriptions of the information the visualisation is attempting to
+convey. Even when such text appears to make direct reference to a visual element, it can be unclear what 
+it should specifically be linked against. For example, in \figref{linked-text-types}, the text highlighted
+in green is referring to one of the bars in the chart, but it is not clear how this should be presented.
+In the example, this information is communicated by highlighting the bar itself, but in a sense the text is
+instead referencing the index of the bar rather than the bars contents. It could therefore be argued that the
+the text should be linked against the index variable underneath the bar, rather than the bar itself.
+Our system needs to be able to walk arbitrarily deep into nested structures when performing the linking.
+
+This is an example of the more general linguistic problem of mereology: analysing relationships between the
+whole and the parts from which it is composed.
+
 
 \subsubsection{Indirect Summary of Underlying Data}
 The second sort of linked text is summarizing some underlying data. In \figref{linked-text-types},
@@ -32,7 +44,7 @@ has been synthesized, the system should be able to reuse it where appropriate, s
 we wanted to refer to a different probability, we should not synthesize a new mapping, just insert
 a new call to the mapping in the appropriate location. For now, we call these mappings "policies".
 
-\subsection{Kinds of Policy}
+\subsection{Applications of Self-Certifying Text}
 Here we shall present some examples of the type of policy that we might want to synthesize.
 
 \paragraph{Calibrated Terminology:} in scientific reporting, probabilities are often not directly given, but instead
