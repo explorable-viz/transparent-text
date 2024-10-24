@@ -1,0 +1,17 @@
+\section{Implementation Considerations}
+\label{sec:implementation}
+
+Here we catalogue some of the considerations our implementation of this system has/will need.
+
+\paragraph{Dictionaries:} in order to programmatically walk into potentially nested data structures.
+Doing so is infeasible when working with records, since our language does not have a type system, 
+or a way to dynamically construct symbols on the fly. Instead, we use dictionaries since we can
+dynamically construct strings, and use these to walk into the fields of a dictionary structure.
+
+\paragraph{Language integrated provenance:} in order for generated text to be easily linked to the
+underlying program, it is important that the language an author uses to generate the text has a
+model of data provenance tightly integrated into the language itself. This obviates the need for the
+author to build their own interactivity features, instead the code which supplies the generated text
+should automatically provide linking capability to the underlying data. 
+
+\paragraph{Transparent multiverse:} 
