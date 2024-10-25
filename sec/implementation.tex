@@ -1,12 +1,19 @@
-\section{Implementation Considerations}
+\section{TODOs within this work}
 \label{sec:implementation}
 
-Here we catalogue some of the considerations our implementation of this system has/will need.
+Here we catalogue some of the TODO's our implementation of this system has/will need.
+
+\subsection{Language Features}
 
 \paragraph{Dictionaries:} in order to programmatically walk into potentially nested data structures.
 Doing so is infeasible when working with records, since our language does not have a type system, 
 or a way to dynamically construct symbols on the fly. Instead, we use dictionaries since we can
 dynamically construct strings, and use these to walk into the fields of a dictionary structure.
+
+\paragraph{CSV reading:} in order for any such system to be realistic, we need to implement more of the
+standard features of such a language. Chief amongst these is some way to read in structured data that hasn't
+been converted to the currently supported dictionary format. CSV's are the natural choice for this, since they
+are ubiquitous, and we can easily read a CSV and convert it to a dictionary.
 
 \paragraph{Language integrated provenance:} in order for generated text to be easily linked to the
 underlying program, it is important that the language an author uses to generate the text has a
@@ -14,4 +21,12 @@ model of data provenance tightly integrated into the language itself. This obvia
 author to build their own interactivity features, instead the code which supplies the generated text
 should automatically provide linking capability to the underlying data. 
 
-\paragraph{Transparent multiverse:} 
+\subsection{Artifacts}
+
+\paragraph{Transparent multiverse:} as a proof of concept, we intend to (potentially) build an explorable,
+interactive multiverse analysis, for now we are calling this a "transparent multiverse analysis". This will
+involve a small scale data analysis project. This will come with the ability to not only toggle between different choices of
+method (for example: a simple vs central moving average), but also to then interactively explore the data dependencies 
+induced by that set of choices. Toggling between choices will have the effect of not only updating the figures,
+but also updating the accompanying text, since the text will be re-generated from different underlying data, 
+and support (potentially) different conclusions.
