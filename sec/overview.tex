@@ -17,6 +17,28 @@ which is a task well beyond the scope of current research in AI. We shall instea
 problem, namely how do we link text and visualizations based on the results of a data analysis that has already been
 performed. The larger problem should be considered a long-term goal for such a research program.
 
+\subsection{Potential Users}
+We envisage a wide range of use-cases that could make use of the sort of system we are proposing.
+In all cases, the potential user is an author of a document, attemping to communicate some sort of information to a potential reader.
+We have so far considered the following potential users:
+
+\paragraph{Data Scientists:} data scientists already use tools like notebooks in order to package their results, and
+communicate information. Our system could be used to build something that looks like a typical notebook interface, but
+provides automated linking from the cells containing text to the cells containing visualizations. The idea of self-certifying
+text is useful in this context, since it would allow another data scientist to interrogate assumptions made in the analysis,
+which is a boon to reproducibility.
+
+\paragraph{Science journalists:} a science journalist would benefit from being able to write articles using our tool.
+Since their readers may not necessarily be experts in the topic they are trying to communicate, augmenting visualizations
+with interactivity allows a layperson to better understand the concept being communicated. An broadly educated reader
+will also benefit from the ability to understand assumptions made when writing the article.
+
+\paragraph{Educators:} a great deal of education and self-study is now done through online resources, such as blogs.
+These resources, whilst undoubtedly useful, miss a key part of in-person education, which is the ability for a student
+to ask questions of the teacher. Whilst our system will in no way attempt emulate a teacher, the ability for a student
+to interact with the document and to understand the data dependencies induced by the code. Self-certifying text could
+allow the reader to gain a better understanding of the meaning of subject specific language used in the document. 
+
 \subsection{Linking Text To Visual and Data Objects}
 We shall make the assumption that the author of an article has already written the code which performs
 their data analysis, and the code which turns the results into useful visualisations. Restricting the scope to the problem of
