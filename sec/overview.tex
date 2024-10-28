@@ -73,35 +73,37 @@ if something is ``very likely'', we would still believe that it is less likely t
 is ``virtually certain''. Handling these sorts of linguistic constructs will be a key part of addressing
 the problem. 
 
-\subsubsection{Indexing Visual Elements: Mereology}
-Often, visualisations are paired with descriptions of the information the visualisation is attempting to
-convey. Even when such text appears to make direct reference to a visual element, it can be unclear what 
-it should specifically be linked against. For example, in \figref{linked-text-types}, the text highlighted
-in green is referring to one of the bars in the chart, but it is not clear how this should be presented.
-In the example, this information is communicated by highlighting the bar itself, but in a sense the text is
-instead referencing the index of the bar rather than the bars contents. It could therefore be argued that the
-the text should be linked against the index variable underneath the bar, rather than the bar itself.
-Our system needs to be able to walk arbitrarily deep into nested structures when performing the linking.
+\subsubsection{Selecting Visual Elements: Iteration, Scope and Mereology}
+Text that refers to objects of discourse is relatively common, but even direct references are non-trivial 
+linguistically. \figref{linked-text-types} shows a figure taken from a report summarizing recent climate 
+science for policymakers. Even this simple example shows the complexity of the problem: the text highlighted
+in orange refers to the collection of bar-charts shown on the left hand side, introducing a set of 5 bar-charts
+into the scope of discourse. The text highlighted in green refers to the bars within these charts, mapping 
+a narrowing of scope across the bar-charts that have already been introduced. Then, the text highlighted in
+purple narrows this scope further to talk about the bar representing total warming, again within each of the
+charts at the same time. 
 
-This is an example of the more general linguistic problem of mereology: analysing relationships between the
-whole and the parts from which it is composed. In the case of the chart, one can reference: the chart as a whole,
-the bars as a whole, individual bars, the fields of the records underlying each of the bars, and so on.
-We will need our system to be able to generate linked text that can make these arbitrary walks into the nested
-data structures we provide.
+This illustrative example showcases several sub-problems our system will need to be able to handle. First
+is that of creating an iterative scope for the references that follow. We can imagine that the orange-highlighted
+text effectively creates an iterable, which the green highlighted text maps over. The purple-highlighted text
+then maps over the iterable created by the green highlighted text. This sort of iteration is a common feature of natural language,
+and any well-designed system should allow for such expressions to be written by the author, and linked appropriately.
 
+In order to reference substructures that appear within the 5 charts, the system must be able to walk arbitrarily 
+into structured data objects. In linguistics this is referred to as ``mereology'', the study of relationships
+between parts and wholes. In our case, one could imagine the collection of 5 charts as the whole, with each
+individual bar-chart being a part of that whole. Because all 5 charts are structurally the same (of the same type),
+we can apply the same walk to each of them: bar-charts in our language have a field called \kw{bars}, a list
+of the various bars. In this light, we can imagine the green-highlighted text as walking into the \kw{bars} field
+of the charts, and the purple-highlighted text as walking into this list, and selecting the bar with the label "total warming".
+
+Automatically generating sentences that refer to visual elements in this way is one of the core problems we aim to solve.
 
 \begin{figure}
-   \includegraphics[width=0.7\textwidth]{fig/ipcc-visual-elements.png}
+   \includegraphics[width=0.9\textwidth]{fig/ipcc-visual-elements.png}
    \caption{Examples of scope in linked text}
    \label{fig:visual-element-scope}
 \end{figure}
-
-\subsubsection{Iterators and Scope}
-The next linguistic form that our system must be able to work with is that of iteration and scope. 
-In \figref{visual-element-scope}, the text highlighted with the first red box creates a scope for
-the references that follow. The text which follows it refers to bars within an individual chart,
-with the understanding that the references to these components are distributed across each chart
-within the scope. In effect, the text can be thought of as mapping links over every chart in scope.
 
 \subsubsection{Quantitative Expressions}
 On its surface, directly embedding a quantitative expression into the text seems to be the simplest
@@ -109,14 +111,6 @@ of the linguistic categories we have identified thus far, but this may not be th
 a percentage may be simple: requiring the user to only provide a numerical value, and scaling it
 to be in the range of $0$-$100$, but more complicated expressions, such as a description of a calculation
 may be more difficult to synthesize. 
-
-\subsection{Applications of Self-Certifying Text}
-Here we shall present some examples of the type of policy that we might want to synthesize.
-
-\paragraph{Calibrated Terminology:} in scientific reporting, probabilities are often not directly given, but instead
-mapped to calibrated terminology. We have already mentioned the term ``virtually certain'' from the IPCC report, but in the beginning
-of that document, they make sure to explain the meaning of terms like ``likely'' and ``very likely'' as well. This
-sort of simple conversion is an example of the simplest form of policy that one might want to synthesize.
 
 \subsection{Challenges}
 Applying language models to the task of code generation is not new, however the aim of generating code that
