@@ -1,29 +1,37 @@
 \section{Introduction}
 
-When reading a scientific article, the reader's comprehension of the text may
-be greatly improved by inclusion of charts, tables and figures that help summarise information.
-For example, in \figref{table-explanation}, findings from climate change models
-are summarized in a table with an accompanying paragraph providing the reader
-with context for interpeting the table, references to ``SSP-'' in the text meaning
-the rows of the table, with column of interest left implicit at first.
+Communication in the sciences is often done through combining the mediums of text,
+data visualizations, and code. The idea of literate programming \cite{knuth84} has
+been influential in providing documenting code with a large amount of context. In data
+analytics this idea has been taken further, much work is done using
+the popular ``notebook interface'' \cite{kluyver16}, allowing a data scientist to 
+interleave code with its own results, and expository text. 
 
-Visualizations such as tables and bar-charts summarize data to make it easier to
-understand. The readers comprehension can be further aided by incorporating 
-interactivity into the visualization. By enabling the reader to click on parts
-of a chart to see the data it summarizes, the reader gets a better sense of what
-the author is trying to say. Understanding can be improved further, by extending
-interactivity to the text itself.
+Whilst these tools are no doubt useful, they do not necessarily provide complete
+transparency. Code used in notebooks is often highly abstract, providing wrappers
+for complex underlying models which have often been applied as black-boxes.
 
-Authoring of such articles is already difficult and time-consuming, and asking
-the author to build in interactive features is unreasonable. As yet, there are
-no tools that treat supporting text as a visual element to interact with. It is
+A readers comprehension of such a document may be further improved by the addition of
+interactive features to such visualizations. For example, in \figref{table-explanation},
+whilst the text provides a summary of the table, a readers understanding can be improved
+by allowing them to interact with the table itself, to see the data it summarizes,
+or highlight the text underneath to see the corresponding data in the table. 
+
+Enabling the reader to click on parts of a chart to see the data it summarizes, 
+in a similar manner to the example with the table, the reader is more able to 
+understand what the author of a document is trying to say.
+
+Authoring of articles in this format is already difficult and time-consuming, and asking
+the author to build in interactive features is unreasonable. Crucially, there are
+no tools that treat supporting text as a visual element to interact with, and it is
 not entirely clear what interactive text might look like. 
 
 Some of the difficulty can be mitigated by building visualizations with a tool
 which provides automatic support for interaction, but existing solutions do
 not come with the ability to extend these visualizations with supporting text.
 As a body of text, a scientific article is full of references to the topic of
-discourse, so any tool that helps solve this problem will need an automated
+discourse, meaning a large number of interactive elements which would be labourious to manually
+link to visualization elements. Thus any tool that helps solve this problem will need an automated
 component.
 
 \begin{figure}[h]
