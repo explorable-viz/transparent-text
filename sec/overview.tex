@@ -33,11 +33,18 @@ Since their readers may not necessarily be experts in the topic they are trying 
 with interactivity allows a layperson to better understand the concept being communicated. An broadly educated reader
 will also benefit from the ability to understand assumptions made when writing the article.
 
+\paragraph{Scientific advisors:} policymakers and government officials cannot be expected to understand the nuances of
+every major branch of scientific research that can impact their decisions, but they should at least be able to
+understand their advisors recommendations, and why they are recommended\footnote{Whether or not they follow said advice is another story}.
+An advisor could build their summary for a policymaker using our tool, allowing the policymaker to more effectively
+follow the arguments being made, and the data underpinning them, without needing to understand all of the technical details. 
+
 \paragraph{Educators:} a great deal of education and self-study is now done through online resources, such as blogs.
 These resources, whilst undoubtedly useful, miss a key part of in-person education, which is the ability for a student
 to ask questions of the teacher. Whilst our system will in no way attempt emulate a teacher, the ability for a student
 to interact with the document and to understand the data dependencies induced by the code. Self-certifying text could
 allow the reader to gain a better understanding of the meaning of subject specific language used in the document. 
+
 
 \subsection{Linking Text To Visual and Data Objects}
 We shall make the assumption that the author of an article has already written the code which performs
@@ -89,7 +96,7 @@ text effectively creates an iterable, which the green highlighted text maps over
 then maps over the iterable created by the green highlighted text. This sort of iteration is a common feature of natural language,
 and any well-designed system should allow for such expressions to be written by the author, and linked appropriately.
 
-In order to reference substructures that appear within the 5 charts, the system must be able to walk arbitrarily 
+In order to reference common substructures that appear within the 5 charts, the system must be able to walk arbitrarily 
 into structured data objects. In linguistics this is referred to as ``mereology'', the study of relationships
 between parts and wholes. In our case, one could imagine the collection of 5 charts as the whole, with each
 individual bar-chart being a part of that whole. Because all 5 charts are structurally the same (of the same type),
