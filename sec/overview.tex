@@ -63,6 +63,14 @@ be interested in generating.
    \label{fig:linked-text-types}
 \end{figure}
 
+\subsubsection{Quantitative Expressions}
+Directly embedding a quantitative expression into the text seems to be the simplest
+of the linguistic categories we have identified thus far, but this may not be the case. Embedding
+a percentage may be simple: requiring the user to only provide a numerical value, and scaling it
+to be in the range of $0$-$100$, but more complicated expressions, such as a description of a calculation
+may be more difficult to synthesize. Solving the problem of explaining a calculation or piece of a program
+will itself go a long way to improving the transparency of a piece of science communication.
+
 \subsubsection{Graded Adjectives}
 A graded adjective is an adjective that can be modified to make its form stronger or weaker.
 As an example, consider mapping ranges of probabilities onto natural language. If the probability
@@ -111,13 +119,6 @@ Automatically generating sentences that refer to visual elements in this way is 
    \caption{Examples of scope in linked text}
    \label{fig:visual-element-scope}
 \end{figure}
-
-\subsubsection{Quantitative Expressions}
-On its surface, directly embedding a quantitative expression into the text seems to be the simplest
-of the linguistic categories we have identified thus far, but this may not be the case. Embedding
-a percentage may be simple: requiring the user to only provide a numerical value, and scaling it
-to be in the range of $0$-$100$, but more complicated expressions, such as a description of a calculation
-may be more difficult to synthesize. 
 
 \subsection{Challenges}
 Applying language models to the task of code generation is not new, however the aim of generating code that
