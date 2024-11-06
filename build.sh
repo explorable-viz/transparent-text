@@ -2,7 +2,7 @@
 set -e
 
 PDFLATEX="pdflatex -file-line-error -halt-on-error"
-TARGET=${1:-main}
+TARGET=${1:-paper}
 
 $PDFLATEX $TARGET
 bibtex $TARGET
