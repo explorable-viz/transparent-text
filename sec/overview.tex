@@ -90,7 +90,7 @@ the problem.
 
 \subsubsection{Selecting Visual Elements: Iteration, Scope and Mereology}
 Text that refers to objects of discourse is relatively common, but even direct references are non-trivial 
-linguistically. \figref{linked-text-types} shows a figure taken from a report summarizing recent climate 
+linguistically. \figref{linked-text-types} -- taken from \cite{lee23} -- shows a figure taken from a report summarizing recent climate 
 science for policymakers. Even this simple example shows the complexity of the problem: the text highlighted
 in orange refers to the collection of bar-charts shown on the left hand side, introducing a set of 5 bar-charts
 into the scope of discourse. The text highlighted in green refers to the bars within these charts, mapping 
@@ -118,6 +118,23 @@ Automatically generating sentences that refer to visual elements in this way is 
    \includegraphics[width=0.9\textwidth]{fig/ipcc-visual-elements.png}
    \caption{Examples of scope in linked text}
    \label{fig:visual-element-scope}
+\end{figure}
+
+
+
+We have recreated a prototype of this example with our current system, which already demonstrates
+some of the difficulties inherent to this problem.
+
+\begin{figure}
+   \includegraphics[width=0.9\textwidth]{fig/figure-spm-fluid-mockup.png}
+   \caption{Prototype of SPM example in fluid}
+   \label{fig:figure-spm-fluid}
+\end{figure}
+
+\begin{figure}
+   \tiny
+   \lstinputlisting[language=Fluid]{listings/bar-chart.fld}
+   \caption{Source code for \figref{figure-spm-fluid}}
 \end{figure}
 
 \subsection{Challenges}
