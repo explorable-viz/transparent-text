@@ -16,7 +16,13 @@ data visualizations, and code. The idea of literate programming \cite{knuth84} h
 been influential, and in data analytics the ``notebook interface'' \cite{kluyver16}, is popular
 allowing a data scientist to interleave code with its own results, and expository text. 
 
-Whilst these solutions mechanism for transparency, they come with limitations. Users do not want to 
+\begin{figure}[h]
+   \includegraphics[width=0.7\textwidth]{fig/ipcc-table-explanation.png}
+   \caption{Explanation suported by contents of table}
+   \label{fig:table-explanation}
+\end{figure}
+
+Whilst these solutions provide some level of transparency, they come with limitations. Users do not want to 
 install bespoke software in order to read articles, and notebooks do not necessarily provide complete
 transparency by themselves; the code is often highly abstract, providing wrappers
 for complex models which have often been applied as black-boxes.
@@ -41,10 +47,9 @@ should not be considered a binary quantity. Instead it is helpful to think of it
 
 A traditional computer program is often less transparent than one presented as a notebook,
 similarly, a paper that does not come with an artifact is less transparent than if the artifact
-was included. A programming language without data provenance is less transparent than one with
-provenance features. Whilst increasing transparency is useful, science communication may never
-be fully transparent. Unfortuantely, we cannot stop malicious
-actors from misusing data, nor force them to use transparent
+was included. A programming language with data provenance is more transparent than one without.
+Increasing transparency is useful, but science communication may never be fully transparent.
+Unfortuantely, we cannot stop malicious actors from misusing data, nor force them to use transparent
 systems, but we believe that the ideas demonstrated in this proposal will go some way
 to improving the situation.
 
@@ -53,12 +58,7 @@ text. Making reference to visual marks or underlying data can be thought of as a
 interacting with a textual reference should query the underlying data, and provide the user with immediate
 visual feedback, perhaps by highlighting elements of relevant visualizations, perhaps by showing the user
 how a given result was computed. We stress that generic tooling for this sort of thing does not yet exist.
-
-\begin{figure}[h]
-   \includegraphics[width=0.7\textwidth]{fig/ipcc-table-explanation.png}
-   \caption{Explanation based on the contents of a table}
-   \label{fig:table-explanation}
-\end{figure}
+We call text that comes with an account of how it was generated \emph{self-certifying text}.
 
 \begin{figure}
    \includegraphics[width=0.9\textwidth]{fig/ipcc-visual-elements.png}
@@ -67,68 +67,61 @@ how a given result was computed. We stress that generic tooling for this sort of
 \end{figure}
 
 \subsection{Self-Certifying Text}
-We shall make the assumption that the author of an article has already written the code which performs
-their data analysis, and the code which turns the results into useful visualisations. Restricting the scope to the problem of
-automatically generating code which references the pre-computed visual and data objects.
-Indeed, without having solved this more restricted problem it is difficult to see how one would approach
-the more general problem of embedding data analytics directly into text.
-
-We begin by breaking down the sorts of linked text that the developer may
-be interested in generating. 
-
-\begin{figure}
-   \includegraphics[width=0.7\textwidth]{fig/text-viz-types.png}
-   \caption{Two sorts of linked text}
-   \label{fig:linked-text-types}
-\end{figure}
+What does it mean for supporting text to be self-certifying? 
 
 \subsubsection{Quantitative Expressions}
-Directly embedding a quantitative expression into the text seems to be the simplest
-of the linguistic categories we have identified thus far, but this may not be the case. Embedding
-a percentage may be simple: requiring the user to only provide a numerical value, and scaling it
-to be in the range of $0$-$100$, but more complicated expressions, such as a description of a calculation
-may be more difficult to synthesize. Solving the problem of explaining a calculation or piece of a program
-will itself go a long way to improving the transparency of a piece of science communication.
+\begin{itemize}
+   \item Raw results
+   \item percentages
+   \item rounded or normalized information
+\end{itemize}
+% Directly embedding a quantitative expression into the text seems to be the simplest
+% of the linguistic categories we have identified thus far, but this may not be the case. Embedding
+% a percentage may be simple: requiring the user to only provide a numerical value, and scaling it
+% to be in the range of $0$-$100$, but more complicated expressions, such as a description of a calculation
+% may be more difficult to synthesize. Solving the problem of explaining a calculation or piece of a program
+% will itself go a long way to improving the transparency of a piece of science communication.
 
 \subsubsection{Graded Adjectives}
 A graded adjective is an adjective that can be modified to make its form stronger or weaker.
 As an example, consider mapping ranges of probabilities onto natural language. If the probability
 of an event occurring is $1$, we can say it is \emph{certain} to occur. If instead it is $0.99$
 or some other value arbitrarily close to $1$, we will \emph{grade} the adjective to weaken it:
-it is \emph{virtually certain} to occur. In \figref{linked-text-types}, this corresponds to the text
-highlighted in pink.
+it is \emph{virtually certain} to occur. We see examples of this in \figref{table-explanation},
+with the terms ``exceptionally unlikely'' and ``virtually certain''.
 
-Considered in more depth, we arrive at the concept of modalities in natural language. Similar to 
-the concepts in modal logic, a modality allows the expression of concepts such as necessity or possibility.
-In the context described above, the idea that a probability is \emph{virtually certain} introduces the modality of
-possibility -- an event must be possible in order to be virtually certain to occur. Even something simple
-like the discussion of probabilities above can combine the two into the idea of graded modality:
-if something is ``very likely'', we would still believe that it is less likely to occur than something that
-is ``virtually certain''. Handling these sorts of linguistic constructs will be a key part of addressing
-the problem. 
+% Considered in more depth, we arrive at the concept of modalities in natural language. Similar to 
+% the concepts in modal logic, a modality allows the expression of concepts such as necessity or possibility.
+% In the context described above, the idea that a probability is \emph{virtually certain} introduces the modality of
+% possibility -- an event must be possible in order to be virtually certain to occur. Even something simple
+% like the discussion of probabilities above can combine the two into the idea of graded modality:
+% if something is ``very likely'', we would still believe that it is less likely to occur than something that
+% is ``virtually certain''. Handling these sorts of linguistic constructs will be a key part of addressing
+% the problem. 
 
 \subsubsection{Selecting Visual Elements: Iteration, Scope and Mereology}
 Text that refers to objects of discourse is relatively common, but even direct references are non-trivial 
-linguistically. \figref{linked-text-types} -- taken from \cite{lee23} -- shows an example \textit{in situ},
+linguistically. \figref{visual-elements-scope} -- taken from \cite{lee23} -- shows an example \textit{in situ},
 the report it is taken from collates a large amount of climate research data, and attempts to synthesize
 useful information for policymakers. Even this simple example shows the complexity of the problem: the text highlighted
 in orange refers to the collection of bar-charts shown on the left hand side, introducing a set of 5 bar-charts
 into the scope of discourse. The text highlighted in green refers to the bars within these charts, mapping 
 a narrowing of scope across the bar-charts that have already been introduced. Then, the text highlighted in
 purple narrows this scope further to talk about the bar representing total warming, again within each of the
-charts at the same time. 
+charts at the same time. To handle this kind of reference, we need a generic mechanism for referencing
+containers independently of their contents.
 
-This illustrative example showcases several sub-problems our system will need to be able to handle. First
-is that of creating an iterative scope for the references that follow. We can imagine that the orange-highlighted
-text effectively creates an iterable, which the green highlighted text maps over. The purple-highlighted text
-then maps over the iterable created by the green highlighted text. This sort of iteration is a common feature of natural language,
-and any well-designed system should allow for such expressions to be written by the author, and linked appropriately.
+% This illustrative example showcases several sub-problems our system will need to be able to handle. First
+% is that of creating an iterative scope for the references that follow. We can imagine that the orange-highlighted
+% text effectively creates an iterable, which the green highlighted text maps over. The purple-highlighted text
+% then maps over the iterable created by the green highlighted text. This sort of iteration is a common feature of natural language,
+% and any well-designed system should allow for such expressions to be written by the author, and linked appropriately.
 
-In order to reference common substructures that appear within the 5 charts, the system must be able to walk arbitrarily 
-into structured data objects. In linguistics this is referred to as ``mereology'', the study of relationships
-between parts and wholes. In our case, one could imagine the collection of 5 charts as the whole, with each
-individual bar-chart being a part of that whole. Because all 5 charts are structurally the same (of the same type),
-we can apply the same walk to each of them: bar-charts in our language have a field called \kw{bars}, a list
-of the various bars. In this light, we can imagine the green-highlighted text as walking into the \kw{bars} field
-of the charts, and the purple-highlighted text as walking into this list, and selecting the bar with the label "total warming".
+% In order to reference common substructures that appear within the 5 charts, the system must be able to walk arbitrarily 
+% into structured data objects. In linguistics this is referred to as ``mereology'', the study of relationships
+% between parts and wholes. In our case, one could imagine the collection of 5 charts as the whole, with each
+% individual bar-chart being a part of that whole. Because all 5 charts are structurally the same (of the same type),
+% we can apply the same walk to each of them: bar-charts in our language have a field called \kw{bars}, a list
+% of the various bars. In this light, we can imagine the green-highlighted text as walking into the \kw{bars} field
+% of the charts, and the purple-highlighted text as walking into this list, and selecting the bar with the label "total warming".
 
