@@ -2,49 +2,50 @@
 
 Much work has been done on the topic of \emph{data provenance}, which aims to provide
 transparency in data analytics systems by allowing a user to interrogate where data has come
-from, the ways it has been manipulated and transformed. Since collecting such information
-requires a lot of effort, research has been done on integrating data provenance features
-into programming languages themselves \cite{fehrenbach16}. More recent work has
-extended this approach has been extended to working with data visualizations \cite{perera22}.
+from, the ways it has been manipulated and transformed. Collecting such information
+requires a lot of effort, work has gone into integrating data provenance features
+into programming languages themselves \cite{fehrenbach16}. More recent work
+extends this approach to work with data visualizations \cite{perera22}.
 
-Provenance information is of similar utility in science communication: good science is
+Provenance information is of great utility in science communication: good science is
 \emph{reproducible}, and good science communication should give the layperson as many tools
-as possible to verify claims made from data.
+as possible to verify or reproduce conclusions made from data.
 
-Communication in the sciences is often done through combining the mediums of text,
+Communication is often done through combining the mediums of text,
 data visualizations, and code. The idea of literate programming \cite{knuth84} has
-been influential in providing documenting code with a large amount of context. In data
-analytics much work is done using the popular ``notebook interface'' \cite{kluyver16},
+been influential, and in data analytics the ``notebook interface'' \cite{kluyver16}, is popular
 allowing a data scientist to interleave code with its own results, and expository text. 
 
-Whilst solutions like notebooks provide a useful 
-mechanism for reproducibility, they come with limitations. Users do not want to 
-have to install software in order to read articles, and notebooks do not necessarily provide complete
-transparency by themselves. Code used in notebooks is often highly abstract, providing wrappers
-for complex underlying models which have often been applied as black-boxes.
+Whilst these solutions mechanism for transparency, they come with limitations. Users do not want to 
+install bespoke software in order to read articles, and notebooks do not necessarily provide complete
+transparency by themselves; the code is often highly abstract, providing wrappers
+for complex models which have often been applied as black-boxes.
 
-Even if a notebook interface existed for a language which incorporated data provenance features,
-data provenance tools do not necessarily extend their features to accompanying text. For example,
-if piece of text accompanies a data visualization, giving context to the elements of said 
-visualization, the readers comprehension can be aided further by allowing them to interact
-with the text. If the text mentions data shown in a chart, the reader should be able to
-click on the text referring to the chart, and have the relevant visual marks highlighted.
-Similarly, if the reader directly interacts with a chart, any text that is relevant to that
-chart should be highlighted to the reader.
+More recently, \cite{dragicevic19} proposed the idea of an \emph{explorable multiverse} as a
+mechanism for improving transparency. The idea is that during data analysis, choices made by
+the analyst can significantly impact results; and that analysis should be run multiple times
+using different methods. The user should then be allowed to toggle between different choices
+and see how a change in the method impacts the conclusions that can be drawn from the data.
 
-Whilst we do not propose to solve the problem of deliberate misinformation, we believe
-that interactive features which allow readers to interrogate where data came from, and how
-it was used to support an argument will allow both laypeople and policymakers to make more
-informed decisions. We argue that increased data transparency is a good thing. Transparency
-should not be considered a binary quantity. Instead it is helpful to think of it as a continuum:
+\cite{psallidas18} has done work on applying techniques of data lineage to interactive
+visualizations based on in-memory databases. Their work allows for fine-grained
+provenance queries at high-speed, but does not extend this work to supporting text.
+In general it is unclear what a data provenance query on text looks like, or how one
+might write an article as a program that allows for interactive provenance queries on text.
+
+Whilst we do not propose to solve the problem of deliberate misinformation,
+interactive features, which allow readers to interrogate where data came from and how
+it was used to support an argument, allow both laypeople and policymakers to make more
+informed decisions. Increased data transparency is a good thing. Transparency
+should not be considered a binary quantity. Instead it is helpful to think of it as a continuum.
 
 A traditional computer program is often less transparent than one presented as a notebook,
 similarly, a paper that does not come with an artifact is less transparent than if the artifact
 was included. A programming language without data provenance is less transparent than one with
 provenance features. Whilst increasing transparency is useful, science communication may never
 be fully transparent. Unfortuantely, we cannot stop malicious
-actors from deliberately obfuscating or misusing data, nor can we force them to use transparent
-systems. That said, we believe that the ideas demonstrated in this proposal will go some way
+actors from misusing data, nor force them to use transparent
+systems, but we believe that the ideas demonstrated in this proposal will go some way
 to improving the situation.
 
 To meet this goal, we need to allow authors to introduce a richer kind of reference into supporting
@@ -72,7 +73,6 @@ automatically generating code which references the pre-computed visual and data 
 Indeed, without having solved this more restricted problem it is difficult to see how one would approach
 the more general problem of embedding data analytics directly into text.
 
-\subsection{Important Linguistic Features of Self-Certifying Text}
 We begin by breaking down the sorts of linked text that the developer may
 be interested in generating. 
 
@@ -131,21 +131,4 @@ individual bar-chart being a part of that whole. Because all 5 charts are struct
 we can apply the same walk to each of them: bar-charts in our language have a field called \kw{bars}, a list
 of the various bars. In this light, we can imagine the green-highlighted text as walking into the \kw{bars} field
 of the charts, and the purple-highlighted text as walking into this list, and selecting the bar with the label "total warming".
-
-Automatically generating sentences that refer to visual elements in this way is one of the core problems we aim to solve.
-
-We have recreated a prototype of this example with our current system, which already demonstrates
-some of the difficulties inherent to this problem.
-
-\begin{figure}
-   \includegraphics[width=0.9\textwidth]{fig/figure-spm-fluid-mockup.png}
-   \caption{Prototype of SPM example in fluid}
-   \label{fig:figure-spm-fluid}
-\end{figure}
-
-\begin{figure}
-   \tiny
-   \lstinputlisting[language=Fluid]{listings/bar-chart.fld}
-   \caption{Source code for \figref{figure-spm-fluid}}
-\end{figure}
 

@@ -46,6 +46,24 @@ to interact with the document and to understand the data dependencies induced by
 allow the reader to gain a better understanding of the meaning of subject specific language used in the document. 
 
 \subsection{Challenges}
+
+We have recreated a prototype of the example from \figref{linked-test-types} with our current system, which already demonstrates
+some of the difficulties inherent to this problem.
+
+\begin{figure}
+   \includegraphics[width=0.9\textwidth]{fig/figure-spm-fluid-mockup.png}
+   \caption{Prototype of SPM example in fluid}
+   \label{fig:figure-spm-fluid}
+\end{figure}
+
+\begin{figure}
+   \tiny
+   \lstinputlisting[language=Fluid]{listings/bar-chart.fld}
+   \caption{Source code for \figref{figure-spm-fluid}}
+\end{figure}
+
+
+
 Applying language models to the task of code generation is not new, however the aim of generating code that
 itself produces natural language appears to be a novel one. We currently anticipate the following challenges,
 and will add more as the work progresses.
