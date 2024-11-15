@@ -1,13 +1,8 @@
 let getByX x table = fromSome (getByField "x" x table);
-
 let mkPercent num = (numToStr (num * 100)) ++ "%";
-
 let referToBar bar = "the bar representing scenario " ++ bar.x ++ " has a z value of " ++ (numToStr (head bar.bars).z);
-
 let probAsText = likelihoodMap likelihoods;
-
 let stackedBarHeight stackedBar = sum [ bar.z | bar <- stackedBar.bars ];
-
 let getTotal table = fromSome (getByField "x" "Total" table);
 
 let explainCorrespondingBars bars x = 
@@ -22,7 +17,7 @@ let mkBarChart source = BarChart {
                       };
 
 let ssp119Industry = getByX "Industry" ssp119.data;
-    ssp119IndHeight = (head rightBar3.bars).z;
+    ssp119IndHeight = (head ssp119Industry.bars).z;
     ssp245Consumer = getByX "Consumer" ssp245.data;
     totals = map getTotal [ssp119, ssp245];
     meanFirstBar = (sum (map stackedBarHeight totals)) / (length totals)
@@ -30,7 +25,7 @@ in MultiView {
     ssp119BarChart: mkBarChart ssp119
     rightBarChart: mkBarChart ssp245
     explanation:
-        LinkedText [ "From the barchart shown above, we see that ", referToBar rightBar3
+        LinkedText [ "From the barchart shown above, we see that ", referToBar ssp119Industry
                    , " which suggests that in the high-emissions scenario it is ", probAsText (computeProb (40, 80) ssp119IndHeight)
                    , " that warming will exceed the global warming target of 2c by 2100."
                    , " In contrast, in the lowest-emission scenario, the probability of exceeding the target is only "
