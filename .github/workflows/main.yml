@@ -1,47 +1,58 @@
 #Launch prompts workflow
 name: PromptExecutor
-'on': [workflow_call]
+'on':
+  workflow_dispatch:
 jobs:
   prompt-test-ubuntu:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
           node-version: 22
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin' # See 'Supported distributions' for available options
-        java-version: '21'
-    - name: Install ollama
-      run: |
-        yarn ollama-install
-    - name: Pull llama3
-      run: |
-        yarn pull-llama3
-    - name: Test
-      run: |
-        yarn test
-  prompt-test-macos:
-    runs-on: macos-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-          node-version: 22
-    - uses: actions/setup-java@v4
-      with:
-        distribution: 'temurin' # See 'Supported distributions' for available options
-        java-version: '21'
-    - name: Install ollama
-      run: |
-        brew install ollama
-    - name: Run ollama
-      run: |
-        yarn ollama-serve
-    - name: Pull llama3
-      run: |
-        yarn pull-llama3
-    - name: Test
-      run: |
-        yarn test
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '21'
+      - name: Install ollama
+        run: |
+          yarn ollama-install
+      - name: Run ollama
+        run: |
+          yarn ollama-serve
+      - name: Pull llama3
+        run: |
+          yarn pull-llama3
+      - name: Launch Prompt Tests (20 sentences)
+        run: |
+          yarn test
+#  prompt-test-macos:
+#    runs-on: macos-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-node@v4
+#        with:
+#          node-version: 22
+#      - uses: actions/setup-java@v4
+#        with:
+#          distribution: 'temurin' # See 'Supported distributions' for available options
+#          java-version: '21'
+#      - name: Install ollama
+#        run: |
+#          brew install ollama
+#      - name: Run ollama
+#        run: |
+#          yarn ollama-serve
+#      - name: Pull llama3
+#        run: |
+#          yarn pull-llama3
+#      - name: Invoke via API
+#        run: |
+#          curl -s http://localhost:11434/api/generate -d '{
+#          "model": "llama3",
+#          "stream": false,
+#          "prompt":"What are the risks of running privileged Docker containers for CI workloads?"
+#          }' | jq
+#      - name: Test
+#        run: |
+#          yarn test
