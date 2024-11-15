@@ -16,9 +16,6 @@ jobs:
     - name: Install ollama
       run: |
         yarn ollama-install
-    - name: Run ollama
-      run: |
-        yarn ollama-serve
     - name: Pull llama3
       run: |
         yarn pull-llama3
