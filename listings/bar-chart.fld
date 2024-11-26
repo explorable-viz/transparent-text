@@ -1,34 +1,35 @@
 let getByX x table = fromSome (getByField "x" x table);
-let mkPercent num = (numToStr (num * 100)) ++ "%";
 let referToBar bar = "the bar representing scenario " ++ bar.x ++ " has a z value of " ++ (numToStr (head bar.bars).z);
 let probAsText = likelihoodMap likelihoods;
 let stackedBarHeight stackedBar = sum [ bar.z | bar <- stackedBar.bars ];
-let getTotal table = fromSome (getByField "x" "Total" table);
 
-let explainCorrespondingBars bars x = 
+let getTotal stackedBars = fromSome (getByField "x" "Total" stackedBars);
+let getCO2 stackedBars = fromSome (getByField "x" "CO2" stackedBars);
+let getNonCO2 stackedBars = fromSome (getByField "x" "Non-CO2" stackedBars);
+
+
+let explainBars bars x = 
     if length bars == length (filter (fun bar -> bar.x == x) bars)
-    then "the bars on the left of each chart which represent " ++ x ++ " emissions"
+    then "($^\circ$C; " ++ x ++ " bar)"
     else error "absurd";
 
-let mkBarChart source = BarChart {
-                        caption: "Example bar-chart for scenario " ++ source.scenario,
-                        size: { width: 275, height: 185 },
-                        stackedBars: source.data 
-                      };
+let mkBarChart scenName table = 
+    BarChart {
+        caption: "Example bar chart for scenario " ++ scenName,
+        size: { width: 275, height: 185 },
+        stackedBars: table
+    };
 
-let ssp119Industry = getByX "Industry" ssp119.data;
-    ssp119IndHeight = (head ssp119Industry.bars).z;
-    ssp245Consumer = getByX "Consumer" ssp245.data;
-    totals = map getTotal [ssp119, ssp245];
-    meanFirstBar = (sum (map stackedBarHeight totals)) / (length totals)
+let getHeight bar offset = (head bar.bars).z + offset;
+
+let total = map getTotal [ssp119, ssp245];
+    co2 = map getCO2 [ssp119, ssp245];
+    nonco2 = map getNonCO2 [ssp119, ssp245];
+    meanTotal = (sum (map stackedBarHeight total)) / (length total)
 in MultiView {
-    ssp119BarChart: mkBarChart ssp119
-    rightBarChart: mkBarChart ssp245
+    leftBarChart: mkBarChart "SSP1-1.9" ssp119,
+    rightBarChart: mkBarChart "SSP2-4.5" ssp245,
     explanation:
-        LinkedText [ "From the barchart shown above, we see that ", referToBar ssp119Industry
-                   , " which suggests that in the high-emissions scenario it is ", probAsText (computeProb (40, 80) ssp119IndHeight)
-                   , " that warming will exceed the global warming target of 2c by 2100."
-                   , " In contrast, in the lowest-emission scenario, the probability of exceeding the target is only "
-                   ,  mkPercent (computeProb (25, 45) (head ssp245Consumer.bars).z)
-                   , " and we can see that ", explainCorrespondingBars firstBars "Total", " have an average value of ", numToStr meanFirstBar]
+        LinkedText [ "Within each scenario bar plot, the bars represent: total warming ", explainBars total "Total",
+                     ", warming contributions from CO2 ", explainBars co2 "CO2", " and from non-CO2 GHG's ", explainBars nonco2 "Non-CO2"]
 }
