@@ -5,70 +5,70 @@
   "prompts": [
     {
       "role": "system",
-      "content": "You are a BOB code generator. BOB is a DSL for data visualization.\nINPUT:\nA set of BOB instructions and a CAPTION containing statistical phrases, numbers, and other information.\n\nTASK:\nReplace ONLY the statistical phrases that match this regex (and not the synonims): \\b(?:virtually certain|very likely|likely|more likely than not|about as likely as not|unlikely|very unlikely|exceptionally unlikely)\\b\n\nOUTPUT: A JavaScript array of strings, formatted as: [s1, s2, ..., sn]\nCONSTRAINTS:\n    Do NOT consider synonims of statistical phrases (pratically certain != virtually certain).\n    Do NOT add any comments.\n    Do NOT include a period at the end of the list.\n    Do NOT insert a probability if the text does not match the specified phrases.\n    Do NOT alter or add to the CAPTION text except for replacing the specified phrases.",
-      "raw_content": "You are a BOB code generator. BOB is a DSL for data visualization.\nINPUT:\nA set of BOB instructions and a CAPTION containing statistical phrases, numbers, and other information.\n\nTASK:\nReplace ONLY the statistical phrases that match this regex (and not the synonims): $REGEX$\n\nOUTPUT: A JavaScript array of strings, formatted as: [s1, s2, ..., sn]\nCONSTRAINTS:\n    Do NOT consider synonims of statistical phrases (pratically certain != virtually certain).\n    Do NOT add any comments.\n    Do NOT include a period at the end of the list.\n    Do NOT insert a probability if the text does not match the specified phrases.\n    Do NOT alter or add to the CAPTION text except for replacing the specified phrases."
+      "content": "You are a BOB code generator. BOB is a DSL for data visualization.\n\nINPUT: The input is a triple (data, code, caption) where:\n- data: json datas about chart described in the caption\n- code: bob instructions about the chart\n- caption: caption of the chart.\n\nDo not edit other part of the caption, just to the following tasks.\n1. Replace with the function likelihoodMap only the tag  [STAT_REPLACE]\n2. Replace the name of the scenario with the variable if you find it in the CODE section.\n3. Replace the number with the corresponding variable in the DATA section.\n\nOUTPUT: A JavaScript array of strings, formatted as: s1, s2, ..., sn\nCONSTRAINTS:\n1. Do NOT modify CAPTION text, except for replacing the phrases in the list.\n2. Do NOT make any grammar correction.\n3. Do NOT add any comments.",
+      "raw_content": "You are a BOB code generator. BOB is a DSL for data visualization.\n\nINPUT: The input is a triple (data, code, caption) where:\n- data: json datas about chart described in the caption\n- code: bob instructions about the chart\n- caption: caption of the chart.\n\nDo not edit other part of the caption, just to the following tasks.\n1. Replace with the function likelihoodMap only the tag  [STAT_REPLACE]\n2. Replace the name of the scenario with the variable if you find it in the CODE section.\n3. Replace the number with the corresponding variable in the DATA section.\n\nOUTPUT: A JavaScript array of strings, formatted as: s1, s2, ..., sn\nCONSTRAINTS:\n1. Do NOT modify CAPTION text, except for replacing the phrases in the list.\n2. Do NOT make any grammar correction.\n3. Do NOT add any comments."
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
       "code": "let realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable",
-      "caption": "For SSP1-1.9, the rise in global temperature by century's end is contained at 1.4. In SSP2-4.5, it becomes likely that the rise will surpass the critical 2°C threshold.",
-      "content": "\nlet realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable\nFor SSP1-1.9, the rise in global temperature by century's end is contained at 1.4. In SSP2-4.5, it becomes likely that the rise will surpass the critical 2°C threshold."
+      "caption": "For SSP1-1.9, the rise in global temperature by century's end is contained at 1.4. In SSP2-4.5, it becomes [STAT_REPLACE] that the rise will surpass the critical 2°C threshold.",
+      "content": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]\nlet realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable\nFor SSP1-1.9, the rise in global temperature by century's end is contained at 1.4. In SSP2-4.5, it becomes [STAT_REPLACE] that the rise will surpass the critical 2°C threshold."
     },
     {
       "role": "assistant",
-      "content": "\"For \", sspone.scenario, \", the rise in global temperature by century's end is contained at 1.4. In \", ssptwo.scenario, \", it becomes \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \" that the rise will surpass the critical 2°C threshold.\""
+      "content": "\"For \", sspone.scenario, \", the rise in global temperature by century's end is contained at \", numToStr sspone.bE81100, \". In \", ssptwo.scenario, \", it becomes \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \" that the rise will surpass the critical 2°C threshold.\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 1.7, low4160: 1.3, high4160: 2.2, bestEst81100: 1.8, low81100: 1.3, high81100: 2.4},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
       "code": "let realTable = newDataTable 3;\n    probTable = newModel 0.3;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable",
-      "caption": "The SSP1-2.6 scenario caps an increase to 1.7 by the century's end, with an exceedance being about as likely as not. Contrastingly, SSP2-4.5 considers it likely.",
-      "content": "\nlet realTable = newDataTable 3;\n    probTable = newModel 0.3;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable\nThe SSP1-2.6 scenario caps an increase to 1.7 by the century's end, with an exceedance being about as likely as not. Contrastingly, SSP2-4.5 considers it likely."
+      "caption": "The SSP1-2.6 scenario caps an increase to 1.7 by the century's end, with an exceedance being [STAT_REPLACE]. Contrastingly, SSP2-4.5 considers it likely.",
+      "content": "[\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 1.7, low4160: 1.3, high4160: 2.2, bestEst81100: 1.8, low81100: 1.3, high81100: 2.4},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]\nlet realTable = newDataTable 3;\n    probTable = newModel 0.3;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable\nThe SSP1-2.6 scenario caps an increase to 1.7 by the century's end, with an exceedance being [STAT_REPLACE]. Contrastingly, SSP2-4.5 considers it likely."
     },
     {
       "role": "assistant",
-      "content": "\"The \", sspone.scenario, \" scenario caps an increase to 1.7 by the century's end, with an exceedance being \", likelihoodMap(findLikelihood(sspone .low81100, sspone .high81100) 2.0), \". Contrastingly, \", ssptwo.scenario, \" considers it \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
+      "content": "\"The \", sspone.scenario, \" scenario caps an increase to \", numToStr sspone.bestEst4160, \" by the century's end, with an exceedance being \", likelihoodMap(findLikelihood(sspone .low81100, sspone .high81100) 2.0), \". Contrastingly, \", ssptwo.scenario, \" considers it \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 1.7, low4160: 1.3, high4160: 2.2, bestEst81100: 1.8, low81100: 1.3, high81100: 2.4},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]",
       "code": "let realTable = newDataTable 5;\n    probTable = newModel 0.5;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable",
-      "caption": "In the SSP1-2.6 model, a temperature increase of 1.7 renders the 2°C exceedance about as likely as not. Conversely, SSP5-8.5 pushes this to virtually certain.",
-      "content": "\nlet realTable = newDataTable 5;\n    probTable = newModel 0.5;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable\nIn the SSP1-2.6 model, a temperature increase of 1.7 renders the 2°C exceedance about as likely as not. Conversely, SSP5-8.5 pushes this to virtually certain."
+      "caption": "In the SSP1-2.6 model, a temperature increase of 1.7 renders the 2°C exceedance [STAT_REPLACE]. Conversely, SSP5-8.5 pushes this to virtually certain.",
+      "content": "[\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 1.7, low4160: 1.3, high4160: 2.2, bestEst81100: 1.8, low81100: 1.3, high81100: 2.4},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]\nlet realTable = newDataTable 5;\n    probTable = newModel 0.5;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable\nIn the SSP1-2.6 model, a temperature increase of 1.7 renders the 2°C exceedance [STAT_REPLACE]. Conversely, SSP5-8.5 pushes this to virtually certain."
     },
     {
       "role": "assistant",
-      "content": "\"In the \", sspone.scenario, \" model, a temperature increase of 1.7 renders the 2°C exceedance \", likelihoodMap(findLikelihood(sspone.low81100, sspone.high81100) 2.0), \". Conversely, \", ssptwo.scenario, \" pushes this to \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
+      "content": "\"In the \", sspone.scenario, \" model, a temperature increase of \", numToStr sspone.bestEst4160, \" renders the 2°C exceedance \", likelihoodMap(findLikelihood(sspone.low81100, sspone.high81100) 2.0), \". Conversely, \", ssptwo.scenario, \" pushes this to \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.1, low4160: 1.7, high4160: 2.6, bestEst81100: 3.6, low81100: 2.8, high81100: 4.6}\n]",
       "code": "let realTable = newDataTable 7;\n    probTable = newModel 0.7;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP3-7.0\" realTable",
-      "caption": "The SSP1-1.9 forecast shows a modest 1.4 increase by century's end, making a 2°C exceedance unlikely. In contrast, SSP3-7.0 makes it very likely.",
-      "content": "\nlet realTable = newDataTable 7;\n    probTable = newModel 0.7;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP3-7.0\" realTable\nThe SSP1-1.9 forecast shows a modest 1.4 increase by century's end, making a 2°C exceedance unlikely. In contrast, SSP3-7.0 makes it very likely."
+      "caption": "The SSP1-1.9 forecast shows a modest 1.4 increase by century's end, making a 2°C exceedance [STAT_REPLACE]. In contrast, SSP3-7.0 makes it very likely.",
+      "content": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.1, low4160: 1.7, high4160: 2.6, bestEst81100: 3.6, low81100: 2.8, high81100: 4.6}\n]\nlet realTable = newDataTable 7;\n    probTable = newModel 0.7;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP3-7.0\" realTable\nThe SSP1-1.9 forecast shows a modest 1.4 increase by century's end, making a 2°C exceedance [STAT_REPLACE]. In contrast, SSP3-7.0 makes it very likely."
     },
     {
       "role": "assistant",
-      "content": "\"The \", sspone.scenario, \" forecast shows a modest 1.4 increase by century's end, making a 2°C exceedance \", likelihoodMap(findLikelihood(sspone.low81100, sspone.high81100) 2.0), \". In contrast, \", ssptwo.scenario, \" makes it \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
+      "content": "\"The \", sspone.scenario, \" forecast shows a modest \", numToStr sspone.bestEst81100, \" increase by century's end, making a 2°C exceedance \", likelihoodMap(findLikelihood(sspone.low81100, sspone.high81100) 2.0), \". In contrast, \", ssptwo.scenario, \" makes it \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable",
-      "caption": "According to SSP1-1.9, temperature rises remain modest at 1.4, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility virtually certain.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable\nAccording to SSP1-1.9, temperature rises remain modest at 1.4, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility virtually certain."
+      "caption": "According to SSP1-1.9, temperature rises remain modest at 1.4, making a 2°C exceedance [STAT_REPLACE]. SSP5-8.5, however, makes this possibility [STAT_REPLACE].",
+      "content": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable\nAccording to SSP1-1.9, temperature rises remain modest at 1.4, making a 2°C exceedance [STAT_REPLACE]. SSP5-8.5, however, makes this possibility [STAT_REPLACE]."
     },
     {
       "role": "assistant",
-      "content": "\"According to \",sspone.scenario, \", temperature rises remain modest at 1.4, making a 2°C exceedance \", likelihoodMap(findLikelihood(sspone.low81100, sspone.high81100) 2.0), \". \", ssptwo.scenario, \" however, makes this possibility \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
+      "content": "\"According to \",sspone.scenario, \", temperature rises remain modest at \", numToStr sspone.bestEst81100, \", making a 2°C exceedance \", likelihoodMap(findLikelihood(sspone.low81100, sspone.high81100) 2.0), \". \", ssptwo.scenario, \" however, makes this possibility \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.1, low4160: 1.7, high4160: 2.6, bestEst81100: 3.6, low81100: 2.8, high81100: 4.6}\n]",
       "code": "let envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable",
-      "caption": "The scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark about as likely as not. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable.",
-      "content": "\nlet envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable\nThe scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark about as likely as not. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable."
+      "caption": "The scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [STAT_REPLACE]. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable.",
+      "content": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.1, low4160: 1.7, high4160: 2.6, bestEst81100: 3.6, low81100: 2.8, high81100: 4.6}\n]\nlet envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable\nThe scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [STAT_REPLACE]. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable."
     },
     {
       "role": "assistant",
@@ -76,32 +76,32 @@
     },
     {
       "role": "user",
-      "data": "",
-      "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable",
-      "caption": "According to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility virtually certain.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable\nAccording to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility virtually certain."
+      "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]",
+      "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    early = getByScenario \"SSP1-1.9\" realTable;\n    late = getByScenario \"SSP5-8.5\" realTable",
+      "caption": "According to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility [STAT_REPLACE].",
+      "content": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    early = getByScenario \"SSP1-1.9\" realTable;\n    late = getByScenario \"SSP5-8.5\" realTable\nAccording to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility [STAT_REPLACE]."
     },
     {
       "role": "assistant",
-      "content": "\"According to \", sspone.scenario, \", temperature rises remain modest at 1.7, making a 2°C  exceedance \", likelihoodMap(findLikelihood(sspone.low81100, sspone.high81100) 2.0), \". \", ssptwo.scenario, \" however, makes this possibility \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \".\""
+      "content": "\"According to \", early.scenario, \", temperature rises remain modest at \", numToStr early.high2140, \", making a 2°C  exceedance \", likelihoodMap(findLikelihood(early.low81100, sspone.high81100) 2.0), \". \", late.scenario, \" however, makes this possibility \", likelihoodMap(findLikelihood(late.low81100, ssptwo.high81100) 2.0), \".\""
     },
     {
       "role": "user",
-      "data": "",
-      "code": "let realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    sspone = getByScenario \"SSP1-1.19\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable",
+      "data": "[\n    { scenario: \"SSP1-1.19\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.4, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]",
+      "code": "let realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    s1= getByScenario \"SSP1-1.19\" realTable;\n    s2= getByScenario \"SSP2-4.5\" realTable",
       "caption": "For SSP1-1.19, the rise in global temperature by century's end is contained at 2.4. In SSP2-4.5, it becomes about as likely as not that the rise will surpass the critical 2°C threshold.",
-      "content": "\nlet realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    sspone = getByScenario \"SSP1-1.19\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable\nFor SSP1-1.19, the rise in global temperature by century's end is contained at 2.4. In SSP2-4.5, it becomes about as likely as not that the rise will surpass the critical 2°C threshold."
+      "content": "[\n    { scenario: \"SSP1-1.19\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.4, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.6, low2140: 1.3, high2140: 1.9, bestEst4160: 2.4, low4160: 1.9, high4160: 3.0, bestEst81100: 4.4, low81100: 3.3, high81100: 5.7}\n]\nlet realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    s1= getByScenario \"SSP1-1.19\" realTable;\n    s2= getByScenario \"SSP2-4.5\" realTable\nFor SSP1-1.19, the rise in global temperature by century's end is contained at 2.4. In SSP2-4.5, it becomes about as likely as not that the rise will surpass the critical 2°C threshold."
     },
     {
       "role": "assistant",
-      "content": "\"For \", sspone.scenario, \", the rise in global temperature by century's end is contained at 2.4. In \", ssptwo.scenario, \", it becomes \", likelihoodMap(findLikelihood(ssptwo.low81100, ssptwo.high81100) 2.0), \" that the rise will surpass the critical 2°C threshold.\""
+      "content": "\"For \", s1.scenario, \", the rise in global temperature by century's end is contained at \", numToStr s1.high4160, \". In \", s2.scenario, \", it becomes \", likelihoodMap(findLikelihood(s2.low81100, ssptwo.high81100) 2.0), \" that the rise will surpass the critical 2°C threshold.\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[]",
       "code": "let envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable",
-      "caption": "The scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark more likely than not. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable.",
-      "content": "\nlet envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable\nThe scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark more likely than not. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable."
+      "caption": "The scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [STAT_REPLACE]. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable.",
+      "content": "[]\nlet envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable\nThe scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [STAT_REPLACE]. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance improbable."
     },
     {
       "role": "assistant",
@@ -109,10 +109,10 @@
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable",
-      "caption": "According to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility virtually certain.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable\nAccording to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance unlikely. SSP5-8.5, however, makes this possibility virtually certain."
+      "caption": "According to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance [STAT_REPLACE]. SSP5-8.5, however, makes this possibility virtually certain.",
+      "content": "[]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable\nAccording to SSP1-1.9, temperature rises remain modest at 1.7, making a 2°C exceedance [STAT_REPLACE]. SSP5-8.5, however, makes this possibility virtually certain."
     },
     {
       "role": "assistant",
@@ -120,80 +120,102 @@
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"scenario-1\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"scenario-2\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    s1 = getByScenario \"scenario-1\" realTable;\n    s2 = getByScenario \"scenario-2\" realTable",
-      "caption": "According to scenario-1, the temperature increase remains modest, at 1.3, making an exceedance of 2 C unlikely. Scenario-2, on the other hand, makes this possibility virtually certain.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    s1 = getByScenario \"scenario-1\" realTable;\n    s2 = getByScenario \"scenario-2\" realTable\nAccording to scenario-1, the temperature increase remains modest, at 1.3, making an exceedance of 2 C unlikely. Scenario-2, on the other hand, makes this possibility virtually certain."
+      "caption": "According to scenario-1, the temperature increase remains modest, at 1.3, making an exceedance of 2 C [STAT_REPLACE]. Scenario-2, on the other hand, makes this possibility virtually certain.",
+      "content": "[\n    { scenario: \"scenario-1\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"scenario-2\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    s1 = getByScenario \"scenario-1\" realTable;\n    s2 = getByScenario \"scenario-2\" realTable\nAccording to scenario-1, the temperature increase remains modest, at 1.3, making an exceedance of 2 C [STAT_REPLACE]. Scenario-2, on the other hand, makes this possibility virtually certain."
     },
     {
       "role": "assistant",
-      "content": "\"According to \", s1.scenario, \", the temperature increase remains modest, at 1.3, making an exceedance of 2 C \", likelihoodMap(findLikelihood(s1.low81100, s1.high81100) 2.0), \". \", s2.scenario, \", on the other hand, makes this possibility \", likelihoodMap(findLikelihood(s2.low81100, s2.high81100) 2.0), \".\""
+      "content": "\"According to \", s1.scenario, \", the temperature increase remains modest, at \", numToStr s1.low2140, \", making an exceedance of 2 C \", likelihoodMap(findLikelihood(s1.low81100, s1.high81100) 2.0), \". \", s2.scenario, \", on the other hand, makes this possibility \", likelihoodMap(findLikelihood(s2.low81100, s2.high81100) 2.0), \".\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 4.5},\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    a = getByScenario \"SSP5-8.5\" realTable;\n    b = getByScenario \"RCP2.6\" realTable",
-      "caption": "The high-emissions scenario -- SSP5-8.5 -- projects a temperature increase of 4.5°C by the end of the century. Under this model, it is virtually certain that global temperature increase will exceed the target of 2°C by the end of the century. Conversely, in the low-emissions scenario, RCP2.6, it is very unlikely that global temperatures will surpass this target.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    a = getByScenario \"SSP5-8.5\" realTable;\n    b = getByScenario \"RCP2.6\" realTable\nThe high-emissions scenario -- SSP5-8.5 -- projects a temperature increase of 4.5°C by the end of the century. Under this model, it is virtually certain that global temperature increase will exceed the target of 2°C by the end of the century. Conversely, in the low-emissions scenario, RCP2.6, it is very unlikely that global temperatures will surpass this target."
+      "caption": "The high-emissions scenario -- SSP5-8.5 -- projects a temperature increase of 4.5°C by the end of the century. Under this model, it is [STAT_REPLACE] that global temperature increase will exceed the target of 2°C by the end of the century. Conversely, in the low-emissions scenario, RCP2.6, it is [STAT_REPLACE] that global temperatures will surpass this target.",
+      "content": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 4.5},\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    a = getByScenario \"SSP5-8.5\" realTable;\n    b = getByScenario \"RCP2.6\" realTable\nThe high-emissions scenario -- SSP5-8.5 -- projects a temperature increase of 4.5°C by the end of the century. Under this model, it is [STAT_REPLACE] that global temperature increase will exceed the target of 2°C by the end of the century. Conversely, in the low-emissions scenario, RCP2.6, it is [STAT_REPLACE] that global temperatures will surpass this target."
     },
     {
       "role": "assistant",
-      "content": "\"The high-emissions scenario -- \", a.scenario, \" -- projects a temperature increase of 4.5°C by the end of the century. Under this model, it is \", likelihoodMap(findLikelihood(a.low81100, a.high81100) 2.0), \" that global temperature increase will exceed the target of 2°C by the end of the century. Conversely, in the low-emissions scenario,  \", b.scenario, \" it is \", likelihoodMap(findLikelihood(b.low81100, b.high81100) 2.0), \" that global temperatures will surpass this target.\""
+      "content": "\"The high-emissions scenario -- \", a.scenario, \" -- projects a temperature increase of \", numToStr a.high81100, \"°C by the end of the century. Under this model, it is \", likelihoodMap(findLikelihood(a.low81100, a.high81100) 2.0), \" that global temperature increase will exceed the target of 2°C by the end of the century. Conversely, in the low-emissions scenario,  \", b.scenario, \" it is \", likelihoodMap(findLikelihood(b.low81100, b.high81100) 2.0), \" that global temperatures will surpass this target.\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 4.5}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    intermediate_s = getByScenario \"SSP2-4.5\" realTable;",
-      "caption": "The intermediate scenario SSP2-4.5 forecasts a 2.8°C temperature increase by 2100. In this scenario, it is very likely that the global temperature will exceed the 2°C target, making it a significant challenge to stay within that threshold.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    intermediate_s = getByScenario \"SSP2-4.5\" realTable;\nThe intermediate scenario SSP2-4.5 forecasts a 2.8°C temperature increase by 2100. In this scenario, it is very likely that the global temperature will exceed the 2°C target, making it a significant challenge to stay within that threshold."
+      "caption": "The intermediate scenario SSP2-4.5 forecasts a 2.8°C temperature increase by 2100. In this scenario, it is [STAT_REPLACE] that the global temperature will exceed the 2°C target, making it a significant challenge to stay within that threshold.",
+      "content": "[\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 4.5}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    intermediate_s = getByScenario \"SSP2-4.5\" realTable;\nThe intermediate scenario SSP2-4.5 forecasts a 2.8°C temperature increase by 2100. In this scenario, it is [STAT_REPLACE] that the global temperature will exceed the 2°C target, making it a significant challenge to stay within that threshold."
     },
     {
       "role": "assistant",
-      "content": "\"The intermediate scenario \", intermediate_s.scenario, \" forecasts a 2.8°C temperature increase by 2100. In this scenario, it is \", likelihoodMap(findLikelihood(intermediate_s.low81100, intermediate_s.high81100) 2.0), \" that the global temperature will exceed the 2°C target, making it a significant challenge to stay within that threshold.\""
+      "content": "\"The intermediate scenario \", intermediate_s.scenario, \" forecasts a \", numToStr intermediate_s.high4160, \"°C temperature increase by 2100. In this scenario, it is \", likelihoodMap(findLikelihood(intermediate_s.low81100, intermediate_s.high81100) 2.0), \" that the global temperature will exceed the 2°C target, making it a significant challenge to stay within that threshold.\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 4.5}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;",
-      "caption": "The low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is likely that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;\nThe low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is likely that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts."
+      "caption": "The low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is [STAT_REPLACE] that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.",
+      "content": "[\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 4.5}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;\nThe low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is [STAT_REPLACE] that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts."
     },
     {
       "role": "assistant",
-      "content": "\"The low-emissions scenario -- \", low_scen.scenario, \" -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is \", likelihoodMap(findLikelihood(low_scen.low81100, low_scen.high81100) 2.0), \" that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.\""
+      "content": "\"The low-emissions scenario -- \", low_scen.scenario, \" -- predicts a temperature increase of \", numToStr low_scen.low4160, \"°C by the century’s end. In this case, it is \", likelihoodMap(findLikelihood(low_scen.low81100, low_scen.high81100) 2.0), \" that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;",
-      "caption": "Under the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is virtually certain that the temperature increase will exceed 2°C, with catastrophic environmental effects.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;\nUnder the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is virtually certain that the temperature increase will exceed 2°C, with catastrophic environmental effects."
+      "caption": "Under the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is [STAT_REPLACE] that the temperature increase will exceed 2°C, with catastrophic environmental effects.",
+      "content": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;\nUnder the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is [STAT_REPLACE] that the temperature increase will exceed 2°C, with catastrophic environmental effects."
     },
     {
       "role": "assistant",
-      "content": "\"Under the very high emissions scenario \", low_scen.scenario, \" global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is \", likelihoodMap(findLikelihood(scen .low81100, scen .high81100) 2.0), \" that the temperature increase will exceed 2°C, with catastrophic environmental effects.\""
+      "content": "\"Under the very high emissions scenario \", low_scen.scenario, \" global temperatures are projected to rise by \", numToStr scen.high81100, \"°C by the end of the century. In this scenario, it is \", likelihoodMap(findLikelihood(scen .low81100, scen .high81100) 2.0), \" that the temperature increase will exceed 2°C, with catastrophic environmental effects.\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;",
-      "caption": "Under the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is about as likely as not that the temperature increase will exceed 2°C, with catastrophic environmental effects.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;\nUnder the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is about as likely as not that the temperature increase will exceed 2°C, with catastrophic environmental effects."
+      "caption": "Under the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is [STAT_REPLACE] that the temperature increase will exceed 2°C, with catastrophic environmental effects.",
+      "content": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;\nUnder the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is [STAT_REPLACE] that the temperature increase will exceed 2°C, with catastrophic environmental effects."
     },
     {
       "role": "assistant",
-      "content": "\"Under the very high emissions scenario \", low_scen.scenario, \" global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is \", likelihoodMap(findLikelihood(scen .low81100, scen .high81100) 2.0), \" that the temperature increase will exceed 2°C, with catastrophic environmental effects.\""
+      "content": "\"Under the very high emissions scenario \", low_scen.scenario, \" global temperatures are projected to rise by \", numToStr scen.high81100, \"°C by the end of the century. In this scenario, it is \", likelihoodMap(findLikelihood(scen .low81100, scen .high81100) 2.0), \" that the temperature increase will exceed 2°C, with catastrophic environmental effects.\""
     },
     {
       "role": "user",
-      "data": "",
+      "data": "[\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]",
       "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;",
-      "caption": "The low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is about as likely as not that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.",
-      "content": "\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;\nThe low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is about as likely as not that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts."
+      "caption": "The low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.7°C by the century’s end. In this case, it is [STAT_REPLACE] that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.",
+      "content": "[\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;\nThe low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.7°C by the century’s end. In this case, it is [STAT_REPLACE] that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts."
     },
     {
       "role": "assistant",
-      "content": "\"The low-emissions scenario -- \", low_scen.scenario, \" -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is \", likelihoodMap(findLikelihood(low_scen.low81100, low_scen.high81100) 2.0), \" that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.\""
+      "content": "\"The low-emissions scenario -- \", low_scen.scenario, \" -- predicts a temperature increase of \", numToStr low_scen.high2140, \"°C by the century’s end. In this case, it is \", likelihoodMap(findLikelihood(low_scen.low81100, low_scen.high81100) 2.0),\" that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.\""
+    },
+    {
+      "role": "user",
+      "data": "[\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]",
+      "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;",
+      "caption": "The low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is practically certain that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.",
+      "content": "[\n    { scenario: \"RCP2.6\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    low_scen = getByScenario \"RCP2.6\" realTable;\nThe low-emissions scenario -- RCP2.6 -- predicts a temperature increase of 1.8°C by the century’s end. In this case, it is practically certain that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts."
+    },
+    {
+      "role": "assistant",
+      "content": "\"The low-emissions scenario -- \", low_scen.scenario, \" -- predicts a temperature increase of \", numToStr low_scen.high2140, \"°C by the century’s end. In this case, it is practically certain that the global temperature will remain below the critical 2°C target, reducing the risk of severe climate impacts.\""
+    },
+    {
+      "role": "user",
+      "data": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]",
+      "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;",
+      "caption": "Under the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is practically certain that the temperature increase will exceed 2°C, with catastrophic environmental effects.",
+      "content": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.3, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.8, bestEst81100: 1.4, low81100: 1.0, high81100: 5.1}\n]\nlet realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    scen = getByScenario \"SSP5-8.5,\" realTable;\nUnder the very high emissions scenario SSP5-8.5, global temperatures are projected to rise by 5.1°C by the end of the century. In this scenario, it is practically certain that the temperature increase will exceed 2°C, with catastrophic environmental effects."
+    },
+    {
+      "role": "assistant",
+      "content": "\"Under the very high emissions scenario \", scen.scenario, \" global temperatures are projected to rise by \", numToStr scen.high81100, \"°C by the end of the century. In this scenario, it is practically certain that the temperature increase will exceed 2°C, with catastrophic environmental effects.\""
     }
   ]
 }
