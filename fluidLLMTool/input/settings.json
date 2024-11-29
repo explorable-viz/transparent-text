@@ -1,0 +1,12 @@
+{
+  "temperature": "0.3",
+  "num_ctx": "4096",
+  "openai-token": "",
+  "gemini-token": "",
+  "gemini-projectId": "",
+  "gemini-location": "",
+  "claude-token": "",
+  "ollama-url": "http://127.0.0.1",
+  "ollama-port": "11434",
+  "log-path": "logs/"
+}

@@ -1,0 +1,52 @@
+[
+  {
+    "code": "let realTable = newDataTable 1;\n    probTable = newModel 0.1;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable",
+    "caption": "For SSP1-1.9, the rise in global temperature by century's end is contained at 1.4. In SSP2-4.5, it becomes likely that the rise will surpass the critical 2c threshold.",
+    "output": "For \", sspone.scenario ,\", the rise in global temperature by century's end is contained at 1.4. In \", ssptwo.scenario ,\", it becomes \", likelihoodMap (ssptwo probTable).probability ,\" that the rise will surpass the critical 2c threshold."
+  },
+  {
+    "code": "let realTable = newDataTable 2;\n    probTable = newModel 0.2;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP3-7.0\" realTable",
+    "caption": "SSP1-1.9 suggests a slow 1.4 increase, making an exceedance of 2c unlikely. SSP3-7.0, however, elevates this possibility to likely.",
+    "output": "\", sspone.scenario ,\" suggests a slow 1.4 increase, making an exceedance of 2c \", likelihoodMap (sspone probTable).probability ,\". \", ssptwo.scenario ,\" however, elevates this possibility to \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 3;\n    probTable = newModel 0.3;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable",
+    "caption": "The SSP1-2.6 scenario caps an increase to 1.7 by the century's end, with an exceedance being about as likely as not. Contrastingly, SSP2-4.5 considers it likely.",
+    "output": "The \", sspone.scenario ,\" scenario caps an increase to 1.7 by the century's end, with an exceedance being \", likelihoodMap (sspone probTable).probability ,\". Contrastingly, \", ssptwo.scenario ,\" considers it \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 4;\n    probTable = newModel 0.4;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP3-7.0\" realTable",
+    "caption": "Rising to 1.7 under SSP1-2.6 positions the 2c exceedance as about as likely as not. Whereas SSP3-7.0 makes it more likely than not.",
+    "output": "Rising to 1.7 under \", sspone.scenario ,\" positions the 2c exceedance as \", likelihoodMap (sspone probTable).probability ,\". Whereas \", ssptwo.scenario ,\" makes it \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 5;\n    probTable = newModel 0.5;\n    sspone = getByScenario \"SSP1-2.6\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable",
+    "caption": "In the SSP1-2.6 model, a temperature increase of 1.7 renders the 2c exceedance about as likely as not. Conversely, SSP5-8.5 pushes this to virtually certain.",
+    "output": "In the \", sspone.scenario ,\" model, a temperature increase of 1.7 renders the 2c exceedance \", likelihoodMap (sspone probTable).probability ,\". Conversely, \", ssptwo.scenario ,\" pushes this to \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 6;\n    probTable = newModel 0.6;\n    sspone = getByScenario \"SSP2-4.5\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable",
+    "caption": "Under SSP2-4.5, exceeding the 2c benchmark is likely. With SSP5-8.5, it's virtually certain.",
+    "output": "Under \", sspone.scenario ,\", exceeding the 2c benchmark is \", likelihoodMap (sspone probTable).probability ,\". With \", ssptwo.scenario ,\", it's \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 7;\n    probTable = newModel 0.7;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP3-7.0\" realTable",
+    "caption": "The SSP1-1.9 forecast shows a modest 1.4 increase by century's end, making a 2c exceedance unlikely. In contrast, SSP3-7.0 makes it very likely.",
+    "output": "The \", sspone.scenario ,\" forecast shows a modest 1.4 increase by century's end, making a 2c exceedance \", likelihoodMap (sspone probTable).probability ,\". In contrast, \", ssptwo.scenario ,\" makes it \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 8;\n    probTable = newModel 0.8;\n    sspone = getByScenario \"SSP2-4.5\" realTable;\n    ssptwo = getByScenario \"SSP3-7.0\" realTable",
+    "caption": "In SSP2-4.5, surpassing the 2c target is likely. Even more assuredly, SSP3-7.0 makes such an exceedance very likely.",
+    "output": "In \", sspone.scenario ,\", surpassing the 2c target is \", likelihoodMap (sspone probTable).probability ,\". Even more assuredly, \", ssptwo.scenario ,\" makes such an exceedance \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 9;\n    probTable = newModel 0.9;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP5-8.5\" realTable",
+    "caption": "According to SSP1-1.9, temperature rises remain modest at 1.4, making a 2c exceedance unlikely. SSP5-8.5, however, makes this possibility virtually certain.",
+    "output": "According to \", sspone.scenario ,\", temperature rises remain modest at 1.4, making a 2c exceedance \", likelihoodMap (sspone probTable).probability ,\". \", ssptwo.scenario ,\" however, makes this possibility \", likelihoodMap (ssptwo probTable).probability ,\"."
+  },
+  {
+    "code": "let realTable = newDataTable 10;\n    probTable = newModel 1.0;\n    sspone = getByScenario \"SSP1-1.9\" realTable;\n    ssptwo = getByScenario \"SSP2-4.5\" realTable",
+    "caption": "SSP1-1.9 projects a 1.4 increase, rendering the 2c exceedance unlikely. By contrast, SSP2-4.5 renders it virtually certain.",
+    "output": "SSP1-1.9 projects a 1.4 increase, rendering the 2c exceedance \", likelihoodMap (sspone probTable).probability ,\". By contrast, \", ssptwo.scenario ,\" renders it \", likelihoodMap (ssptwo probTable).probability ,\"."
+  }
+]
