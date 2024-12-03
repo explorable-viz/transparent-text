@@ -1,14 +1,30 @@
 ## PromptExecutor
-PromptExecutor is a command line tool which allows to execute the prompts into an LLM. At this time the only supported model is llama3, but further versions will offer the possibility to use also other models.
+PromptExecutor is a command line tool which allows to execute the prompts into a Large Language Model. At this time the only supported model is llama3, but further versions will offer the possibility to use also other models.
 
 ### The Java Application
 The folder jar, host the java application. It is possible to run the app through the command
-'-jar jar/prompt-executor.jar <param1> <param2> [param3]'
+
+`java -jar jar/prompt-executor.jar <agent> <prompt> <settings> <sentences> [expected]`
+
 where:
 
-- `param1` is the path of the JSON prompt file
-- `param2` is the path of the sentence file
-- `param3`, which is not mandatory, is the path of the expected result for the validation process.
+- `agent` is the agent class which correspond to the model will be executed
+- `prompt` is the path of the JSON prompt file
+- `settings` is the path of the JSON settings file
+- `sentences` is the path of the sentence file
+- `expected`, which is not mandatory, is the path of the expected result for the validation process.
+
+### List of available agents
+
+| Class                      | Model                  | Token Needed | 
+|----------------------------|------------------------|--------------| 
+| ClaudeSonnetEvaluatorAgent | claude-sonnet-20241022 | yes          | 
+| GeminiPro15EvaluationAgent | gemini-pro             | yes          | 
+| Gpt4oEvaluationAgent       | gpt-4o                 | yes          | 
+| Gpt35EvaluationAgent       | gpt-3.5                | yes          | 
+| Llama3EvaluatorAgent       | llama3:8b              | no           | 
+| Llama31EvaluatorAgent      | llama3.1:8b            | no           | 
+
 
 ### Scripts
 There are four main bash scripts, placed in the script folder, for the installation and the execution of the Prompt Executor
@@ -25,3 +41,13 @@ All the scripts are integrated with yarn scripts.
 - `yarn pull-llama3` provides to pull the llama3 model
 - `yarn ollama-serve` provides to start the ollama server
 - `yarn test` provides to launch the test with the file in the input folder.
+
+### Webtools 
+
+There are two web-based tools which allow to edit the prompt base-knowledge and the input sentences. These tools are in the folder `./webapp`
+
+| Tool            | Description                           | Link                                                           |
+|-----------------|---------------------------------------|----------------------------------------------------------------| 
+| Prompt Editor   | Tool for the editing of the prompt    | [./webapp/prompt-editor.html](./webapp/prompt-editor.html)     |
+| Sentence Editor | Tool for the editing of the sentences | [./webapp/sentence-editor.html](./webapp/sentence-editor.html) |
+
