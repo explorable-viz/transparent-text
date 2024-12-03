@@ -2,6 +2,11 @@
 name: PromptExecutor
 'on':
   workflow_dispatch:
+  push:
+    paths:
+      - fluidLLMTool/**
+    paths-ignore:
+      - '**/*.md'
 jobs:
   prompt-test-ubuntu:
     runs-on: ubuntu-latest
