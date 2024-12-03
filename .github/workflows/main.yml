@@ -5,6 +5,9 @@ name: PromptExecutor
   push:
     paths:
       - fluidLLMTool/**
+  pull_request:
+    paths:
+      - fluidLLMTool/**
 jobs:
   prompt-test-ubuntu:
     runs-on: ubuntu-latest
@@ -18,15 +21,19 @@ jobs:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '21'
       - name: Install ollama
+        working-directory: ./fluidLLMTool
         run: |
           yarn ollama-install
       - name: Run ollama
+        working-directory: ./fluidLLMTool
         run: |
           yarn ollama-serve
       - name: Pull llama3
+        working-directory: ./fluidLLMTool
         run: |
           yarn pull-llama3
       - name: Launch Prompt Tests (20 sentences)
+        working-directory: ./fluidLLMTool
         run: |
           yarn test
 #  prompt-test-macos:
