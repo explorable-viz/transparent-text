@@ -113,7 +113,7 @@ function importJson() {
                 const userCaption = prompt.caption || '';
                 addPrompt(userCaption, '', userData, userCode);
             } else if (prompt.role === 'assistant') {
-                const assistantContent = prompt.content || '';
+                const assistantContent = prompt.raw_content || prompt.content || '';
                 const lastRowAssistant = document.querySelectorAll('#prompt-list .row:last-child .col-md-6:nth-child(2) textarea');
                 if (lastRowAssistant.length > 0) {
                     lastRowAssistant[0].value = assistantContent;
@@ -142,13 +142,23 @@ function exportJson() {
         const key = row.querySelector('input[type="text"]').value.trim();
         const value = row.querySelectorAll('input[type="text"]')[1].value.trim();
         if (key) variables[key] = value;
+
     });
 
     // Process the system prompt
     let processedSystemPrompt = systemPrompt;
     for (const [key, value] of Object.entries(variables)) {
         const variablePlaceholder = `$${key}$`;
-        processedSystemPrompt = processedSystemPrompt.replaceAll(variablePlaceholder, value);
+        var v = value;
+        if (value === 'RANDOM_INT') {
+            v = Math.floor(Math.random() * (100));
+        } else if (value === 'RANDOM_FLOAT') {
+            const rand = Math.random() * (100);
+            v = parseFloat(rand.toFixed(6));
+        }else if (value === 'RANDOM_STRING') {
+            v = getRandomString(8);
+        }
+        processedSystemPrompt = processedSystemPrompt.replaceAll(variablePlaceholder, v);
     }
 
     // Initialize prompts array
@@ -174,7 +184,16 @@ function exportJson() {
         let processedContent = [userData, userCode, userCaption].join('\n');
         for (const [key, value] of Object.entries(variables)) {
             const variablePlaceholder = `$${key}$`;
-            processedContent = processedContent.replaceAll(variablePlaceholder, value);
+            var v = value;
+            if (value === 'RANDOM_INT') {
+                v = Math.floor(Math.random() * (100));
+            } else if (value === 'RANDOM_FLOAT') {
+                const rand = Math.random() * (100);
+                v = parseFloat(rand.toFixed(6));
+            }else if (value === 'RANDOM_STRING') {
+                v = getRandomString(8);
+            }
+            processedContent = processedContent.replaceAll(variablePlaceholder, v);
         }
 
         // Add user content
@@ -190,13 +209,23 @@ function exportJson() {
 
         // Replace variables in assistant response
         const processedAssistantResponse = assistantResponse.replaceAll(/\$([A-Za-z0-9_]+)\$/g, (match, varName) => {
-            return variables[varName] || match; // Replace or leave as-is if no match
+            var v = variables[varName];
+            if (variables[varName] === 'RANDOM_INT') {
+                v = Math.floor(Math.random() * (100));
+            } else if (variables[varName] === 'RANDOM_FLOAT') {
+                const rand = Math.random() * (100);
+                v = parseFloat(rand.toFixed(6));
+            }else if (variables[varName] === 'RANDOM_STRING') {
+                v = getRandomString(8);
+            }
+            return v; // Replace or leave as-is if no match
         });
 
         // Add assistant response
         if (assistantResponse) {
             prompts.push({
                 role: 'assistant',
+                raw_content: assistantResponse,
                 content: processedAssistantResponse
             });
         }
@@ -217,6 +246,14 @@ function exportJson() {
 }
 
 
+function getRandomString(length = 8) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+}
 
 function addVariable(key = '', value = '') {
     const variablesList = document.getElementById('variables-list');
@@ -268,4 +305,31 @@ function removeVariable(button) {
     if (variablesList.children.length === 0) {
         variablesList.innerHTML = '<p class="text-muted">No variables defined yet.</p>';
     }
+}
+
+function shufflePrompts() {
+    const promptList = document.getElementById('prompt-list');
+    const rows = Array.from(promptList.querySelectorAll('.row')); // Get all rows
+    const separators = Array.from(promptList.querySelectorAll('hr')); // Get all separators
+
+    // Combine rows and separators
+    const combined = rows.map((row, index) => ({
+        row,
+        separator: separators[index] || null
+    }));
+
+    // Shuffle combined rows and separators
+    for (let i = combined.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [combined[i], combined[j]] = [combined[j], combined[i]];
+    }
+
+    // Clear prompt list and re-append shuffled items
+    promptList.innerHTML = '';
+    combined.forEach(item => {
+        if (item.separator) promptList.appendChild(item.separator);
+        promptList.appendChild(item.row);
+    });
+
+    alert('Prompts shuffled!');
 }
