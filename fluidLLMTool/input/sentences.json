@@ -1,52 +1,52 @@
 [
   {
-    "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
-    "code": "let envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable",
-    "caption": "The scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [STAT_REPLACE]. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance [STAT_REPLACE]."
-  },
-  {
-    "data": "[\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
-    "code": "let climateData = newDataTable 11;\n    probabilityModel = newModel 0.15;\n    lowScenario = getByScenario \"SSP2-4.5\" climateData;\n    highScenario = getByScenario \"SSP3-7.0\" climateData",
-    "caption": "Exploring the SSP2-4.5 pathway, a temperature uptick is projected, though it remains [STAT_REPLACE] that this model will lead to breaches of the 2°C ceiling. Conversely, the SSP3-7.0 trajectory indicates a greater chance for significant exceedance by the century's end."
-  },
-  {
-    "data": "[\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
-    "code": "let tempTable = newDataTable 12;\n    modelProb = newModel 0.25;\n    firstPath = getByScenario \"SSP1-2.6\" tempTable;\n    secondPath = getByScenario \"SSP5-8.5\" tempTable",
-    "caption": "Under SSP1-2.6, temperatures are slated for a limited 1.7 climb, making it [STAT_REPLACE] that the 2°C target will remain intact. On the opposing spectrum, SSP5-8.5 sets the stage for warmer conditions, practically ensuring that this threshold is surpassed."
-  },
-  {
     "data": "[\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
     "code": "let envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable",
-    "caption": "The scenario SSP3-7.0 outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [STAT_REPLACE]. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance [STAT_REPLACE]."
+    "caption": "The scenario [SCEN_REPLACE value=\"SSP3-7.0\"] outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [STAT_REPLACE value=\"more likely than not\"]. Meanwhile, [SCEN_REPLACE value=\"SSP1-1.9\"] charts a different course, with a restrained [NUM_REPLACE value=\"1.4\"] rise, making such an exceedance [STAT_REPLACE value=\"very unlikely\"]."
   },
   {
     "data": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.7, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
     "code": "let climateSeries = newDataTable 14;\n    uncertaintyModel = newModel 0.45;\n    scenarioA = getByScenario \"SSP5-8.5\" climateSeries;\n    scenarioB = getByScenario \"SSP1-2.6\" climateSeries",
-    "caption": "The scenario SSP5-8.5 framework foresees a considerable escalation in temperatures, almost certainly surpassing the 2°C objective. On the flip side, SSP1-2.6 allows for a moderate 1.7 increase, presenting an [STAT_REPLACE] scenario for breaching this limit."
+    "caption": "The scenario [SCEN_REPLACE value=\"SSP5-8.5\"] framework foresees a considerable escalation in temperatures, almost certainly surpassing the 2°C objective. On the flip side, [SCEN_REPLACE value=\"SSP1-2.6\"] allows for a moderate [NUM_REPLACE value=\"1.7\"] increase, presenting an [STAT_REPLACE value=\"about as likely as not\"] scenario for breaching this limit."
   },
   {
     "data": "[\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.7, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
     "code": "let temperatureData = newDataTable 15;\n    probabilityModeling = newModel 0.55;\n    emissionsLow = getByScenario \"SSP5-8.5\" temperatureData;\n    emissionsHigh = getByScenario \"SSP3-7.0\" temperatureData",
-    "caption": "According to SSP5-8.5, a rather substantial uptick is foreseen, making a 2°C rise [STAT_REPLACE]. This stands in stark contrast to the projections under SSP3-7.0, which also suggests considerable temperature growth, rendering exceedance [STAT_REPLACE]."
+    "caption": "According to [SCEN_REPLACE value=\"SSP5-8.5\"], a rather substantial uptick is foreseen, making a 2°C rise [STAT_REPLACE value=\"virtually certain\"]. This stands in stark contrast to the projections under [SCEN_REPLACE value=\"SSP3-7.0\"], which also suggests considerable temperature growth, rendering exceedance [STAT_REPLACE value=\"likely\"]."
   },
   {
     "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.7, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
     "code": "let envImpactTable = newDataTable 16;\n    predModel = newModel 0.65;\n    trackOne = getByScenario \"SSP1-1.9\" envImpactTable;\n    trackTwo = getByScenario \"SSP2-4.5\" envImpactTable",
-    "caption": "In SSP1-1.9's chart, adaptability ensures, marking a temperature boost confined to 1.4, thus making any breach of the 2°C limit [STAT_REPLACE]. Alternately, the SSP2-4.5 projection steers towards warming where it's much more assured that this boundary will be exceeded."
+    "caption": "In [SCEN_REPLACE value=\"SSP1-1.9\"]'s chart, adaptability ensures, marking a temperature boost confined to [NUM_REPLACE value=\"1.4\"], thus making any breach of the 2°C limit [STAT_REPLACE value=\"unlikely\"]. Alternately, the [SCEN_REPLACE value=\"SSP2-4.5\"] projection steers towards warming where it's much more assured that this boundary will be exceeded."
   },
   {
     "data": "[\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.7, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
     "code": "let globalTempData = newDataTable 17;\n    impactModel = newModel 0.75;\n    currentScenario = getByScenario \"SSP2-4.5\" globalTempData;\n    alternativeScenario = getByScenario \"SSP1-2.6\" globalTempData",
-    "caption": "Projection for SSP2-4.5 anticipates a warming trend where crossing the 2°C threshold is increasingly [STAT_REPLACE]. Meanwhile, SSP1-2.6 holds the reins tight, presenting an intermediate probability for such changes."
+    "caption": "Projection for [SCEN_REPLACE value=\"SSP2-4.5\"] anticipates a warming trend where crossing the 2°C threshold is increasingly [STAT_REPLACE value=\"likely\"]. Meanwhile, [SCEN_REPLACE value=\"SSP1-2.6\"] holds the reins tight, presenting an intermediate probability for such changes."
   },
   {
     "data": "[\n    { scenario: \"SSP1-1.9\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP5-8.5\", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.7, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
     "code": "let globalImpactSeries = newDataTable 18;\n    probEstimate = newModel 0.85;\n    scenarioI = getByScenario \"SSP1-1.9\" globalImpactSeries;\n    scenarioII = getByScenario \"SSP5-8.5\" globalImpactSeries",
-    "caption": "The scenario SSP1-1.9 charts a restricted temperature elevation up to 1.4, ensuring an [STAT_REPLACE] breach of the established 2°C limit. Contrastively, SSP5-8.5 exacerbates the potential for significant warming, making such an event practically certain."
+    "caption": "The scenario [SCEN_REPLACE value=\"SSP1-1.9\"] charts a restricted temperature elevation up to [NUM_REPLACE value=\"1.4\"], ensuring an [STAT_REPLACE value=\"unlikely\"] breach of the established 2°C limit. Contrastively, [SCEN_REPLACE value=\"SSP5-8.5\"] exacerbates the potential for significant warming, making such an event practically certain."
   },
   {
     "data": "[\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},\n    { scenario: \"SSP2-4.5\", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.7, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}\n]",
     "code": "let climateShiftData = newDataTable 19;\n    probCalculation = newModel 0.95;\n    pathA = getByScenario \"SSP3-7.0\" climateShiftData;\n    pathB = getByScenario \"SSP2-4.5\" climateShiftData",
-    "caption": "The SSP3-7.0 outlook reveals elevated heating risks, suggesting a very high likelihood of exceeding the 2°C threshold. For SSP2-4.5, such risks remain, aligning more confidently towards an overpass."
+    "caption": "The [SCEN_REPLACE value=\"SSP3-7.0\"] outlook reveals elevated heating risks, suggesting a very high likelihood of exceeding the 2°C threshold. For [SCEN_REPLACE value=\"SSP2-4.5\"], such risks remain, aligning more confidently towards an overpass."
+  },
+  {
+    "data": "[\n    { scenario: \"SSP4-6.0\", bestEst2140: 1.8, low2140: 1.4, high2140: 2.2, bestEst4160: 2.3, low4160: 1.8, high4160: 2.8, bestEst81100: 3.0, low81100: 2.4, high81100: 3.6},\n    { scenario: \"SSP5-8.5\", bestEst2140: 2.0, low2140: 1.6, high2140: 2.4, bestEst4160: 2.5, low4160: 2.0, high4160: 3.0, bestEst81100: 3.8, low81100: 2.8, high81100: 4.5}\n]",
+    "code": "let scenarioData = newDataTable 14;\n    riskModel = newModel 0.40;\n    midScenario = getByScenario \"SSP4-6.0\" scenarioData;\n    extremeScenario = getByScenario \"SSP5-8.5\" scenarioData",
+    "caption": "Under the [SCEN_REPLACE value=\"SSP4-6.0\"] scenario, temperatures are expected to rise, presenting [STAT_REPLACE value=\"unlikely\"] risks of surpassing the 2°C limit. On the other hand, the [SCEN_REPLACE value=\"SSP5-8.5\"] scenario forecasts a more drastic temperature increase, heightening the likelihood of exceeding the 2°C threshold."
+  },
+  {
+    "data": "[\n    { scenario: \"SSP1-2.6\", bestEst2140: 1.3, low2140: 1.0, high2140: 1.6, bestEst4160: 1.4, low4160: 1.0, high4160: 1.8, bestEst81100: 1.2, low81100: 0.8, high81100: 1.6},\n    { scenario: \"SSP4-6.0\", bestEst2140: 2.0, low2140: 1.6, high2140: 2.4, bestEst4160: 2.5, low4160: 2.0, high4160: 3.0, bestEst81100: 3.2, low81100: 2.6, high81100: 4.0}\n]",
+    "code": "let climateTable = newDataTable 15;\n    uncertaintyModel = newModel 0.25;\n    sustainableScenario = getByScenario \"SSP1-2.6\" climateTable;\n    businessAsUsualScenario = getByScenario \"SSP4-6.0\" climateTable",
+    "caption": "The [SCEN_REPLACE value=\"SSP1-2.6\"] scenario suggests a manageable temperature increase, resulting in an [STAT_REPLACE value=\"about as likely as not\"] probability of breaching the 2°C threshold. Conversely, the [SCEN_REPLACE value=\"SSP4-6.0\"] pathway indicates a heightened risk of exceeding this critical limit."
+  },
+  {
+    "data": "[\n    { scenario: \"SSP3-7.0\", bestEst2140: 1.7, low2140: 1.3, high2140: 2.1, bestEst4160: 2.2, low4160: 1.7, high4160: 2.7, bestEst81100: 2.9, low81100: 2.3, high81100: 3.7},\n    { scenario: \"SSP5-8.5\", bestEst2140: 2.1, low2140: 1.7, high2140: 2.5, bestEst4160: 2.6, low4160: 2.1, high4160: 3.1, bestEst81100: 3.9, low81100: 3.0, high81100: 4.7}\n]",
+    "code": "let dataSet = newDataTable 16;\n    analysisModel = newModel 0.50;\n    stressedScenario = getByScenario \"SSP3-7.0\" dataSet;\n    highEmissionScenario = getByScenario \"SSP5-8.5\" dataSet",
+    "caption": "In the [SCEN_REPLACE value=\"SSP3-7.0\"] framework, there's a [STAT_REPLACE value=\"likely\"] chance of temperatures surpassing 2°C. Meanwhile, the high-emission [SCEN_REPLACE value=\"SSP5-8.5\"] scenario significantly elevates the risk of exceeding this critical temperature threshold."
   }
 ]
