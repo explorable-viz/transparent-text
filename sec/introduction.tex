@@ -1,20 +1,19 @@
 \section{Introduction}
 
-Much work has been done on the topic of \emph{data provenance}, which aims to provide
-transparency in data analytics systems by allowing a user to interrogate where data has come
-from, the ways it has been manipulated and transformed. Collecting such information
-requires a lot of effort, work has gone into integrating data provenance features
-into programming languages themselves \cite{fehrenbach16}. More recent work
-extends this approach to work with data visualizations \cite{perera22}.
-
-Provenance information is of great utility in science communication: good science is
+In data analytics and other forms of science communication, reader understanding can
+be greatly improved by providing the reader with information about ``data provenance'':
+where did this data come from, how was it used, and how did that lead to the conclusions being presented to me?
+Collecting information for this purpose requires a lot of effort, and so work has gone into automatic its collection,
+by integrating data provenance features into programming languages themselves \cite{fehrenbach16}. More recently, this idea
+has been extended to work with data visualizations \cite{perera22}, further aiding reader comprehension.
+The utility of this information is clear: good science  is
 \emph{reproducible}, and good science communication should give the layperson as many tools
 as possible to verify or reproduce conclusions made from data.
 
 Communication is often done through combining the mediums of text,
 data visualizations, and code. The idea of literate programming \cite{knuth84} has
-been influential, and in data analytics the ``notebook interface'' \cite{kluyver16}, is popular
-allowing a data scientist to interleave code with its own results, and expository text. 
+been influential, and in data analytics the ``notebook interface'' \cite{kluyver16} has become
+the de facto standard for communication, allowing a data scientist to interleave code with its own results, and expository text. 
 
 \begin{figure}[h]
    \includegraphics[width=0.7\textwidth]{fig/ipcc-table-explanation.png}
