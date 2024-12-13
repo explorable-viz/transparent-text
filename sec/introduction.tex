@@ -5,7 +5,7 @@ providing the reader with information about ``data provenance'': where did this 
 used, and how did that lead to the conclusions being presented to me? Collecting information for this purpose
 requires a lot of effort, and so work has gone into automatic its collection, by integrating data provenance
 features into programming languages themselves \cite{fehrenbach16}. More recently, this idea has been extended
-to work with data visualizations \cite{perera22}, further aiding reader comprehension. The utility of this
+to work with data visualizations \cite{perera22,bond24}, further aiding reader comprehension. The utility of this
 information is clear: good science  is \emph{reproducible}, and good science communication should give the
 layperson as many tools as possible to verify or reproduce conclusions made from data.
 
@@ -25,13 +25,13 @@ install bespoke software in order to read articles, and notebooks do not necessa
 transparency by themselves; the code is often highly abstract, providing wrappers for complex models which
 have often been applied as black-boxes.
 
-More recently, \cite{dragicevic19} proposed the idea of an \emph{explorable multiverse} as a mechanism for
+More recently, \citet{dragicevic19} proposed the idea of an \emph{explorable multiverse} as a mechanism for
 improving transparency. The idea is that during data analysis, choices made by the analyst can significantly
 impact results; and that analysis should be run multiple times using different methods. The user should then
 be allowed to toggle between different choices and see how a change in the method impacts the conclusions that
 can be drawn from the data.
 
-\cite{psallidas18} has done work on applying techniques of data lineage to interactive visualizations based on
+\citet{psallidas18} have done work on applying techniques of data lineage to interactive visualizations based on
 in-memory databases. Their work allows for fine-grained provenance queries at high-speed, but does not extend
 this work to supporting text. In general it is unclear what a data provenance query on text looks like, or how
 one might write an article as a program that allows for interactive provenance queries on text.
@@ -90,15 +90,15 @@ with the terms ``exceptionally unlikely'' and ``virtually certain''.
 
 \subsubsection{Selecting Visual Elements: Iteration, Scope and Mereology}
 Text that refers to objects of discourse is relatively common, but even direct references are non-trivial
-linguistically. \figref{visual-elements-scope} -- taken from \cite{lee23} -- shows an example \textit{in situ},
-the report it is taken from collates a large amount of climate research data, and attempts to synthesize
-useful information for policymakers. Even this simple example shows the complexity of the problem: the text highlighted
-in orange refers to the collection of bar-charts shown on the left hand side, introducing a set of 5 bar-charts
-into the scope of discourse. The text highlighted in green refers to the bars within these charts, mapping
-a narrowing of scope across the bar-charts that have already been introduced. Then, the text highlighted in
-purple narrows this scope further to talk about the bar representing total warming, again within each of the
-charts at the same time. To handle this kind of reference, we need a generic mechanism for referencing
-containers independently of their contents.
+linguistically. \figref{ipcc-mockup}, taken from \cite{lee23}, shows an example \textit{in situ}, the report
+it is taken from collates a large amount of climate research data, and attempts to synthesize useful
+information for policymakers. Even this simple example shows the complexity of the problem: the text
+highlighted in orange refers to the collection of bar-charts shown on the left hand side, introducing a set of
+5 bar-charts into the scope of discourse. The text highlighted in green refers to the bars within these
+charts, mapping a narrowing of scope across the bar-charts that have already been introduced. Then, the text
+highlighted in purple narrows this scope further to talk about the bar representing total warming, again
+within each of the charts at the same time. To handle this kind of reference, we need a generic mechanism for
+referencing containers independently of their contents.
 
 % This illustrative example showcases several sub-problems our system will need to be able to handle. First
 % is that of creating an iterative scope for the references that follow. We can imagine that the orange-highlighted
