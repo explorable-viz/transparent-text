@@ -1,19 +1,18 @@
 \section{Introduction}
 
-In data analytics and other forms of science communication, reader understanding can
-be greatly improved by providing the reader with information about ``data provenance'':
-where did this data come from, how was it used, and how did that lead to the conclusions being presented to me?
-Collecting information for this purpose requires a lot of effort, and so work has gone into automatic its collection,
-by integrating data provenance features into programming languages themselves \cite{fehrenbach16}. More recently, this idea
-has been extended to work with data visualizations \cite{perera22}, further aiding reader comprehension.
-The utility of this information is clear: good science  is
-\emph{reproducible}, and good science communication should give the layperson as many tools
-as possible to verify or reproduce conclusions made from data.
+In data analytics and other forms of science communication, reader understanding can be greatly improved by
+providing the reader with information about ``data provenance'': where did this data come from, how was it
+used, and how did that lead to the conclusions being presented to me? Collecting information for this purpose
+requires a lot of effort, and so work has gone into automatic its collection, by integrating data provenance
+features into programming languages themselves \cite{fehrenbach16}. More recently, this idea has been extended
+to work with data visualizations \cite{perera22}, further aiding reader comprehension. The utility of this
+information is clear: good science  is \emph{reproducible}, and good science communication should give the
+layperson as many tools as possible to verify or reproduce conclusions made from data.
 
-Communication is often done through combining the mediums of text,
-data visualizations, and code. The idea of literate programming \cite{knuth84} has
-been influential, and in data analytics the ``notebook interface'' \cite{kluyver16} has become
-the de facto standard for communication, allowing a data scientist to interleave code with its own results, and expository text. 
+Communication is often done through combining the mediums of text, data visualizations, and code. The idea of
+literate programming \cite{knuth84} has been influential, and in data analytics the ``notebook interface''
+\cite{kluyver16} has become the de facto standard for communication, allowing a data scientist to interleave
+code with its own results, and expository text.
 
 \begin{figure}[h]
    \includegraphics[width=0.7\textwidth]{fig/ipcc-table-explanation.png}
@@ -21,7 +20,7 @@ the de facto standard for communication, allowing a data scientist to interleave
    \label{fig:table-explanation}
 \end{figure}
 
-Whilst these solutions provide some level of transparency, they come with limitations. Users do not want to 
+Whilst these solutions provide some level of transparency, they come with limitations. Users do not want to
 install bespoke software in order to read articles, and notebooks do not necessarily provide complete
 transparency by themselves; the code is often highly abstract, providing wrappers
 for complex models which have often been applied as black-boxes.
@@ -62,7 +61,7 @@ green provides code which helps explain the text. We can immediately see the con
 transparency: if the explanation simply provided the first line -- the final expression which
 produced the text -- one could argue that we have made some improvement on the transparency
 of the example. The context added underneath, the definitions of the task specific functions
-used to construct the final expression, makes it \emph{more transparent}, than just 
+used to construct the final expression, makes it \emph{more transparent}, than just
 providing a single source expression.
 
 
@@ -80,7 +79,7 @@ We call text that comes with an account of how it was generated \emph{self-certi
 \end{figure}
 
 \subsection{Self-Certifying Text}
-What does it mean for supporting text to be self-certifying? 
+What does it mean for supporting text to be self-certifying?
 
 \subsubsection{Quantitative Expressions}
 \begin{itemize}
@@ -103,22 +102,22 @@ or some other value arbitrarily close to $1$, we will \emph{grade} the adjective
 it is \emph{virtually certain} to occur. We see examples of this in \figref{table-explanation},
 with the terms ``exceptionally unlikely'' and ``virtually certain''.
 
-% Considered in more depth, we arrive at the concept of modalities in natural language. Similar to 
+% Considered in more depth, we arrive at the concept of modalities in natural language. Similar to
 % the concepts in modal logic, a modality allows the expression of concepts such as necessity or possibility.
 % In the context described above, the idea that a probability is \emph{virtually certain} introduces the modality of
 % possibility -- an event must be possible in order to be virtually certain to occur. Even something simple
 % like the discussion of probabilities above can combine the two into the idea of graded modality:
 % if something is ``very likely'', we would still believe that it is less likely to occur than something that
 % is ``virtually certain''. Handling these sorts of linguistic constructs will be a key part of addressing
-% the problem. 
+% the problem.
 
 \subsubsection{Selecting Visual Elements: Iteration, Scope and Mereology}
-Text that refers to objects of discourse is relatively common, but even direct references are non-trivial 
+Text that refers to objects of discourse is relatively common, but even direct references are non-trivial
 linguistically. \figref{visual-elements-scope} -- taken from \cite{lee23} -- shows an example \textit{in situ},
 the report it is taken from collates a large amount of climate research data, and attempts to synthesize
 useful information for policymakers. Even this simple example shows the complexity of the problem: the text highlighted
 in orange refers to the collection of bar-charts shown on the left hand side, introducing a set of 5 bar-charts
-into the scope of discourse. The text highlighted in green refers to the bars within these charts, mapping 
+into the scope of discourse. The text highlighted in green refers to the bars within these charts, mapping
 a narrowing of scope across the bar-charts that have already been introduced. Then, the text highlighted in
 purple narrows this scope further to talk about the bar representing total warming, again within each of the
 charts at the same time. To handle this kind of reference, we need a generic mechanism for referencing
@@ -130,7 +129,7 @@ containers independently of their contents.
 % then maps over the iterable created by the green highlighted text. This sort of iteration is a common feature of natural language,
 % and any well-designed system should allow for such expressions to be written by the author, and linked appropriately.
 
-% In order to reference common substructures that appear within the 5 charts, the system must be able to walk arbitrarily 
+% In order to reference common substructures that appear within the 5 charts, the system must be able to walk arbitrarily
 % into structured data objects. In linguistics this is referred to as ``mereology'', the study of relationships
 % between parts and wholes. In our case, one could imagine the collection of 5 charts as the whole, with each
 % individual bar-chart being a part of that whole. Because all 5 charts are structurally the same (of the same type),
