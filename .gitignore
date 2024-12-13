@@ -16,3 +16,5 @@ node_modules
 venv/
 benchmark/
 *.agdai
+/preprocessing/.ipynb_checkpoints
+/preprocessing/CMIP6_tas_landsea/.ipynb_checkpoints
