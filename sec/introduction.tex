@@ -15,68 +15,45 @@ literate programming \cite{knuth84} has been influential, and in data analytics 
 code with its own results, and expository text.
 
 \begin{figure}[h]
-   \includegraphics[width=0.7\textwidth]{fig/ipcc-table-explanation.png}
-   \caption{Explanation suported by contents of table}
-   \label{fig:table-explanation}
+   \includegraphics[width=0.9\textwidth]{fig/ipcc-mockup.png}
+   \caption{Mockup of end-user transparency features (numbered 1 to 8)}
+   \label{fig:ipcc-mockup}
 \end{figure}
 
 Whilst these solutions provide some level of transparency, they come with limitations. Users do not want to
 install bespoke software in order to read articles, and notebooks do not necessarily provide complete
-transparency by themselves; the code is often highly abstract, providing wrappers
-for complex models which have often been applied as black-boxes.
+transparency by themselves; the code is often highly abstract, providing wrappers for complex models which
+have often been applied as black-boxes.
 
-More recently, \cite{dragicevic19} proposed the idea of an \emph{explorable multiverse} as a
-mechanism for improving transparency. The idea is that during data analysis, choices made by
-the analyst can significantly impact results; and that analysis should be run multiple times
-using different methods. The user should then be allowed to toggle between different choices
-and see how a change in the method impacts the conclusions that can be drawn from the data.
+More recently, \cite{dragicevic19} proposed the idea of an \emph{explorable multiverse} as a mechanism for
+improving transparency. The idea is that during data analysis, choices made by the analyst can significantly
+impact results; and that analysis should be run multiple times using different methods. The user should then
+be allowed to toggle between different choices and see how a change in the method impacts the conclusions that
+can be drawn from the data.
 
-\cite{psallidas18} has done work on applying techniques of data lineage to interactive
-visualizations based on in-memory databases. Their work allows for fine-grained
-provenance queries at high-speed, but does not extend this work to supporting text.
-In general it is unclear what a data provenance query on text looks like, or how one
-might write an article as a program that allows for interactive provenance queries on text.
+\cite{psallidas18} has done work on applying techniques of data lineage to interactive visualizations based on
+in-memory databases. Their work allows for fine-grained provenance queries at high-speed, but does not extend
+this work to supporting text. In general it is unclear what a data provenance query on text looks like, or how
+one might write an article as a program that allows for interactive provenance queries on text.
 
-Whilst we do not propose to solve the problem of deliberate misinformation,
-interactive features, which allow readers to interrogate where data came from and how
-it was used to support an argument, allow both laypeople and policymakers to make more
-informed decisions. Increased data transparency is a good thing. Transparency
+Whilst we do not propose to solve the problem of deliberate misinformation, interactive features, which allow
+readers to interrogate where data came from and how it was used to support an argument, allow both laypeople
+and policymakers to make more informed decisions. Increased data transparency is a good thing. Transparency
 should not be considered a binary quantity. Instead it is helpful to think of it as a continuum.
 
-\begin{figure}
-   \begin{subfigure}{\textwidth}
-      \includegraphics[width=0.9\textwidth]{fig/ipcc-table-mockup-small.png}
-      \caption{End-user interaction: 1}
-      \label{fig:table-mockup-a}
-   \end{subfigure}
-   \begin{subfigure}{\textwidth}
-      \includegraphics[width=0.9\textwidth]{fig/table-spm-fluid-mockup.png}
-      \caption{End-user interaction: 2}
-      \label{fig:table-mockup-b}
-   \end{subfigure}
-\end{figure}
-
-In the mock-up shown in \figref{table-mockup}, the explanation attached to the text in
-green provides code which helps explain the text. We can immediately see the continuum of
-transparency: if the explanation simply provided the first line -- the final expression which
-produced the text -- one could argue that we have made some improvement on the transparency
-of the example. The context added underneath, the definitions of the task specific functions
-used to construct the final expression, makes it \emph{more transparent}, than just
+In the mock-up shown in \figref{ipcc-mockup}, the explanation attached to the text in green provides code
+which helps explain the text. We can immediately see the continuum of transparency: if the explanation simply
+provided the first line -- the final expression which produced the text -- one could argue that we have made
+some improvement on the transparency of the example. The context added underneath, the definitions of the task
+specific functions used to construct the final expression, makes it \emph{more transparent}, than just
 providing a single source expression.
 
-
-To meet this goal, we need to allow authors to introduce a richer kind of reference into supporting
-text. Making reference to visual marks or underlying data can be thought of as a \emph{query},
-interacting with a textual reference should query the underlying data, and provide the user with immediate
-visual feedback, perhaps by highlighting elements of relevant visualizations, perhaps by showing the user
-how a given result was computed. We stress that generic tooling for this sort of thing does not yet exist.
-We call text that comes with an account of how it was generated \emph{self-certifying text}.
-
-\begin{figure}
-   \includegraphics[width=0.9\textwidth]{fig/ipcc-visual-elements.png}
-   \caption{Examples of scope in linked text}
-   \label{fig:visual-element-scope}
-\end{figure}
+To meet this goal, we need to allow authors to introduce a richer kind of reference into supporting text.
+Making reference to visual marks or underlying data can be thought of as a \emph{query}, interacting with a
+textual reference should query the underlying data, and provide the user with immediate visual feedback,
+perhaps by highlighting elements of relevant visualizations, perhaps by showing the user how a given result
+was computed. We stress that generic tooling for this sort of thing does not yet exist. We call text that
+comes with an account of how it was generated \emph{self-certifying text}.
 
 \subsection{Self-Certifying Text}
 What does it mean for supporting text to be self-certifying?
