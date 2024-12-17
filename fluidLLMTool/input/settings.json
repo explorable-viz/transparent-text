@@ -9,5 +9,8 @@
   "claude-token": "",
   "ollama-url": "http://127.0.0.1",
   "ollama-port": "11434",
-  "log-path": "logs/"
+  "log-path": "logs/",
+  "fluid-compiler-path": "./fluid-parser",
+  "fluid-temp-file": "llmTest",
+  "agent-limit": "5"
 }
