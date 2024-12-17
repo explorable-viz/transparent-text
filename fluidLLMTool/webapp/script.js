@@ -30,8 +30,8 @@ function addPrompt(userCaption = '', assistantResponse = '', userData = '', user
                     <textarea class="form-control prompt-code" rows="5" placeholder="Enter BOB code...">${userCode}</textarea>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Caption</label>
-                    <textarea class="form-control prompt-caption" rows="5" placeholder="Enter caption...">${userCaption}</textarea>
+                    <label class="form-label">Text</label>
+                    <textarea class="form-control prompt-caption" rows="5" placeholder="Enter text...">${userCaption}</textarea>
                 </div>
             `;
 
