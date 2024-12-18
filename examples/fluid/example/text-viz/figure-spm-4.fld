@@ -27,14 +27,14 @@ let mkBarChart scenName table =
 
 let getHeight bar offset = (head bar.bars).z + offset;
 
-let ssp119 = mkBarChart "SSP1-1.9" ssp119Source;
+let ssp126 = mkBarChart "SSP1-2.6" ssp126Source;
     ssp245 = mkBarChart "SSP2-4.5" ssp245Source;
-    total = map getTotal [ssp119, ssp245];
-    co2 = map getCO2 [ssp119, ssp245];
-    nonco2 = map getNonCO2 [ssp119, ssp245];
+    total = map getTotal [ssp126, ssp245];
+    co2 = map getCO2 [ssp126, ssp245];
+    nonco2 = map getNonCO2 [ssp126, ssp245];
     meanTotal = (sum (map stackedBarHeight total)) / (length total)
 in MultiView {
-    leftBarChart: ssp119,
+    leftBarChart: ssp126,
     rightBarChart: ssp245,
     explanation:
         LinkedText [ "Within each scenario bar plot, the bars represent: total warming ", explainBars total "Total",
