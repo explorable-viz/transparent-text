@@ -24,6 +24,7 @@ public class FluidParserValidatorAgent implements Agent {
 
     private String log;
     private String expected;
+
     public void setPrevAgent(Agent prevAgent) {
         this.prevAgent = prevAgent;
     }
@@ -72,6 +73,7 @@ public class FluidParserValidatorAgent implements Agent {
             "    else (target - min)/(max - min);" +
             "##CODE##\n" +
             "in ##EXPRESSION##\n";
+
     public FluidParserValidatorAgent(String sentence, String response) {
         this.sentence = sentence;
         this.response = response;
@@ -103,22 +105,23 @@ public class FluidParserValidatorAgent implements Agent {
              * Check which bash need to be executed
              * based on OS.
              */
-            if(os.contains("win")) {
+            if (os.contains("win")) {
                 bashType = "cmd.exe /c";
             } else {
-                bashType = "bash -c";
+                bashType = "";
             }
-            String command = STR."\{bashType} cd \{compilerPath} & yarn fluid -f \{file}";
+            String command = STR."\{bashType} yarn fluid -f \{file}";
+            logger.info("Running command");
+            logger.info(command);
             Process proc = Runtime.getRuntime().exec(command);
             InputStream in = proc.getInputStream();
-
             InputStream err = proc.getErrorStream();
             proc.waitFor();
             String output = new String(in.readAllBytes());
             String err_output = new String(err.readAllBytes());
-            if(!err_output.isEmpty()) {
-                logger.log(Level.SEVERE, err_output);
-            }
+            logger.info("Output to be validated" + output);
+            logger.info("seems error " + err_output);
+
             valid = checkValidity(output, parsedSentence.getString("caption"));
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -132,7 +135,7 @@ public class FluidParserValidatorAgent implements Agent {
      * Checks the validity of the given output against a specific pattern within a provided string.
      *
      * @param output the output to be validated
-     * @param s the string containing the pattern to match against the output
+     * @param s      the string containing the pattern to match against the output
      * @return true if the output matches the pattern, false otherwise
      */
     private boolean checkValidity(String output, String s) {
@@ -146,9 +149,9 @@ public class FluidParserValidatorAgent implements Agent {
         } else {
             return false;
         }
-        String generatedExpression = output.split("\n")[2];
+        String generatedExpression = output.split("\n")[1];
         generatedExpression = generatedExpression.replaceAll("^\"|\"$", "");
-        if(generatedExpression.equals(value)) {
+        if (generatedExpression.equals(value)) {
             logger.info("Validation passed");
             return true;
         }
@@ -163,17 +166,17 @@ public class FluidParserValidatorAgent implements Agent {
      * Retrieves the next Agent in the workflow based on validation status and previous agent type.
      *
      * @return the next Agent based on the validation status and previous agent type:
-     *         <br> - If validation passed, returns a new OutputAgent with the response.
-     *         <br> - If validation failed, creates a specific error message depending on the log and
-     *         returns a FluidGeneratorAgent with updated values if the previous agent is an instance of FluidGeneratorAgent,
-     *         otherwise returns a new OutputAgent with an error flag.
+     * <br> - If validation passed, returns a new OutputAgent with the response.
+     * <br> - If validation failed, creates a specific error message depending on the log and
+     * returns a FluidGeneratorAgent with updated values if the previous agent is an instance of FluidGeneratorAgent,
+     * otherwise returns a new OutputAgent with an error flag.
      */
     @Override
     public Agent next() {
-        if(!valid) {
+        if (!valid) {
             logger.info("Validation not passed. Going back to " + prevAgent.getClass().getName());
             String msg = "";
-            if(log.toLowerCase().contains("key") && log.toLowerCase().contains("not found")) {
+            if (log.toLowerCase().contains("key") && log.toLowerCase().contains("not found")) {
                 msg = STR."KeyNotFound Error. The generated expression \{response} is trying to access to a key which does not exist.Check the code and regenerate the expression which is supposed to generate the following value: \{expected}. Remember: reply only with the expression, without any other comment.";
             } else if (log.toLowerCase().contains("parseerror")) {
                 msg = STR."SyntacticError. The generated expression \{response} generated the following error. \n \{log} Check the code and regenerate the expression which is supposed to generate the following value: \{expected}. Remember: reply only with the expression, without any other comment.";
@@ -182,7 +185,7 @@ public class FluidParserValidatorAgent implements Agent {
             }
             if (prevAgent instanceof FluidGeneratorAgent agent) {
                 agent.setSentence(msg);
-                agent.setnExecution(agent.getnExecution()+1);
+                agent.setnExecution(agent.getnExecution() + 1);
                 return agent;
             } else {
                 logger.info("Error: missed agent.");
