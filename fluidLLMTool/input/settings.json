@@ -1,7 +1,7 @@
 {
   "temperature": "0.3",
   "timeout": "1800",
-  "num_ctx": "4000",
+  "num_ctx": "2000",
   "openai-token": "",
   "gemini-token": "",
   "gemini-projectId": "",
@@ -10,7 +10,7 @@
   "ollama-url": "http://127.0.0.1",
   "ollama-port": "11434",
   "log-path": "logs/",
-  "fluid-compiler-path": "./fluid-parser",
+  "fluid-compiler-path": "./",
   "fluid-temp-file": "llmTest",
   "agent-limit": "5"
 }

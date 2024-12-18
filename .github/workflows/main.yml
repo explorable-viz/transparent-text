@@ -20,15 +20,6 @@ jobs:
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '22'
-      - name: Install Compiler
-        working-directory: ./fluidLLMTool
-        run: |
-          yarn install-fluid-compiler
-      - name: Check out Fluid Repo
-        working-directory: ./fluidLLMTool/fluid-parser
-        run: |
-          git clone https://github.com/explorable-viz/fluid.git fluid-repo
-          mv fluid-repo/fluid .
       - name: Deploy LLM Tool
         working-directory: ./fluidLLMTool
         run: |

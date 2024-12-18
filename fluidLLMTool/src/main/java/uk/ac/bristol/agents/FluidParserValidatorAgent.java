@@ -191,7 +191,7 @@ public class FluidParserValidatorAgent implements Agent {
     }
 
     private void writeFluidFile(String data, String code) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(STR."fluid-parser/fluid/example/\{Settings.getInstance().get(Settings.FLUID_TEMP_FILE)}.fld");
+        PrintWriter out = new PrintWriter(STR."fluid/example/\{Settings.getInstance().get(Settings.FLUID_TEMP_FILE)}.fld");
         String result = template.replaceAll("##DATA##", data);
         result = result.replaceAll("##CODE##", code);
         result = result.replaceAll("##EXPRESSION##", response);
