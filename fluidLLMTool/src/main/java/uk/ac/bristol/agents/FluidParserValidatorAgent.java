@@ -1,7 +1,7 @@
-package agents;
+package uk.ac.bristol.agents;
 
 import org.json.JSONObject;
-import plrg.Settings;
+import uk.ac.bristol.plrg.Settings;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

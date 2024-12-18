@@ -1,9 +1,9 @@
-package agents;
+package uk.ac.bristol.agents;
 
 import it.unisa.cluelab.lllm.llm.LLMEvaluatorAgent;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
-import plrg.Settings;
+import uk.ac.bristol.plrg.Settings;
 
 import java.util.logging.Logger;
 

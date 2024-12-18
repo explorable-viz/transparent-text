@@ -1,4 +1,4 @@
-package agents;
+package uk.ac.bristol.agents;
 
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONArray;

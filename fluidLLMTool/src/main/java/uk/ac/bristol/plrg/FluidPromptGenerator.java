@@ -1,4 +1,4 @@
-package plrg;
+package uk.ac.bristol.plrg;
 
 import it.unisa.cluelab.lllm.llm.prompt.Prompt;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;

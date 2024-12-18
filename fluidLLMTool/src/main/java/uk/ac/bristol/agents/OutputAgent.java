@@ -1,4 +1,4 @@
-package agents;
+package uk.ac.bristol.agents;
 
 import java.util.logging.Logger;
 

@@ -1,8 +1,8 @@
-package plrg;
+package uk.ac.bristol.plrg;
 
-import agents.Agent;
-import agents.InputAgent;
-import agents.OutputAgent;
+import uk.ac.bristol.agents.Agent;
+import uk.ac.bristol.agents.InputAgent;
+import uk.ac.bristol.agents.OutputAgent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
