@@ -95,7 +95,20 @@ public class FluidParserValidatorAgent implements Agent {
             writeFluidFile(data, code);
             String file = Settings.getInstance().get(Settings.FLUID_TEMP_FILE);
             String compilerPath = Settings.getInstance().get(Settings.FLUID_COMPILER_PATH);
-            Process proc = Runtime.getRuntime().exec(STR."cmd.exe /c cd \{compilerPath} & yarn fluid -f \{file}");
+            String os = System.getProperty("os.name").toLowerCase();
+
+            String bashType = "";
+            /**
+             * Check which bash need to be executed
+             * based on OS.
+             */
+            if(os.contains("win")) {
+                bashType = "cmd.exe /c";
+            } else {
+                bashType = "bash -c";
+            }
+            String command = STR."\{bashType} cd \{compilerPath} & yarn fluid -f \{file}";
+            Process proc = Runtime.getRuntime().exec(command);
             InputStream in = proc.getInputStream();
 
             InputStream err = proc.getErrorStream();
