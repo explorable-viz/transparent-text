@@ -1,13 +1,10 @@
 package agents;
 
 import it.unisa.cluelab.lllm.llm.LLMEvaluatorAgent;
-import it.unisa.cluelab.lllm.llm.prompt.Prompt;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
-import uk.ac.bristol.plrg.Main;
-import uk.ac.bristol.plrg.Settings;
+import plrg.Settings;
 
-import java.util.Set;
 import java.util.logging.Logger;
 
 public class FluidGeneratorAgent implements Agent{

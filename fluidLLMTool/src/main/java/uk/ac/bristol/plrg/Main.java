@@ -1,4 +1,4 @@
-package uk.ac.bristol.plrg;
+package plrg;
 
 import agents.Agent;
 import agents.InputAgent;
