@@ -1,0 +1,35 @@
+let split [] = ([], []);
+    split (x : xs) =
+      let (ys, zs) = split xs in (x : zs, ys);
+
+let merge xs ys =
+       match (xs, ys) as {
+          ([], _) -> ys;
+          (x : xs', []) -> xs;
+          (x : xs', y : ys') ->
+             if x < y
+             then x : merge xs' ys
+             else y : merge xs ys'
+       };
+
+let mergesort xs =
+       if length xs < 2
+       then xs
+       else
+          let (ys, zs) = split xs in
+          merge (mergesort ys) (mergesort zs);
+
+let findPercentile data p =
+    let sorted = mergesort data;
+        rank = (p / 100.0) * (length data - 1) + 1
+    in if rank == floor(rank)
+    then nth rank sorted
+    else let x1 = floor rank;
+             x2 = ceiling rank
+        in (nth x1 sorted) + (rank - x1) * (nth x2 sorted - nth x1 sorted);
+
+let likelihoodLE data target = 
+    length (filter (fun x -> x <= target) data) / length data;
+
+let likelihoodGE data target = 
+    length (filter (fun x -> x >= target) data) / length data;
