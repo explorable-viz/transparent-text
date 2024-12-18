@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -114,6 +115,10 @@ public class FluidParserValidatorAgent implements Agent {
             InputStream err = proc.getErrorStream();
             proc.waitFor();
             String output = new String(in.readAllBytes());
+            String err_output = new String(err.readAllBytes());
+            if(!err_output.isEmpty()) {
+                logger.log(Level.SEVERE, err_output);
+            }
             valid = checkValidity(output, parsedSentence.getString("caption"));
         } catch (IOException e) {
             throw new RuntimeException(e);
