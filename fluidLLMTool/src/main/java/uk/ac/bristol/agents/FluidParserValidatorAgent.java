@@ -131,7 +131,7 @@ public class FluidParserValidatorAgent implements Agent {
      * @return true if the output matches the pattern, false otherwise
      */
     private boolean checkValidity(String output, String s) {
-
+        logger.info(STR."Checking validity of the following output \{output}");
         String regex = "value=\\\"(.*?)\\\"";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(s);
