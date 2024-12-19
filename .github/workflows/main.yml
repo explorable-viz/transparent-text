@@ -41,6 +41,7 @@ jobs:
       - name: Launch Prompt Tests (10 sentences)
         working-directory: ./fluidLLMTool
         run: |
+          yarn install
           yarn test
 #  prompt-test-macos:
 #    runs-on: macos-latest
