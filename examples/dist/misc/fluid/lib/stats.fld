@@ -20,8 +20,8 @@ let mergesort xs =
           merge (mergesort ys) (mergesort zs);
 
 -- assume data is sorted
-let findPercentile data p =
-    let rank = (p / 100.0) * (length data - 1) + 1
+let findQuantile q p data = 
+    let rank = (p / q) * (length data - 1)
     in if rank == floor rank
     then nth rank data
     else let x1 = floor rank;
@@ -30,16 +30,30 @@ let findPercentile data p =
              right = nth x2 data
         in left + (rank - x1) * (right - left);
 
+let findPercentile = findQuantile 100;
+
+let split p data = 
+    let go fls trs [] = (fls, trs);
+        go fls trs (x : xs) = 
+            if p x
+            then go fls (x : trs) xs
+            else go (x : fls) trs xs
+    in go [] [] data;
+
 let accumBins data [] = [];
-    accumBins data (r : es) = 
-        let ge = filter (fun x -> r < x) data;
-            le = filter (fun x -> x <= r) data
-        in le : accumBins ge es; 
+    accumBins data (r : es) =  
+        let (ge, le) = split (fun x -> x <= r) data
+        in le : accumBins ge es;        
 
 let cut data nbins = 
     let low = minimum data;
         binwidth = (maximum data - low) / nbins;
         edges = [ low + (x * binwidth) | x <- enumFromTo 1 nbins ]
+    in (accumBins data edges, binwidth);
+
+let qcut data nbins = 
+    let low = minimum data;
+        edges = [ findQuantile nbins x data | x <- enumFromTo 1 nbins]
     in accumBins data edges;
 
 let likelihoodLE data target = 
