@@ -103,8 +103,8 @@ let filter p [] = [];
 let filterMap p [] = [];
     filterMap p (x : xs) =
       match p x as {
-         None -> filterMap f xs;
-         Some y -> y : filterMap f xs
+         None -> filterMap p xs;
+         Some y -> y : filterMap p xs
       };
 
 -- (a -> b -> a) -> a -> List b -> a

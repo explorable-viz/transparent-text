@@ -19,14 +19,18 @@ let mergesort xs =
           let (ys, zs) = split xs in
           merge (mergesort ys) (mergesort zs);
 
+-- assume data is sorted
 let findPercentile data p =
-    let sorted = mergesort data;
-        rank = (p / 100.0) * (length data - 1) + 1
-    in if rank == floor(rank)
-    then nth rank sorted
+    let rank = (p / 100.0) * (length data - 1) + 1
+    in if rank == floor rank
+    then nth rank data
     else let x1 = floor rank;
-             x2 = ceiling rank
-        in (nth x1 sorted) + (rank - x1) * (nth x2 sorted - nth x1 sorted);
+             x2 = ceiling rank;
+             left = nth x1 data;
+             right = nth x2 data
+        in left + (rank - x1) * (right - left);
+
+
 
 let likelihoodLE data target = 
     length (filter (fun x -> x <= target) data) / length data;

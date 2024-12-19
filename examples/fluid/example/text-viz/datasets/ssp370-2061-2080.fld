@@ -1,0 +1,182 @@
+[
+  {
+    model: "NorESM2-LM",
+    world: 16.57,
+    world_historical: 14.5,
+    changed: 1.82
+  },
+  {
+    model: "CAMS-CSM1-0",
+    world: 15.99,
+    world_historical: 13.8,
+    changed: 1.95
+  },
+  {
+    model: "NorESM2-MM",
+    world: 16.13,
+    world_historical: 13.92,
+    changed: 1.96
+  },
+  {
+    model: "GFDL-ESM4",
+    world: 15.95,
+    world_historical: 13.5,
+    changed: 2.2
+  },
+  {
+    model: "MIROC6",
+    world: 17.61,
+    world_historical: 15.12,
+    changed: 2.24
+  },
+  {
+    model: "MIROC-ES2L",
+    world: 17.48,
+    world_historical: 14.96,
+    changed: 2.27
+  },
+  {
+    model: "INM-CM5-0",
+    world: 15.71,
+    world_historical: 13.14,
+    changed: 2.32
+  },
+  {
+    model: "IITM-ESM",
+    world: 16.62,
+    world_historical: 13.99,
+    changed: 2.38
+  },
+  {
+    model: "MPI-ESM1-2-HR",
+    world: 16.57,
+    world_historical: 13.94,
+    changed: 2.38
+  },
+  {
+    model: "MPI-ESM1-2-LR",
+    world: 16.18,
+    world_historical: 13.54,
+    changed: 2.39
+  },
+  {
+    model: "INM-CM4-8",
+    world: 15.97,
+    world_historical: 13.31,
+    changed: 2.41
+  },
+  {
+    model: "FGOALS-g3",
+    world: 15.49,
+    world_historical: 12.81,
+    changed: 2.43
+  },
+  {
+    model: "BCC-CSM2-MR",
+    world: 17.63,
+    world_historical: 14.82,
+    changed: 2.56
+  },
+  {
+    model: "MRI-ESM2-0",
+    world: 16.63,
+    world_historical: 13.74,
+    changed: 2.63
+  },
+  {
+    model: "CNRM-ESM2-1",
+    world: 16.58,
+    world_historical: 13.64,
+    changed: 2.69
+  },
+  {
+    model: "ACCESS-ESM1-5",
+    world: 17.59,
+    world_historical: 14.54,
+    changed: 2.8
+  },
+  {
+    model: "CESM2",
+    world: 17.08,
+    world_historical: 14.02,
+    changed: 2.81
+  },
+  {
+    model: "EC-Earth3-Veg-LR",
+    world: 16.74,
+    world_historical: 13.54,
+    changed: 2.95
+  },
+  {
+    model: "AWI-CM-1-1-MR",
+    world: 16.96,
+    world_historical: 13.76,
+    changed: 2.96
+  },
+  {
+    model: "CNRM-CM6-1",
+    world: 16.09,
+    world_historical: 12.88,
+    changed: 2.96
+  },
+  {
+    model: "CMCC-CM2-SR5",
+    world: 17.34,
+    world_historical: 14.1,
+    changed: 2.98
+  },
+  {
+    model: "CESM2-WACCM",
+    world: 17.14,
+    world_historical: 13.84,
+    changed: 3.06
+  },
+  {
+    model: "ACCESS-CM2",
+    world: 17.17,
+    world_historical: 13.84,
+    changed: 3.09
+  },
+  {
+    model: "EC-Earth3",
+    world: 17.34,
+    world_historical: 13.94,
+    changed: 3.15
+  },
+  {
+    model: "IPSL-CM6A-LR",
+    world: 16.52,
+    world_historical: 12.88,
+    changed: 3.39
+  },
+  {
+    model: "CNRM-CM6-1-HR",
+    world: 16.06,
+    world_historical: 12.32,
+    changed: 3.48
+  },
+  {
+    model: "EC-Earth3-Veg",
+    world: 17.28,
+    world_historical: 13.53,
+    changed: 3.5
+  },
+  {
+    model: "KACE-1-0-G",
+    world: 17.54,
+    world_historical: 13.55,
+    changed: 3.74
+  },
+  {
+    model: "UKESM1-0-LL",
+    world: 17.46,
+    world_historical: 13.45,
+    changed: 3.76
+  },
+  {
+    model: "CanESM5",
+    world: 18.23,
+    world_historical: 13.54,
+    changed: 4.44
+  }
+]
