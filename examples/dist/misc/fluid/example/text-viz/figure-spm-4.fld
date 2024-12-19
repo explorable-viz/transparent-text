@@ -28,7 +28,16 @@ let mkBarChart scenName table =
 
 let getHeight bar offset = (head bar.bars).z + offset;
 
+let mkHistogram scenName data bins = 
+    let dataBins = zipWith (fun d b -> { x: b, bars: [ {y: "predicted", z: sum d} ]}) data bins
+    in BarChart {
+        caption: "Histogram of predicted temps for scenario " ++ scenName,
+        size: { width: 275, height: 185 },
+        stackedBars: dataBins
+    };
+
 let ssp126late = aggregateSSP ssp126Source;
+    ssp126distrib = cut ssp126late 8;
     ssp126 = mkBarChart "SSP1-2.6" ssp126Breakdown;
     ssp245 = mkBarChart "SSP2-4.5" ssp245Breakdown;
     total = map getTotal [ssp126, ssp245];
@@ -42,5 +51,6 @@ in MultiView {
         LinkedText [ "Within each scenario bar plot, the bars represent: total warming ", explainBars total "Total",
                      ", warming contributions from CO2 ", explainBars co2 "CO2", " and from non-CO2 GHG's ", explainBars nonco2 "Non-CO2"
                      , ". Under SSP1-2.6, the mean predicted temperature increase by the end of the 21st century is ", numToStr (sum ssp126late / length ssp126late)
-                     , " and the median prediction is ", numToStr (findPercentile ssp126late 50)]
+                     , " and the median prediction is ", numToStr (findPercentile ssp126late 50)],
+    histogram: mkHistogram "SSP1-2.6" ssp126distrib ["1" , "2", "3", "4", "5", "6", "7", "8"]
 }

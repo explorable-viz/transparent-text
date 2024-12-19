@@ -30,7 +30,17 @@ let findPercentile data p =
              right = nth x2 data
         in left + (rank - x1) * (right - left);
 
+let accumBins data [] = [];
+    accumBins data (r : es) = 
+        let ge = filter (fun x -> r < x) data;
+            le = filter (fun x -> x <= r) data
+        in le : accumBins ge es; 
 
+let cut data nbins = 
+    let low = minimum data;
+        binwidth = (maximum data - low) / nbins;
+        edges = [ low + (x * binwidth) | x <- enumFromTo 1 nbins ]
+    in accumBins data edges;
 
 let likelihoodLE data target = 
     length (filter (fun x -> x <= target) data) / length data;
