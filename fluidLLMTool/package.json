@@ -17,11 +17,16 @@
     "url": "https://github.com/explorable-viz/fluid/issues"
   },
   "scripts": {
+    "install-fluid-compiler": "./script/install-fluid-compiler.sh",
+    "build-executor": "./script/build-executor.sh",
     "pull-llama3": "./script/model-pull.sh llama3",
     "pull-llama3-1": "./script/model-pull.sh llama3.1",
     "ollama-install": "./script/ollama-install.sh",
     "ollama-serve": "./script/ollama-serve.sh",
-    "test": "./script/prompt-executor.sh Llama31EvaluatorAgent input/prompts.json input/settings.json input/sentences.json input/expected.txt 0.6"
+    "test": "./script/prompt-executor.sh Llama31EvaluatorAgent input/prompt-expression.json input/settings.json input/expression.json input/expression-expected.txt 0.5"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "dependencies": {
+    "@explorable-viz/fluid": "0.7.16"
+  }
 }

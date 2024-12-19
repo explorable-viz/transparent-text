@@ -62,9 +62,9 @@ fi
 
 # Run the Java command with the parameters
 if [ -z "$expected_results" ]; then
-    output=$(java -jar jar/prompt-executor.jar "$agent_class" "$prompt_configuration" "$sentences")
+    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences")
 else
-    output=$(java -jar jar/prompt-executor.jar "$agent_class" "$prompt_configuration" "$sentences" "$expected_results")
+    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences" "$expected_results")
 fi
 
 # Analyses the output with a regex to extract the accuracy

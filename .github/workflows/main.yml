@@ -19,22 +19,29 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '21'
+          java-version: '22'
+      - name: Deploy LLM Tool
+        working-directory: ./fluidLLMTool
+        run: |
+          yarn build-executor
+        env:
+          GITHUB_TOKEN: ${{ secrets.LLM_PROMPT_EXECUTOR_TOKEN }}
       - name: Install ollama
         working-directory: ./fluidLLMTool
         run: |
-          yarn ollama-install
+          yarn --cwd ./fluidLLMTool ollama-install
       - name: Run ollama
         working-directory: ./fluidLLMTool
         run: |
           yarn ollama-serve
-      - name: Pull llama3
+      - name: Pull llama3.1
         working-directory: ./fluidLLMTool
         run: |
-          yarn pull-llama3
-      - name: Launch Prompt Tests (20 sentences)
+          yarn pull-llama3-1
+      - name: Launch Prompt Tests (10 sentences)
         working-directory: ./fluidLLMTool
         run: |
+          yarn install
           yarn test
 #  prompt-test-macos:
 #    runs-on: macos-latest
