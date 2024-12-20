@@ -32,6 +32,7 @@ let findQuantile q p data =
 
 let findPercentile = findQuantile 100;
 
+-- (a -> Boolean) -> List a -> (List a, List a)
 let split p data = 
     let go fls trs [] = (fls, trs);
         go fls trs (x : xs) = 
@@ -43,7 +44,7 @@ let split p data =
 let accumBins data [] = [];
     accumBins data (r : es) =  
         let (ge, le) = split (fun x -> x <= r) data
-        in le : accumBins ge es;        
+        in le : accumBins ge es;
 
 let cut data nbins = 
     let low = minimum data;

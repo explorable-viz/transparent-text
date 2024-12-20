@@ -12,10 +12,7 @@ let barHeight (BarChart bc) x =
     let bar = fromSome (findWithKey "x" x bc.stackedBars)
     in sum [ segment.z | segment <- bar.bars ];
 
-let explainBars bars x = 
-    if length bars == length (filter (fun bar -> bar.x == x) bars)
-    then "(°C; " ++ x ++ " bar)"
-    else error "absurd";
+let explainBars bars x = ("°C; " ++ x ++ " bar", bars);
 
 let mkBarChart caption table = 
     BarChart {
@@ -24,26 +21,28 @@ let mkBarChart caption table =
         stackedBars: table
     };
 
-let transformBreakdown table = map (fun record -> { x: record.type, bars: [ { y: "emissions", z: record.emissions } ]}) table;
+let reshapeWarming table = map (fun record -> { x: record.type, bars: [ { y: "emissions", z: record.emissions } ]}) table;
 
-let transformBins data bins width = zipWith (fun d b -> { x: b, bars: [ {y: "predicted", z: length d / width} ]}) data bins;
+let reshapePreds data bins width = zipWith (fun d b -> { x: b, bars: [ {y: "predicted", z: length d / width} ]}) data bins;
 
 let getHeight bar offset = (head bar.bars).z + offset;
 
 let ssp126late = [ record.changed | record <- ssp126Source];
-    (ssp126distrib, w) = cut ssp126late 8;
-    ssp126 = mkBarChart "SSP1-2.6" (transformBreakdown ssp126Breakdown);
-    ssp245 = mkBarChart "SSP2-4.5" (transformBreakdown ssp245Breakdown);
-    total = map getTotal [ssp126, ssp245];
+    (ssp126distrib, width) = cut ssp126late 8;
+    ssp126 = mkBarChart "SSP1-2.6" (reshapeWarming ssp126Breakdown);
+    ssp245 = mkBarChart "SSP2-4.5" (reshapeWarming ssp245Breakdown);
+    totalBars = map getTotal [ssp126, ssp245];
     co2 = map getCO2 [ssp126, ssp245];
     nonco2 = map getNonCO2 [ssp126, ssp245]
 in MultiView {
-    histogram: mkBarChart "SSP1-2.6 Predictions" (transformBins ssp126distrib [ "1", "2", "3", "4", "5", "6", "7", "8" ] w),
+    predictionHistogram: mkBarChart "SSP1-2.6 Predictions" (reshapePreds ssp126distrib (map numToStr [1 .. 8]) width),
     ssp126barchart: ssp126,
     ssp245barchart: ssp245,
     explanation:
-        LinkedText [ "Within each scenario bar plot, the bars represent: total warming ", explainBars total "Total",
-                     ", warming contributions from CO2 ", explainBars co2 "CO2", " and from non-CO2 GHG's ", explainBars nonco2 "Non-CO2"
-                     , ". Under SSP1-2.6, the mean predicted temperature increase by the end of the 21st century is ", numToStr (sum ssp126late / length ssp126late)
+        LinkedText [ "Within each scenario bar plot, the bars represent: total warming (", fst (explainBars totalBars "Total"),
+                     "), warming contributions from CO2 ", fst (explainBars co2 "CO2")
+                     , " and from non-CO2 GHG's ", fst (explainBars nonco2 "Non-CO2")
+                     , ". Under SSP1-2.6, the mean predicted temperature increase by the end of the 21st century is "
+                     , numToStr (sum ssp126late / length ssp126late)
                      , " and the median prediction is ", numToStr (findPercentile 50 ssp126late)]    
 }
