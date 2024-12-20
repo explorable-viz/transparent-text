@@ -33,7 +33,7 @@ let findQuantile q p data =
 let findPercentile = findQuantile 100;
 
 -- (a -> Boolean) -> List a -> (List a, List a)
-let split p data = 
+let splitOn p data = 
     let go fls trs [] = (fls, trs);
         go fls trs (x : xs) = 
             if p x
@@ -41,21 +41,23 @@ let split p data =
             else go (x : fls) trs xs
     in go [] [] data;
 
-let accumBins data [] = [];
-    accumBins data (r : es) =  
-        let (ge, le) = split (fun x -> x <= r) data
-        in le : accumBins ge es;
+let accumBins data Nil = [];
+    accumBins data [l] = [];
+    accumBins data (l : r : es) =  
+        let (ge, le) = splitOn (fun x -> x <= r) data
+        in (le , r - l) : accumBins ge (r : es);
 
 let cut data nbins = 
     let low = minimum data;
         binwidth = (maximum data - low) / nbins;
-        edges = [ low + (x * binwidth) | x <- enumFromTo 1 nbins ]
+        edges = [ low + (x * binwidth) | x <- enumFromTo 0 nbins ]
     in (accumBins data edges, binwidth);
 
-let qcut data nbins = 
-    let low = minimum data;
-        edges = [ findQuantile nbins x data | x <- enumFromTo 1 nbins]
-    in accumBins data edges;
+let qcut data [] = [];
+    qcut data qs = 
+        let low = minimum data;
+            edges = [ findQuantile (fst x) (snd x) data | x <- qs]
+        in accumBins data (low : edges);
 
 let likelihoodLE data target = 
     length (filter (fun x -> x <= target) data) / length data;
