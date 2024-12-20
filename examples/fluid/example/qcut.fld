@@ -1,2 +1,2 @@
 let data = mergesort [ x.changed | x <- ssp126Source ]
-in qcut data [ 5, 50, 95, 100 ]
+in qcut data [ 5, 50, 95 ]
