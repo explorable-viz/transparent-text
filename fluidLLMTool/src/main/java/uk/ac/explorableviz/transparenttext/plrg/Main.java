@@ -21,7 +21,7 @@ public class Main {
     public static void main(String... args) throws Exception {
         if (args.length < 4) {
             System.err.println("missinig arguments, 2 expected but " + args.length + " given");
-            System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts.json] [settings.json] [sentences.txt] [expected.txt]");
+            System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts.json] [settings.json] [sentences.txt] [expected.txt] [numSentences]");
             System.exit(0);
         }
 
@@ -32,11 +32,13 @@ public class Main {
 
         String[] sentences = loadSentences(sentencePath);
 
+        int numSentencesToTest = args.length == 6 ? Integer.parseInt(args[5]) : sentences.length;
+
         ArrayList<String> results = new ArrayList<>();
         /**
          * Workflow execution
          */
-        for (int i = 0; i < sentences.length; i++) {
+        for (int i = 0; i < numSentencesToTest; i++) {
             String s = sentences[i];
             logger.info("Analysing sentence id=" + i);
             Settings.getInstance().loadSettings(settingsPath);
