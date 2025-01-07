@@ -1,4 +1,4 @@
-package uk.ac.explorableviz.transparenttext.agents;
+package explorableviz.transparenttext.agents;
 
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONArray;
@@ -9,16 +9,19 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+/**
+ * @todo this part is init() of fga
+ */
 public class InputAgent implements Agent {
 
     private PromptList prompts;
 
-    private String sentence;
+    private String query;
 
-    public InputAgent(String promptPath, String sentence) throws IOException {
+    public InputAgent(String promptPath, String query) throws IOException {
         this.prompts = new PromptList();
         loadPrompts(promptPath);
-        this.sentence = sentence;
+        this.query = query;
     }
     @Override
     public String execute(String a) {
@@ -27,7 +30,7 @@ public class InputAgent implements Agent {
 
     @Override
     public Agent next() {
-        FluidGeneratorAgent fga =  new FluidGeneratorAgent(prompts, sentence);
+        FluidGeneratorAgent fga =  new FluidGeneratorAgent(prompts, query);
         fga.setPrevAgent(this);
         return fga;
     }

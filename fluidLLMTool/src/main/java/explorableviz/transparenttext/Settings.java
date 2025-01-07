@@ -1,4 +1,4 @@
-package explorableviz.transparenttext.plrg;
+package explorableviz.transparenttext;
 
 import org.json.JSONObject;
 

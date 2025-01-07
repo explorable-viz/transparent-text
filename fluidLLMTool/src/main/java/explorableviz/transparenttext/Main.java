@@ -1,4 +1,4 @@
-package explorableviz.transparenttext.plrg;
+package explorableviz.transparenttext;
 
 import explorableviz.transparenttext.agents.Agent;
 import explorableviz.transparenttext.agents.InputAgent;
@@ -20,30 +20,31 @@ public class Main {
 
     public static void main(String... args) throws Exception {
         if (args.length < 4) {
-            System.err.println("missinig arguments, 2 expected but " + args.length + " given");
-            System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts.json] [settings.json] [sentences.txt] [expected.txt] [numSentences]");
+            System.err.println("missing arguments, 2 expected but " + args.length + " given");
+            System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts] [settings] [queries] [expected] [maxQueries]");
             System.exit(0);
         }
 
-        String agent = args[0];
-        String promptPath = args[1];
-        String sentencePath = args[3];
-        String settingsPath = args[2];
+        final String agent = args[0];
+        final String promptPath = args[1];
+        final String queryPath = args[3];
+        final String settingsPath = args[2];
 
-        String[] sentences = loadSentences(sentencePath);
+        final String[] queries = loadQueries(queryPath);
 
-        int numSentencesToTest = args.length == 6 ? Integer.parseInt(args[5]) : sentences.length;
+        final int numQueries = (args.length == 6) ? Integer.parseInt(args[5]) : queries.length;
 
-        ArrayList<String> results = new ArrayList<>();
-        /**
+        final ArrayList<String> results = new ArrayList<>();
+        /*
          * Workflow execution
          */
-        for (int i = 0; i < numSentencesToTest; i++) {
-            String s = sentences[i];
-            logger.info("Analysing sentence id=" + i);
-            Settings.getInstance().loadSettings(settingsPath);
-            InputAgent inputAgent = new InputAgent(promptPath, s);
+        Settings.getInstance().loadSettings(settingsPath);
+        for (int i = 0; i < numQueries; i++) {
+            String query = queries[i];
+            logger.info("Analysing query id=" + i);
+            InputAgent inputAgent = new InputAgent(promptPath, query);
             Agent nextAgent = inputAgent.next();
+            /* @todo move to for instead of do. work on 'execute' method to return the next agent and the result */
             do {
                 nextAgent.execute(agent);
                 logger.info("NextAgent is" + nextAgent.getClass());
@@ -54,7 +55,7 @@ public class Main {
         }
 
 
-        /**
+        /*
          * Accuracy measure
          */
         if (args.length == 5) {
@@ -66,26 +67,26 @@ public class Main {
                     correct++;
                 }
             }
-            float rate = (float) correct / sentences.length;
+            float rate = (float) correct / queries.length;
             System.out.println("Accuracy: " + rate);
         }
 
         writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
-    public static String[] loadSentences(String sentencePath) throws IOException {
-        String content = new String(Files.readAllBytes(Paths.get(new File(sentencePath).toURI())));
-        JSONArray sentences = new JSONArray(content);
-        String[] outputSentences = new String[sentences.length()];
-        for (int i = 0; i < sentences.length(); i++) {
-            JSONObject o = sentences.getJSONObject(i);
-            outputSentences[i] = o.toString();
+    public static String[] loadQueries(String queryPath) throws IOException {
+        String content = new String(Files.readAllBytes(Paths.get(new File(queryPath).toURI())));
+        JSONArray queries = new JSONArray(content);
+        String[] outputQueries = new String[queries.length()];
+        for (int i = 0; i < queries.length(); i++) {
+            JSONObject o = queries.getJSONObject(i);
+            outputQueries[i] = o.toString();
         }
-        return outputSentences;
+        return outputQueries;
     }
 
-    public static String[] loadExpectedResults(String sentencePath) throws IOException {
-        String content = new String(Files.readAllBytes(Paths.get(new File(sentencePath).toURI())));
+    public static String[] loadExpectedResults(String queriesPath) throws IOException {
+        String content = new String(Files.readAllBytes(Paths.get(new File(queriesPath).toURI())));
         return content.split("\n");
     }
 

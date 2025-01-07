@@ -1,4 +1,4 @@
-package uk.ac.explorableviz.transparenttext.agents;
+package explorableviz.transparenttext.agents;
 
 public class RecognitionAgent {
 }
