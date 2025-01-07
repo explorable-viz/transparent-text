@@ -41,6 +41,7 @@ if [ $# -lt 3 ]; then
     echo "  prompt_configuration          (mandatory): prompt configuration path  (format: JSON)"
     echo "  sentences                     (mandatory): input file"
     echo "  expected_results              (optional) : expected output file (for validation only)"
+    echo "  max_sentences                 (optional) : number of sentences to test during the execution"
     exit 1
 fi
 
@@ -54,6 +55,10 @@ expected_results=${4:-}
 
 # The threshold parameter is optional
 threshold=${5:-}
+
+# The max_sentences parameter is optional
+max_sentences=${6:-}
+
 # If the threshold is not set, the default value is 0.7 (70%)
 
 if [ -z "$threshold" ]; then
@@ -64,7 +69,7 @@ fi
 if [ -z "$expected_results" ]; then
     output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences")
 else
-    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences" "$expected_results")
+    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences" "$expected_results" "$max_sentences")
 fi
 
 # Analyses the output with a regex to extract the accuracy
