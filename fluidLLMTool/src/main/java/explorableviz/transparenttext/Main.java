@@ -1,8 +1,8 @@
-package uk.ac.explorableviz.transparenttext.plrg;
+package explorableviz.transparenttext.plrg;
 
-import uk.ac.explorableviz.transparenttext.agents.Agent;
-import uk.ac.explorableviz.transparenttext.agents.InputAgent;
-import uk.ac.explorableviz.transparenttext.agents.OutputAgent;
+import explorableviz.transparenttext.agents.Agent;
+import explorableviz.transparenttext.agents.InputAgent;
+import explorableviz.transparenttext.agents.OutputAgent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
