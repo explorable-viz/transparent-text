@@ -49,8 +49,8 @@ fi
 # [@todo comment]
 agent_class=$1
 prompt_configuration=$2
-sentences=$3
-settings=$4
+sentences=$4
+settings=$3
 expected_results=${5:-}
 threshold=${6:-}
 max_queries=${7:-}
@@ -62,7 +62,7 @@ fi
 # Run the prompt-executor command with the parameters
 # @todo construct the command with concatenation
 if [ -z "$expected_results" ]; then
-    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences")
+    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$settings" "$prompt_configuration" "$sentences")
 else
     output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$settings" "$sentences" "$expected_results" "$max_queries")
 fi
