@@ -39,6 +39,7 @@ if [ $# -lt 3 ]; then
     echo "Usage: $0 <agent_class> <prompt_configuration> <sentences> [expected_results] [threshold]"
     echo "  agent_class                   (mandatory): LLMAgent to execute"
     echo "  prompt_configuration          (mandatory): prompt configuration path  (format: JSON)"
+    echo "  settings path                 (mandatory): settings configuration path  (format: JSON)"
     echo "  sentences                     (mandatory): input file"
     echo "  expected_results              (optional) : expected output file (for validation only)"
     echo "  threshold                     (optional) : the minimum accuracy to consider successfully the test execution"
@@ -49,9 +50,10 @@ fi
 agent_class=$1
 prompt_configuration=$2
 sentences=$3
-expected_results=${4:-}
-threshold=${5:-}
-max_queries=${6:-}
+settings=$4
+expected_results=${5:-}
+threshold=${6:-}
+max_queries=${7:-}
 
 if [ -z "$threshold" ]; then
     threshold=0.7
@@ -62,7 +64,7 @@ fi
 if [ -z "$expected_results" ]; then
     output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences")
 else
-    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences" "$expected_results" "$max_queries")
+    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$settings" "$sentences" "$expected_results" "$max_queries")
 fi
 
 # Analyses the output with a regex to extract the accuracy
