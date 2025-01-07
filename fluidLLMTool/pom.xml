@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>uk.ac.bristol.plrg</groupId>
+    <groupId>explorableviz.transparenttext</groupId>
     <artifactId>fluidPrompt</artifactId>
     <version>0.1</version>
     <packaging>jar</packaging>
@@ -58,7 +58,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>uk.ac.explorableviz.transparenttext.plrg.Main</mainClass> <!-- Classe principale -->
+                            <mainClass>explorableviz.transparenttext.Main</mainClass> <!-- Classe principale -->
                         </manifest>
                     </archive>
                     <descriptorRefs>
