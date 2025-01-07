@@ -58,7 +58,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>uk.ac.bristol.plrg.Main</mainClass> <!-- Classe principale -->
+                            <mainClass>uk.ac.explorableviz.transparenttext.plrg.Main</mainClass> <!-- Classe principale -->
                         </manifest>
                     </archive>
                     <descriptorRefs>
