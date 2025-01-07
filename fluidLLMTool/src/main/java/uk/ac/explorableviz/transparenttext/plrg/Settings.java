@@ -1,4 +1,4 @@
-package uk.ac.bristol.plrg;
+package uk.ac.explorableviz.transparenttext.plrg;
 
 import org.json.JSONObject;
 

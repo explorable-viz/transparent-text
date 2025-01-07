@@ -1,4 +1,4 @@
-package uk.ac.bristol.agents;
+package uk.ac.explorableviz.transparenttext.agents;
 
 import java.util.logging.Logger;
 

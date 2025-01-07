@@ -1,4 +1,4 @@
-package uk.ac.bristol.agents;
+package uk.ac.explorableviz.transparenttext.agents;
 
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONArray;

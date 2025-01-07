@@ -1,13 +1,12 @@
-package uk.ac.bristol.agents;
+package uk.ac.explorableviz.transparenttext.agents;
 
 import org.json.JSONObject;
-import uk.ac.bristol.plrg.Settings;
+import uk.ac.explorableviz.transparenttext.plrg.Settings;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
