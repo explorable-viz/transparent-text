@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Function to install Java
+# Function to install Java [@todo move to another script]
 install_java() {
     echo "Java is not installed. Installation attempt..."
     if command -v apt &> /dev/null; then
@@ -36,41 +36,43 @@ fi
 
 # Check that at least the first two parameters are provided
 if [ $# -lt 3 ]; then
-    echo "Usage: $0 <agent_class> <prompt_configuration> <sentences> [expected_results] [threshold]"
+    echo "Usage: $0 <agent_class> <prompt_configuration> <queries> [expected_results] [threshold]"
     echo "  agent_class                   (mandatory): LLMAgent to execute"
     echo "  prompt_configuration          (mandatory): prompt configuration path  (format: JSON)"
-    echo "  sentences                     (mandatory): input file"
+    echo "  settings path                 (mandatory): settings configuration path  (format: JSON)"
+    echo "  queries                     (mandatory): input file"
     echo "  expected_results              (optional) : expected output file (for validation only)"
+    echo "  threshold                     (optional) : the minimum accuracy to consider successfully the test execution"
+    echo "  max_queries                   (optional) : number of queries to test during the execution"
     exit 1
 fi
-
-# Assign the first two mandatory parameters
+# [@todo comment]
 agent_class=$1
 prompt_configuration=$2
-sentences=$3
-
-# The expected_results parameter is optional
-expected_results=${4:-}
-
-# The threshold parameter is optional
-threshold=${5:-}
-# If the threshold is not set, the default value is 0.7 (70%)
+queries=$4
+settings=$3
+expected_results=${5:-}
+threshold=${6:-}
+max_queries=${7:-}
 
 if [ -z "$threshold" ]; then
     threshold=0.7
 fi
 
-# Run the Java command with the parameters
-if [ -z "$expected_results" ]; then
-    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences")
-else
-    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$sentences" "$expected_results")
+base_command="java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar $agent_class"
+
+command="$base_command $prompt_configuration $settings $queries"
+
+if [ -n "$expected_results" ]; then
+    command="$command $expected_results $max_queries"
 fi
+
+output=$(eval "$command")
 
 # Analyses the output with a regex to extract the accuracy
 if [[ $output =~ Accuracy:\ ([0-9]*\.[0-9]+) ]]; then
     accuracy=${BASH_REMATCH[1]}
-    # Controlla se l'accuracy è inferiore a 0.7
+    # check if the accuracy is less than the $threshold
     if (( $(echo "$accuracy < $threshold" | bc -l) )); then
         echo "FAILED: Accuracy too low ($accuracy < $threshold)"
         exit 1

@@ -1,4 +1,4 @@
-package uk.ac.bristol.agents;
+package explorableviz.transparenttext.agents;
 
 public interface Agent {
 

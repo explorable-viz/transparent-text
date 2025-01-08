@@ -4,14 +4,14 @@ PromptExecutor is a command line tool which allows to execute the prompts into a
 ### The Java Application
 The folder jar, host the java application. It is possible to run the app through the command
 
-`java -jar jar/prompt-executor.jar <agent> <prompt> <settings> <sentences> [expected]`
+`java -jar jar/prompt-executor.jar <agent> <prompt> <settings> <queries> [expected]`
 
 where:
 
 - `agent` is the agent class which correspond to the model will be executed
 - `prompt` is the path of the JSON prompt file
 - `settings` is the path of the JSON settings file
-- `sentences` is the path of the sentence file
+- `queries` is the path of the queries file
 - `expected`, which is not mandatory, is the path of the expected result for the validation process.
 
 ### List of available agents
@@ -44,10 +44,10 @@ All the scripts are integrated with yarn scripts.
 
 ### Webtools 
 
-There are two web-based tools which allow to edit the prompt base-knowledge and the input sentences. These tools are in the folder `./webapp`
+There are two web-based tools which allow to edit the prompt base-knowledge and the input queries. These tools are in the folder `./webapp`
 
-| Tool            | Description                           | Link                                                           |
-|-----------------|---------------------------------------|----------------------------------------------------------------| 
-| Prompt Editor   | Tool for the editing of the prompt    | [./webapp/prompt-editor.html](./webapp/prompt-editor.html)     |
-| Sentence Editor | Tool for the editing of the sentences | [./webapp/sentence-editor.html](./webapp/sentence-editor.html) |
+| Tool          | Description                           | Link                                                           |
+|---------------|---------------------------------------|----------------------------------------------------------------| 
+| Prompt Editor | Tool for the editing of the prompt    | [./webapp/prompt-editor.html](./webapp/prompt-editor.html)     |
+| Query Editor  | Tool for the editing of the queries | [./webapp/queries-editor.html](./webapp/queries-editor.html) |
 

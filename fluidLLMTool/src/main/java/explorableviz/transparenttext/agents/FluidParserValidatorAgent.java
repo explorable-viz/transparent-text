@@ -1,13 +1,12 @@
-package uk.ac.bristol.agents;
+package explorableviz.transparenttext.agents;
 
 import org.json.JSONObject;
-import uk.ac.bristol.plrg.Settings;
+import explorableviz.transparenttext.Settings;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -16,7 +15,7 @@ public class FluidParserValidatorAgent implements Agent {
 
     private String response;
 
-    private String sentence;
+    private String query;
 
     private boolean valid;
 
@@ -74,8 +73,8 @@ public class FluidParserValidatorAgent implements Agent {
             "##CODE##\n" +
             "in ##EXPRESSION##\n";
 
-    public FluidParserValidatorAgent(String sentence, String response) {
-        this.sentence = sentence;
+    public FluidParserValidatorAgent(String query, String response) {
+        this.query = query;
         this.response = response;
 
     }
@@ -90,9 +89,9 @@ public class FluidParserValidatorAgent implements Agent {
     @Override
     public String execute(String a) {
         logger.info("Running agents " + this.getClass().getName());
-        JSONObject parsedSentence = new JSONObject(sentence);
-        String data = parsedSentence.getString("data");
-        String code = parsedSentence.getString("code");
+        JSONObject parsedQuery = new JSONObject(query);
+        String data = parsedQuery.getString("data");
+        String code = parsedQuery.getString("code");
 
         try {
             writeFluidFile(data, code);
@@ -122,7 +121,7 @@ public class FluidParserValidatorAgent implements Agent {
             logger.info("Output to be validated" + output);
             logger.info("seems error " + err_output);
 
-            valid = checkValidity(output, parsedSentence.getString("caption"));
+            valid = checkValidity(output, parsedQuery.getString("text"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InterruptedException e) {
@@ -184,7 +183,7 @@ public class FluidParserValidatorAgent implements Agent {
                 msg = STR."ValueMismatchError. The generated expression \{response}  generated a value which is not expected. \nCheck the code and regenerate the expression which is supposed to generate the following value: \{expected}. Remember: reply only with the expression, without any other comment.";
             }
             if (prevAgent instanceof FluidGeneratorAgent agent) {
-                agent.setSentence(msg);
+                agent.setLoopbackSetence(msg);
                 agent.setnExecution(agent.getnExecution() + 1);
                 return agent;
             } else {
