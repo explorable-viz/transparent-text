@@ -61,7 +61,7 @@ fi
 
 base_command="java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar $agent_class"
 
-command="$base_command $settings $prompt_configuration $queries"
+command="$base_command $prompt_configuration $settings $queries"
 
 if [ -n "$expected_results" ]; then
     command="$command $expected_results $max_queries"
