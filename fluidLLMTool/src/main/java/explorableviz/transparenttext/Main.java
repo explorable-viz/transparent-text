@@ -58,7 +58,7 @@ public class Main {
         /*
          * Accuracy measure
          */
-        if (args.length == 5) {
+        if (args.length >= 5) {
             String[] expectedResult = null;
             int correct = 0;
             expectedResult = loadExpectedResults(args[4]);
@@ -67,8 +67,10 @@ public class Main {
                     correct++;
                 }
             }
-            float rate = (float) correct / queries.length;
+            float rate = (float) correct / numQueries;
             System.out.println("Accuracy: " + rate);
+        } else {
+            System.out.println("Accuracy: 0.0");
         }
 
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
