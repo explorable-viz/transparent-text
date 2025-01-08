@@ -36,20 +36,20 @@ fi
 
 # Check that at least the first two parameters are provided
 if [ $# -lt 3 ]; then
-    echo "Usage: $0 <agent_class> <prompt_configuration> <sentences> [expected_results] [threshold]"
+    echo "Usage: $0 <agent_class> <prompt_configuration> <queries> [expected_results] [threshold]"
     echo "  agent_class                   (mandatory): LLMAgent to execute"
     echo "  prompt_configuration          (mandatory): prompt configuration path  (format: JSON)"
     echo "  settings path                 (mandatory): settings configuration path  (format: JSON)"
-    echo "  sentences                     (mandatory): input file"
+    echo "  queries                     (mandatory): input file"
     echo "  expected_results              (optional) : expected output file (for validation only)"
     echo "  threshold                     (optional) : the minimum accuracy to consider successfully the test execution"
-    echo "  max_queries                   (optional) : number of sentences to test during the execution"
+    echo "  max_queries                   (optional) : number of queries to test during the execution"
     exit 1
 fi
 # [@todo comment]
 agent_class=$1
 prompt_configuration=$2
-sentences=$4
+queries=$4
 settings=$3
 expected_results=${5:-}
 threshold=${6:-}
@@ -59,13 +59,15 @@ if [ -z "$threshold" ]; then
     threshold=0.7
 fi
 
-# Run the prompt-executor command with the parameters
-# @todo construct the command with concatenation
-if [ -z "$expected_results" ]; then
-    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$settings" "$prompt_configuration" "$sentences")
-else
-    output=$(java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar "$agent_class" "$prompt_configuration" "$settings" "$sentences" "$expected_results" "$max_queries")
+base_command="java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar $agent_class"
+
+command="$base_command $settings $prompt_configuration $queries"
+
+if [ -n "$expected_results" ]; then
+    command="$command $expected_results $max_queries"
 fi
+
+output=$(eval "$command")
 
 # Analyses the output with a regex to extract the accuracy
 if [[ $output =~ Accuracy:\ ([0-9]*\.[0-9]+) ]]; then
