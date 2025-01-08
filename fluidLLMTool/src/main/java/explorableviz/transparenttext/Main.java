@@ -71,7 +71,7 @@ public class Main {
             System.out.println("Accuracy: " + rate);
         }
 
-        writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
+        //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
     public static String[] loadQueries(String queryPath) throws IOException {
