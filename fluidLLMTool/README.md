@@ -1,3 +1,6 @@
+![PromptExecutor](https://github.com/transparent-text/actions/workflows/prompt-executor.yml/badge.svg) 
+![PromptExecutorMocked](https://github.com/transparent-text/actions/workflows/prompt-executor-mocked.yml/badge.svg)
+
 ## PromptExecutor
 PromptExecutor is a command line tool which allows to execute the prompts into a Large Language Model. At this time the only supported model is llama3, but further versions will offer the possibility to use also other models.
 
