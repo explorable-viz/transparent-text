@@ -2,6 +2,8 @@
 name: PromptExecutorMocked
 'on':
   workflow_dispatch:
+    paths:
+      - fluidLLMTool/**
   push:
     paths:
       - fluidLLMTool/**
