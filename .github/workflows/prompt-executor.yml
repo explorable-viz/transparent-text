@@ -2,7 +2,7 @@
 name: PromptExecutor
 'on':
   workflow_dispatch:
-  pull_requests:
+  pull_request:
     paths:
       - fluidLLMTool/**
 jobs:
