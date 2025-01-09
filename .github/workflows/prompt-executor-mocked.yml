@@ -1,15 +1,12 @@
 #Launch prompts workflow
-name: PromptExecutor
+name: PromptExecutorMocked
 'on':
   workflow_dispatch:
   push:
     paths:
       - fluidLLMTool/**
-  pull_request:
-    paths:
-      - fluidLLMTool/**
 jobs:
-  prompt-test-ubuntu:
+  prompt-test-mock-ubuntu:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,10 +25,7 @@ jobs:
           yarn build-executor
         env:
           GITHUB_TOKEN: ${{ secrets.LLM_PROMPT_EXECUTOR_TOKEN }}
-      - name: Ollama Installation and model pull
-        run: |
-          yarn ollama-run
       - name: Launch Prompt Tests
         run: |
           yarn install
-          yarn test
+          yarn test-mock
