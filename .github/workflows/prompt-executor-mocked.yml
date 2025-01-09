@@ -25,9 +25,6 @@ jobs:
           yarn build-executor
         env:
           GITHUB_TOKEN: ${{ secrets.LLM_PROMPT_EXECUTOR_TOKEN }}
-      - name: Ollama Installation and model pull
-        run: |
-          yarn ollama-run
       - name: Launch Prompt Tests
         run: |
           yarn install
