@@ -2,14 +2,11 @@
 name: PromptExecutor
 'on':
   workflow_dispatch:
-  push:
-    paths:
-      - fluidLLMTool/**
-  pull_request:
+  pull_requests:
     paths:
       - fluidLLMTool/**
 jobs:
-  prompt-test-ubuntu:
+  prompt-test-mock-ubuntu:
     runs-on: ubuntu-latest
     defaults:
       run:
