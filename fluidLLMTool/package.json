@@ -20,7 +20,7 @@
     "install-fluid-compiler": "./script/install-fluid-compiler.sh",
     "build-executor": "./script/build-executor.sh",
     "pull-llama3": "./script/model-pull.sh llama3",
-    "pull-llama3-1": "./script/model-pull.sh llama3.1",
+    "pull-llama3-1": "./script/ollama-model-pull.sh llama3.1",
     "ollama-install": "./script/ollama-install.sh",
     "ollama-serve": "./script/ollama-serve.sh",
     "ollama-run": "./script/ollama-steps.sh",

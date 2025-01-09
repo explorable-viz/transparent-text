@@ -1,4 +1,5 @@
 #!/bin/bash
+set -xe
 
 # Function to install Java [@todo move to another script]
 install_java() {
@@ -40,7 +41,7 @@ if [ $# -lt 3 ]; then
     echo "  agent_class                   (mandatory): LLMAgent to execute"
     echo "  prompt_configuration          (mandatory): prompt configuration path  (format: JSON)"
     echo "  settings path                 (mandatory): settings configuration path  (format: JSON)"
-    echo "  queries                     (mandatory): input file"
+    echo "  queries                       (mandatory): input file"
     echo "  expected_results              (optional) : expected output file (for validation only)"
     echo "  threshold                     (optional) : the minimum accuracy to consider successfully the test execution"
     echo "  max_queries                   (optional) : number of queries to test during the execution"

@@ -2,7 +2,7 @@
 # This script installs Ollama on Linux.
 # It detects the current operating system architecture and installs the appropriate version of Ollama.
 
-set -eu
+set -eux
 
 status() { echo ">>> $*" >&2; }
 error() { echo "ERROR $*"; exit 1; }
