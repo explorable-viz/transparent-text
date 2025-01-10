@@ -1,6 +1,5 @@
 package explorableviz.transparenttext.llm;
 
-import explorableviz.transparenttext.agents.FluidGeneratorAgent;
 import it.unisa.cluelab.lllm.llm.LLMEvaluatorAgent;
 import it.unisa.cluelab.lllm.llm.prompt.Prompt;
 import org.json.JSONObject;
