@@ -17,7 +17,6 @@
     "url": "https://github.com/explorable-viz/fluid/issues"
   },
   "scripts": {
-    "install-fluid-compiler": "./script/install-fluid-compiler.sh",
     "build-executor": "./script/build-executor.sh",
     "pull-llama3": "./script/model-pull.sh llama3",
     "pull-llama3-1": "./script/ollama-model-pull.sh llama3.1",
