@@ -1,8 +1,6 @@
 package explorableviz.transparenttext;
 
-import explorableviz.transparenttext.agents.Agent;
-import explorableviz.transparenttext.agents.InputAgent;
-import explorableviz.transparenttext.agents.OutputAgent;
+import explorableviz.transparenttext.agents.FluidGeneratorAgent;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -42,16 +40,19 @@ public class Main {
         for (int i = 0; i < numQueries; i++) {
             String query = queries[i];
             logger.info("Analysing query id=" + i);
-            InputAgent inputAgent = new InputAgent(promptPath, query);
-            Agent nextAgent = inputAgent.next();
-            /* @todo move to for instead of do. work on 'execute' method to return the next agent and the result */
-            do {
-                nextAgent.execute(agent);
-                logger.info("NextAgent is" + nextAgent.getClass());
-                nextAgent = nextAgent.next();
-            } while (!(nextAgent instanceof OutputAgent));
 
-            results.add(nextAgent.execute(""));
+            FluidGeneratorAgent fluidGeneratorAgent = new FluidGeneratorAgent(promptPath, query);
+            results.add(fluidGeneratorAgent.execute(agent));
+//            InputAgent inputAgent = new InputAgent(promptPath, query);
+//            Agent nextAgent = inputAgent.next();
+//            /* @todo move to for instead of do. work on 'execute' method to return the next agent and the result */
+//            do {
+//                nextAgent.execute(agent);
+//                logger.info("NextAgent is" + nextAgent.getClass());
+//                nextAgent = nextAgent.next();
+//            } while (!(nextAgent instanceof OutputAgent));
+
+//            results.add(nextAgent.execute(""));
         }
 
 
