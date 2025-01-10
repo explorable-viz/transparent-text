@@ -14,6 +14,7 @@ public class Settings {
     public static final String LOG_PATH = "log-path";
     public static final String FLUID_COMPILER_PATH = "fluid-compiler-path";
     public static final String FLUID_TEMP_FILE = "fluid-temp-file";
+    public static final String FLUID_TEMPLATE = "fluid-template";
 
     private JSONObject settings;
     public static Settings getInstance() {
