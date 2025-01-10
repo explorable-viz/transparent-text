@@ -60,7 +60,7 @@ if [ -z "$threshold" ]; then
     threshold=0.7
 fi
 
-base_command="java --enable-preview -jar target/fluidPrompt-0.1-jar-with-dependencies.jar $agent_class"
+base_command="java --enable-preview -jar target/PromptExecutor-0.1-jar-with-dependencies.jar $agent_class"
 
 command="$base_command $prompt_configuration $settings $queries"
 
