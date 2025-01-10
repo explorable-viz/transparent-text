@@ -1,0 +1,17 @@
+{
+  "temperature": "0.3",
+  "timeout": "1800",
+  "num_ctx": "2000",
+  "openai-token": "",
+  "gemini-token": "",
+  "gemini-projectId": "",
+  "gemini-location": "",
+  "claude-token": "",
+  "ollama-url": "http://127.0.0.1",
+  "ollama-port": "11434",
+  "log-path": "logs/",
+  "fluid-compiler-path": "./",
+  "fluid-temp-file": "llmTest",
+  "agent-limit": "1",
+  "fluid-template": "let d = ##DATA##;\\n\" +\n            \"let modelProbs = [\\n\" +\n            \"     { model: \\\"SSP1-1.9\\\", probability: 0.92 }\\n\" +\n            \"];\\n\" +\n            \"let newDataTable offset = map (fun s -> { scenario: s.scenario, bE2140: s.bestEst2140 + offset, low2140: s.low2140, high2140: s.high2140, bE4160: s.bestEst4160, low4160: s.low4160, high4160: s.high4160, bE81100: s.bestEst81100, low81100: s.low81100, high81100: s.high81100}) d;\\n\" +\n            \"let newModel offset = map (fun s -> { model: s.model, probability: s.probability + offset}) modelProbs;\\n\" +\n            \"\\n\" +\n            \"let getByScenario scenario data =\\n\" +\n            \"   let helper [] = [];\\n\" +\n            \"      helper (x: xs) =\\n\" +\n            \"            if x.scenario == scenario\\n\" +\n            \"            then x\\n\" +\n            \"            else helper xs\\n\" +\n            \"   in helper data;\\n\" +\n            \"let likelihoods = [\\n\" +\n            \"    { prob: 0.99, msg: \\\"virtually certain\\\" },\\n\" +\n            \"    { prob: 0.9, msg: \\\"very likely\\\"},\\n\" +\n            \"    { prob: 0.66, msg: \\\"likely\\\"},\\n\" +\n            \"    { prob: 0.33, msg: \\\"about as likely as not\\\"},\\n\" +\n            \"    { prob: 0.1, msg: \\\"unlikely\\\"},\\n\" +\n            \"    { prob: 0.01, msg: \\\"very unlikely\\\"},\\n\" +\n            \"    { prob: 0.0, msg: \\\"exceptionally unlikely\\\"}\\n\" +\n            \"];\" +\n            \"let likelihoodMap prob =\\n\" +\n            \"    let go (x:xs) =\\n\" +\n            \"        if x.prob < prob\\n\" +\n            \"        then x.msg\\n\" +\n            \"        else go xs;\\n\" +\n            \"        go [] = \\\"not found\\\"\\n\" +\n            \"    in go likelihoods;\\n\" +\n            \"\\n\" +\n            \"let findLikelihood (min, max) target =\\n\" +\n            \"    if target > max\\n\" +\n            \"    then 0.0\\n\" +\n            \"    else if target < min\\n\" +\n            \"    then 1.0\\n\" +\n            \"    else (target - min)/(max - min);\" +\n            \"##CODE##\\n\" +\n            \"in ##EXPRESSION##\\n"
+}
