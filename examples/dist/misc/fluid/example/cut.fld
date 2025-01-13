@@ -1,2 +1,0 @@
-let data = [ x.changed | x <- ssp126Source ]
-in cut data 8

@@ -1,2 +1,0 @@
-let data = [ x.changed | x <- ssp126Source ]
-in qcut data [ (5, 100), (50, 100), (95, 100) ]
