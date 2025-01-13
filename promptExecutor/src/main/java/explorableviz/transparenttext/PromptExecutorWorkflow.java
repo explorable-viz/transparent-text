@@ -25,8 +25,8 @@ public class PromptExecutorWorkflow {
         this.query = query;
         this.prompts = new PromptList();
         String content = new String(Files.readAllBytes(Paths.get(new File(promptPath).toURI())));
-        JSONObject jsonContent = new JSONObject(content);
-        prompts.parseJSONContent((JSONArray) jsonContent.get("prompts"));
+        JSONArray jsonContent = new JSONArray(content);
+        prompts.parseJSONContent(jsonContent);
         llm = initialiseAgent(agentClassName);
     }
 

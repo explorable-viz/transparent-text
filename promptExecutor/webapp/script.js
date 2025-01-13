@@ -26,8 +26,8 @@ function addPrompt(userCaption = '', assistantResponse = '', userData = '', user
                     <textarea class="form-control prompt-data" rows="5" placeholder="Enter data...">${userData}</textarea>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">BOB Code</label>
-                    <textarea class="form-control prompt-code" rows="5" placeholder="Enter BOB code...">${userCode}</textarea>
+                    <label class="form-label">Fluid Code</label>
+                    <textarea class="form-control prompt-code" rows="5" placeholder="Enter Fluid code...">${userCode}</textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Text</label>
@@ -131,7 +131,7 @@ function importJson() {
 }
 
 
-function exportJson() {
+function exportJson(mode = 0) {
     const systemPromptElement = document.getElementById('system-prompt');
     const systemPrompt = systemPromptElement.value.trim();
 
@@ -232,7 +232,17 @@ function exportJson() {
     });
 
     // Create final JSON
-    const jsonOutput = JSON.stringify({ variables, prompts }, null, 2);
+    let jsonOutput;
+    if(mode === 1) {
+        jsonOutput = JSON.stringify(prompts.map(p => {
+            return {
+                "role": p.role,
+                "content": p.content
+            }
+        }), null, 2);
+    }  else {
+        jsonOutput = JSON.stringify(prompts, null, 2);
+    }
     const blob = new Blob([jsonOutput], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
 
