@@ -1,8 +1,6 @@
 package explorableviz.transparenttext;
 
-import explorableviz.transparenttext.agents.Agent;
-import explorableviz.transparenttext.agents.InputAgent;
-import explorableviz.transparenttext.agents.OutputAgent;
+import explorableviz.transparenttext.agents.FluidLLMGeneratorWorkflow;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -10,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -18,7 +17,7 @@ import java.util.logging.Logger;
 public class Main {
     public static Logger logger = Logger.getLogger(Main.class.getName());
 
-    public static void main(String... args) throws Exception {
+    public static void main(String... args)  {
         if (args.length < 4) {
             System.err.println("missing arguments, 2 expected but " + args.length + " given");
             System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts] [settings] [queries] [expected] [maxQueries]");
@@ -29,31 +28,35 @@ public class Main {
         final String promptPath = args[1];
         final String queryPath = args[3];
         final String settingsPath = args[2];
-
-        final String[] queries = loadQueries(queryPath);
-
-        final int numQueries = (args.length == 6) ? Integer.parseInt(args[5]) : queries.length;
-
+        final ArrayList<String> queries;
+        try {
+            queries = loadQueries(queryPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        final int numQueries = (args.length == 6) ? Integer.parseInt(args[5]) : queries.size();
         final ArrayList<String> results = new ArrayList<>();
+
         /*
          * Workflow execution
          */
-        Settings.getInstance().loadSettings(settingsPath);
-        for (int i = 0; i < numQueries; i++) {
-            String query = queries[i];
-            logger.info("Analysing query id=" + i);
-            InputAgent inputAgent = new InputAgent(promptPath, query);
-            Agent nextAgent = inputAgent.next();
-            /* @todo move to for instead of do. work on 'execute' method to return the next agent and the result */
-            do {
-                nextAgent.execute(agent);
-                logger.info("NextAgent is" + nextAgent.getClass());
-                nextAgent = nextAgent.next();
-            } while (!(nextAgent instanceof OutputAgent));
-
-            results.add(nextAgent.execute(""));
+        try {
+            Settings.getInstance().loadSettings(settingsPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
+        for (int i = 0; i < numQueries; i++) {
+            String query = queries.get(i);
+            logger.info(STR."Analysing query id=\{i}");
+            FluidLLMGeneratorWorkflow fluidLLMGeneratorWorkflow = null;
+            try {
+                fluidLLMGeneratorWorkflow = new FluidLLMGeneratorWorkflow(promptPath, query, agent);
+                results.add(fluidLLMGeneratorWorkflow.execute());
+            }  catch (Exception e) {
+                results.add("ERROR " + e.getMessage());
+            }
+        }
 
         /*
          * Accuracy measure
@@ -61,7 +64,11 @@ public class Main {
         if (args.length >= 5) {
             String[] expectedResult = null;
             int correct = 0;
-            expectedResult = loadExpectedResults(args[4]);
+            try {
+                expectedResult = loadExpectedResults(args[4]);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             for (int i = 0; i < results.size(); i++) {
                 if (expectedResult[i].equals(results.get(i))) {
                     correct++;
@@ -76,13 +83,13 @@ public class Main {
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
-    public static String[] loadQueries(String queryPath) throws IOException {
+    public static ArrayList<String> loadQueries(String queryPath) throws IOException {
         String content = new String(Files.readAllBytes(Paths.get(new File(queryPath).toURI())));
         JSONArray queries = new JSONArray(content);
-        String[] outputQueries = new String[queries.length()];
+        ArrayList<String> outputQueries = new ArrayList<>();
         for (int i = 0; i < queries.length(); i++) {
             JSONObject o = queries.getJSONObject(i);
-            outputQueries[i] = o.toString();
+            outputQueries.add(o.toString());
         }
         return outputQueries;
     }
