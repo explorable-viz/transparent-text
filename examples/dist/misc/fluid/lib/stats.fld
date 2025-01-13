@@ -19,6 +19,7 @@ let mergesort xs =
           let (ys, zs) = split xs in
           merge (mergesort ys) (mergesort zs);
 
+<<<<<<< HEAD
 -- assume data is sorted
 let findQuantile q p data = 
     let rank = (p / q) * (length data - 1)
@@ -58,6 +59,16 @@ let qcut data [] = [];
         let low = minimum data;
             edges = [ findQuantile (fst x) (snd x) data | x <- qs]
         in accumBins data (low : edges);
+=======
+let findPercentile data p =
+    let sorted = mergesort data;
+        rank = (p / 100.0) * (length data - 1) + 1
+    in if rank == floor(rank)
+    then nth rank sorted
+    else let x1 = floor rank;
+             x2 = ceiling rank
+        in (nth x1 sorted) + (rank - x1) * (nth x2 sorted - nth x1 sorted);
+>>>>>>> main
 
 let likelihoodLE data target = 
     length (filter (fun x -> x <= target) data) / length data;
