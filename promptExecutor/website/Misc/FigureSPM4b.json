@@ -1,0 +1,10 @@
+{
+    "datasets": [["likelihoods", "example/text-viz/likelihoods"],
+                 ["ssp126Breakdown", "example/text-viz/ssp126-breakdown"],
+                 ["ssp245Breakdown", "example/text-viz/ssp245-breakdown"],
+                 ["ssp126Source", "example/text-viz/datasets/ssp126-2081-2100"]
+                ],
+    "imports": [ "lib/text-viz", "lib/stats" ],
+    "file": "text-viz/figure-spm-4",
+    "inputs": [ "ssp126Source", "ssp126Breakdown" , "ssp245Breakdown" ]
+}
