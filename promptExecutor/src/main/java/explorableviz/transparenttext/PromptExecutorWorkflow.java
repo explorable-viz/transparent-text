@@ -1,10 +1,9 @@
-package explorableviz.transparenttext.agents;
+package explorableviz.transparenttext;
 
 import it.unisa.cluelab.lllm.llm.LLMEvaluatorAgent;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import explorableviz.transparenttext.Settings;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -14,20 +13,20 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class FluidLLMGeneratorWorkflow {
+public class PromptExecutorWorkflow {
 
-    public final Logger logger = Logger.getLogger(FluidLLMGeneratorWorkflow.class.getName());
+    public final Logger logger = Logger.getLogger(PromptExecutorWorkflow.class.getName());
     private final PromptList prompts;
     private final String query;
     private final String template = Settings.getInstance().get(Settings.FLUID_TEMPLATE);
     private final LLMEvaluatorAgent llm;
 
-    public FluidLLMGeneratorWorkflow(String promptPath, String query, String agentClassName) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public PromptExecutorWorkflow(String promptPath, String query, String agentClassName) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         this.query = query;
         this.prompts = new PromptList();
         String content = new String(Files.readAllBytes(Paths.get(new File(promptPath).toURI())));
-        JSONObject jsonContent = new JSONObject(content);
-        prompts.parseJSONContent((JSONArray) jsonContent.get("prompts"));
+        JSONArray jsonContent = new JSONArray(content);
+        prompts.parseJSONContent(jsonContent);
         llm = initialiseAgent(agentClassName);
     }
 

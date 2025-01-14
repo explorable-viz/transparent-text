@@ -1,6 +1,5 @@
 package explorableviz.transparenttext;
 
-import explorableviz.transparenttext.agents.FluidLLMGeneratorWorkflow;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -48,10 +47,10 @@ public class Main {
         for (int i = 0; i < numQueries; i++) {
             String query = queries.get(i);
             logger.info(STR."Analysing query id=\{i}");
-            FluidLLMGeneratorWorkflow fluidLLMGeneratorWorkflow = null;
+            PromptExecutorWorkflow promptExecutorWorkflow = null;
             try {
-                fluidLLMGeneratorWorkflow = new FluidLLMGeneratorWorkflow(promptPath, query, agent);
-                results.add(fluidLLMGeneratorWorkflow.execute());
+                promptExecutorWorkflow = new PromptExecutorWorkflow(promptPath, query, agent);
+                results.add(promptExecutorWorkflow.execute());
             }  catch (Exception e) {
                 results.add("ERROR " + e.getMessage());
             }

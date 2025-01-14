@@ -9,7 +9,7 @@ function clearAll() {
 }
 
 // Function to add a new prompt
-function addPrompt(userCaption = '', assistantResponse = '', userData = '', userCode = '') {
+function addPrompt(userText = '', assistantResponse = '', userData = '', userCode = '') {
     promptCount++;
 
     // Create new prompt elements
@@ -26,12 +26,12 @@ function addPrompt(userCaption = '', assistantResponse = '', userData = '', user
                     <textarea class="form-control prompt-data" rows="5" placeholder="Enter data...">${userData}</textarea>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">BOB Code</label>
-                    <textarea class="form-control prompt-code" rows="5" placeholder="Enter BOB code...">${userCode}</textarea>
+                    <label class="form-label">Fluid Code</label>
+                    <textarea class="form-control prompt-code" rows="5" placeholder="Enter Fluid code...">${userCode}</textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Text</label>
-                    <textarea class="form-control prompt-caption" rows="5" placeholder="Enter text...">${userCaption}</textarea>
+                    <textarea class="form-control prompt-text" rows="5" placeholder="Enter text...">${userText}</textarea>
                 </div>
             `;
 
@@ -110,8 +110,8 @@ function importJson() {
             if (prompt.role === 'user') {
                 const userData = prompt.data || '';
                 const userCode = prompt.code || '';
-                const userCaption = prompt.caption || '';
-                addPrompt(userCaption, '', userData, userCode);
+                const userText = prompt.text || '';
+                addPrompt(userText, '', userData, userCode);
             } else if (prompt.role === 'assistant') {
                 const assistantContent = prompt.raw_content || prompt.content || '';
                 const lastRowAssistant = document.querySelectorAll('#prompt-list .row:last-child .col-md-6:nth-child(2) textarea');
@@ -131,7 +131,7 @@ function importJson() {
 }
 
 
-function exportJson() {
+function exportJson(mode = 0) {
     const systemPromptElement = document.getElementById('system-prompt');
     const systemPrompt = systemPromptElement.value.trim();
 
@@ -155,7 +155,7 @@ function exportJson() {
         } else if (value === 'RANDOM_FLOAT') {
             const rand = Math.random() * (100);
             v = parseFloat(rand.toFixed(6));
-        }else if (value === 'RANDOM_STRING') {
+        } else if (value === 'RANDOM_STRING') {
             v = getRandomString(8);
         }
         processedSystemPrompt = processedSystemPrompt.replaceAll(variablePlaceholder, v);
@@ -177,11 +177,11 @@ function exportJson() {
     promptList.forEach((row, index) => {
         const userData = row.querySelector('textarea.prompt-data').value.trim();
         const userCode = row.querySelector('textarea.prompt-code').value.trim();
-        const userCaption = row.querySelector('textarea.prompt-caption').value.trim();
+        const userText = row.querySelector('textarea.prompt-text').value.trim();
         const assistantResponse = row.querySelector('textarea.prompt-assistant').value.trim();
 
         // Replace variables in content (concatenated fields)
-        let processedContent = [userData, userCode, userCaption].join('\n');
+        let processedContent = [userData, userCode, userText].join('\n');
         for (const [key, value] of Object.entries(variables)) {
             const variablePlaceholder = `$${key}$`;
             var v = value;
@@ -190,19 +190,19 @@ function exportJson() {
             } else if (value === 'RANDOM_FLOAT') {
                 const rand = Math.random() * (100);
                 v = parseFloat(rand.toFixed(6));
-            }else if (value === 'RANDOM_STRING') {
+            } else if (value === 'RANDOM_STRING') {
                 v = getRandomString(8);
             }
             processedContent = processedContent.replaceAll(variablePlaceholder, v);
         }
 
         // Add user content
-        if (userData || userCode || userCaption) {
+        if (userData || userCode || userText) {
             prompts.push({
                 role: 'user',
                 data: userData,        // Unprocessed data with variables
                 code: userCode,        // Unprocessed code with variables
-                caption: userCaption,  // Unprocessed caption with variables
+                text: userText,  // Unprocessed text with variables
                 content: processedContent // Processed content with variables replaced
             });
         }
@@ -215,7 +215,7 @@ function exportJson() {
             } else if (variables[varName] === 'RANDOM_FLOAT') {
                 const rand = Math.random() * (100);
                 v = parseFloat(rand.toFixed(6));
-            }else if (variables[varName] === 'RANDOM_STRING') {
+            } else if (variables[varName] === 'RANDOM_STRING') {
                 v = getRandomString(8);
             }
             return v; // Replace or leave as-is if no match
@@ -232,8 +232,18 @@ function exportJson() {
     });
 
     // Create final JSON
-    const jsonOutput = JSON.stringify({ variables, prompts }, null, 2);
-    const blob = new Blob([jsonOutput], { type: 'application/json' });
+    let jsonOutput;
+    if (mode === 1) {
+        jsonOutput = JSON.stringify(prompts.map(p => {
+            return {
+                "role": p.role,
+                "content": p.content
+            }
+        }), null, 2);
+    } else {
+        jsonOutput = JSON.stringify({variables, prompts}, null, 2);
+    }
+    const blob = new Blob([jsonOutput], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
 
     // Trigger download
