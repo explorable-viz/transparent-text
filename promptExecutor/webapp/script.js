@@ -1,5 +1,10 @@
 let promptCount = 0;
 
+let mockData = {
+    "scenario": ["sspone", "ssptwo", "sspthree", "ssphigh", "ssplow", "sspmedium", "s1", "s2", "s3", "s4"],
+    "keys": ["best1", "best2", "best3", "low1", "low2", "low3", "high1", "high2", "high3", "a", "b", "c", "d"]
+}
+
 // Function to clear all prompts and reset the interface
 function clearAll() {
     document.getElementById('system-prompt').value = '';
@@ -155,7 +160,11 @@ function exportJson(mode = 0) {
         } else if (value === 'RANDOM_FLOAT') {
             const rand = Math.random() * (100);
             v = parseFloat(rand.toFixed(6));
-        }else if (value === 'RANDOM_STRING') {
+        } else if (value === 'RANDOM_SCENARIO') {
+            v = mockData.scenario[Math.floor(Math.random() * (mockData.scenario.length))]
+        } else if (value === 'RANDOM_KEY') {
+            v = mockData.keys[Math.floor(Math.random() * (mockData.keys.length))]
+        } else if (value === 'RANDOM_STRING') {
             v = getRandomString(8);
         }
         processedSystemPrompt = processedSystemPrompt.replaceAll(variablePlaceholder, v);
@@ -190,7 +199,11 @@ function exportJson(mode = 0) {
             } else if (value === 'RANDOM_FLOAT') {
                 const rand = Math.random() * (100);
                 v = parseFloat(rand.toFixed(6));
-            }else if (value === 'RANDOM_STRING') {
+            } else if (value === 'RANDOM_SCENARIO') {
+                v = mockData.scenario[Math.floor(Math.random() * (mockData.scenario.length))]
+            } else if (value === 'RANDOM_KEY') {
+                v = mockData.keys[Math.floor(Math.random() * (mockData.keys.length))]
+            } else if (value === 'RANDOM_STRING') {
                 v = getRandomString(8);
             }
             processedContent = processedContent.replaceAll(variablePlaceholder, v);
@@ -215,7 +228,11 @@ function exportJson(mode = 0) {
             } else if (variables[varName] === 'RANDOM_FLOAT') {
                 const rand = Math.random() * (100);
                 v = parseFloat(rand.toFixed(6));
-            }else if (variables[varName] === 'RANDOM_STRING') {
+            } else if (variables[varName] === 'RANDOM_SCENARIO') {
+                v = mockData.scenario[Math.floor(Math.random() * (mockData.scenario.length))]
+            } else if (variables[varName] === 'RANDOM_KEY') {
+                v = mockData.keys[Math.floor(Math.random() * (mockData.keys.length))]
+            } else if (variables[varName] === 'RANDOM_STRING') {
                 v = getRandomString(8);
             }
             return v; // Replace or leave as-is if no match
@@ -233,17 +250,17 @@ function exportJson(mode = 0) {
 
     // Create final JSON
     let jsonOutput;
-    if(mode === 1) {
+    if (mode === 1) {
         jsonOutput = JSON.stringify(prompts.map(p => {
             return {
                 "role": p.role,
                 "content": p.content
             }
         }), null, 2);
-    }  else {
-        jsonOutput = JSON.stringify(prompts, null, 2);
+    } else {
+        jsonOutput = JSON.stringify({variables, prompts}, null, 2);
     }
-    const blob = new Blob([jsonOutput], { type: 'application/json' });
+    const blob = new Blob([jsonOutput], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
 
     // Trigger download
