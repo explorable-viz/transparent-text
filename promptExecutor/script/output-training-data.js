@@ -4,11 +4,6 @@ const path = require('path');
 const seedrandom = require('seedrandom');
 let generator;
 
-let mockData = {
-    "scenario": ["sspone", "ssptwo", "sspthree", "ssphigh", "ssplow", "sspmedium", "s1", "s2", "s3", "s4"],
-    "keys": ["best1", "best2", "best3", "low1", "low2", "low3", "high1", "high2", "high3", "a", "b", "c", "d"]
-}
-
 // Funzione per caricare il JSON da un file
 function loadJson(filePath) {
     try {
@@ -51,10 +46,6 @@ function transformJson(inputData) {
             } else if (value === 'RANDOM_FLOAT') {
                 const rand = generator() * (10);
                 v = parseFloat(rand.toFixed(6));
-            } else if (value === 'RANDOM_SCENARIO') {
-                v = mockData.scenario[Math.floor(generator() * (mockData.scenario.length))]
-            } else if (value === 'RANDOM_KEY') {
-                v = mockData.keys[Math.floor(generator() * (mockData.keys.length))]
             } else if (value === 'RANDOM_STRING') {
                 v = getRandomString(8)
             }
@@ -71,15 +62,13 @@ function transformJson(inputData) {
 function main() {
 
     const args = process.argv.slice(2);
-    generator = seedrandom("fluid-seed");
     if (args.length < 3) {
         console.error('Usage: node output-training-data.js <inputFilePath> <outputFilePath> <modality (seed|random) >');
         process.exit(1);
     }
 
-    if (args[2] !== 'seed') {
-        generator = seedrandom()
-    }
+    generator = args[2] !== "seed" ? seedrandom() : seedrandom("fluid-seed")
+
     const inputFilePath = path.resolve(args[0]);
     const outputFilePath = path.resolve(args[1]);
 

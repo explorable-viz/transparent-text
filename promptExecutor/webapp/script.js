@@ -1,10 +1,5 @@
 let promptCount = 0;
 
-let mockData = {
-    "scenario": ["sspone", "ssptwo", "sspthree", "ssphigh", "ssplow", "sspmedium", "s1", "s2", "s3", "s4"],
-    "keys": ["best1", "best2", "best3", "low1", "low2", "low3", "high1", "high2", "high3", "a", "b", "c", "d"]
-}
-
 // Function to clear all prompts and reset the interface
 function clearAll() {
     document.getElementById('system-prompt').value = '';
@@ -14,7 +9,7 @@ function clearAll() {
 }
 
 // Function to add a new prompt
-function addPrompt(userCaption = '', assistantResponse = '', userData = '', userCode = '') {
+function addPrompt(userText = '', assistantResponse = '', userData = '', userCode = '') {
     promptCount++;
 
     // Create new prompt elements
@@ -36,7 +31,7 @@ function addPrompt(userCaption = '', assistantResponse = '', userData = '', user
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Text</label>
-                    <textarea class="form-control prompt-caption" rows="5" placeholder="Enter text...">${userCaption}</textarea>
+                    <textarea class="form-control prompt-text" rows="5" placeholder="Enter text...">${userText}</textarea>
                 </div>
             `;
 
@@ -115,8 +110,8 @@ function importJson() {
             if (prompt.role === 'user') {
                 const userData = prompt.data || '';
                 const userCode = prompt.code || '';
-                const userCaption = prompt.caption || '';
-                addPrompt(userCaption, '', userData, userCode);
+                const userText = prompt.text || '';
+                addPrompt(userText, '', userData, userCode);
             } else if (prompt.role === 'assistant') {
                 const assistantContent = prompt.raw_content || prompt.content || '';
                 const lastRowAssistant = document.querySelectorAll('#prompt-list .row:last-child .col-md-6:nth-child(2) textarea');
@@ -160,10 +155,6 @@ function exportJson(mode = 0) {
         } else if (value === 'RANDOM_FLOAT') {
             const rand = Math.random() * (100);
             v = parseFloat(rand.toFixed(6));
-        } else if (value === 'RANDOM_SCENARIO') {
-            v = mockData.scenario[Math.floor(Math.random() * (mockData.scenario.length))]
-        } else if (value === 'RANDOM_KEY') {
-            v = mockData.keys[Math.floor(Math.random() * (mockData.keys.length))]
         } else if (value === 'RANDOM_STRING') {
             v = getRandomString(8);
         }
@@ -186,11 +177,11 @@ function exportJson(mode = 0) {
     promptList.forEach((row, index) => {
         const userData = row.querySelector('textarea.prompt-data').value.trim();
         const userCode = row.querySelector('textarea.prompt-code').value.trim();
-        const userCaption = row.querySelector('textarea.prompt-caption').value.trim();
+        const userText = row.querySelector('textarea.prompt-text').value.trim();
         const assistantResponse = row.querySelector('textarea.prompt-assistant').value.trim();
 
         // Replace variables in content (concatenated fields)
-        let processedContent = [userData, userCode, userCaption].join('\n');
+        let processedContent = [userData, userCode, userText].join('\n');
         for (const [key, value] of Object.entries(variables)) {
             const variablePlaceholder = `$${key}$`;
             var v = value;
@@ -199,10 +190,6 @@ function exportJson(mode = 0) {
             } else if (value === 'RANDOM_FLOAT') {
                 const rand = Math.random() * (100);
                 v = parseFloat(rand.toFixed(6));
-            } else if (value === 'RANDOM_SCENARIO') {
-                v = mockData.scenario[Math.floor(Math.random() * (mockData.scenario.length))]
-            } else if (value === 'RANDOM_KEY') {
-                v = mockData.keys[Math.floor(Math.random() * (mockData.keys.length))]
             } else if (value === 'RANDOM_STRING') {
                 v = getRandomString(8);
             }
@@ -210,12 +197,12 @@ function exportJson(mode = 0) {
         }
 
         // Add user content
-        if (userData || userCode || userCaption) {
+        if (userData || userCode || userText) {
             prompts.push({
                 role: 'user',
                 data: userData,        // Unprocessed data with variables
                 code: userCode,        // Unprocessed code with variables
-                caption: userCaption,  // Unprocessed caption with variables
+                text: userText,  // Unprocessed text with variables
                 content: processedContent // Processed content with variables replaced
             });
         }
@@ -228,10 +215,6 @@ function exportJson(mode = 0) {
             } else if (variables[varName] === 'RANDOM_FLOAT') {
                 const rand = Math.random() * (100);
                 v = parseFloat(rand.toFixed(6));
-            } else if (variables[varName] === 'RANDOM_SCENARIO') {
-                v = mockData.scenario[Math.floor(Math.random() * (mockData.scenario.length))]
-            } else if (variables[varName] === 'RANDOM_KEY') {
-                v = mockData.keys[Math.floor(Math.random() * (mockData.keys.length))]
             } else if (variables[varName] === 'RANDOM_STRING') {
                 v = getRandomString(8);
             }
