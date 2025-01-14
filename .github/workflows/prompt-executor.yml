@@ -6,7 +6,7 @@ name: PromptExecutor
     paths:
       - promptExecutor/**
 jobs:
-  prompt-test-mock-ubuntu:
+  prompt-test-ubuntu:
     runs-on: ubuntu-latest
     defaults:
       run:
