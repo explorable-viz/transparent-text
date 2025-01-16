@@ -18,17 +18,19 @@ public class PromptExecutorWorkflow {
     public final Logger logger = Logger.getLogger(PromptExecutorWorkflow.class.getName());
     private final PromptList prompts;
     private final String query;
-    private final String template = Settings.getInstance().get(Settings.FLUID_TEMPLATE);
+    private final String template;
     private final LLMEvaluatorAgent llm;
 
-    public PromptExecutorWorkflow(String promptPath, String query, String agentClassName) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public PromptExecutorWorkflow(String promptPath, String query, String agentClassName, String fluidTemplatePath) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         this.query = query;
         this.prompts = new PromptList();
         String content = new String(Files.readAllBytes(Paths.get(new File(promptPath).toURI())));
         JSONArray jsonContent = new JSONArray(content);
         prompts.parseJSONContent(jsonContent);
         llm = initialiseAgent(agentClassName);
+        this.template = new String(Files.readAllBytes(Paths.get(new File(fluidTemplatePath).toURI())));;
     }
+
 
     /**
      * Executes a task with the provided input.

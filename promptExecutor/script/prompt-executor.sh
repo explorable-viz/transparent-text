@@ -45,6 +45,7 @@ if [ $# -lt 3 ]; then
     echo "  expected_results              (optional) : expected output file (for validation only)"
     echo "  threshold                     (optional) : the minimum accuracy to consider successfully the test execution"
     echo "  max_queries                   (optional) : number of queries to test during the execution"
+    echo "  templatePath                  (optional) : fluid templatePath"
     exit 1
 fi
 # [@todo comment]
@@ -55,6 +56,7 @@ settings=$3
 expected_results=${5:-}
 threshold=${6:-}
 max_queries=${7:-}
+templatePath=${8:-}
 
 if [ -z "$threshold" ]; then
     threshold=0.7
@@ -65,7 +67,7 @@ base_command="java --enable-preview -jar target/PromptExecutor-0.1-jar-with-depe
 command="$base_command $prompt_configuration $settings $queries"
 
 if [ -n "$expected_results" ]; then
-    command="$command $expected_results $max_queries"
+    command="$command $expected_results $max_queries $templatePath"
 fi
 
 output=$(eval "$command")

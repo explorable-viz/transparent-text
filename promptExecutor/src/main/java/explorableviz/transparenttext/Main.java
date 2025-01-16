@@ -16,6 +16,7 @@ public class Main {
     public static Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String... args)  {
+
         if (args.length < 4) {
             System.err.println("missing arguments, 2 expected but " + args.length + " given");
             System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts] [settings] [queries] [expected] [maxQueries]");
@@ -24,8 +25,9 @@ public class Main {
 
         final String agent = args[0];
         final String promptPath = args[1];
-        final String queryPath = args[3];
         final String settingsPath = args[2];
+        final String queryPath = args[3];
+        final String fluitTemplatePath = args[6];
         final ArrayList<String> queries;
         try {
             queries = loadQueries(queryPath);
@@ -49,9 +51,11 @@ public class Main {
             logger.info(STR."Analysing query id=\{i}");
             PromptExecutorWorkflow promptExecutorWorkflow = null;
             try {
-                promptExecutorWorkflow = new PromptExecutorWorkflow(promptPath, query, agent);
+                promptExecutorWorkflow = new PromptExecutorWorkflow(promptPath, query, agent, fluitTemplatePath);
                 results.add(promptExecutorWorkflow.execute());
             }  catch (Exception e) {
+                System.err.println(e.getMessage());
+                System.exit(1);
                 results.add("ERROR " + e.getMessage());
             }
         }
