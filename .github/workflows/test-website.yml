@@ -24,6 +24,6 @@ jobs:
         yarn install
         set -x -e
         yarn fluid publish -w Misc -l
-        yarn puppeteer browsers install chrome
-        yarn puppeteer browsers install firefox
+        npx @puppeteer/browsers install chrome@128.0.6613.84
+        npx @puppeteer/browsers install firefox
         yarn website-test misc
