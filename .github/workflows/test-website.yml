@@ -18,6 +18,7 @@ jobs:
     - name: enable-glob
       run: | 
         shopt -s extglob nullglob globstar
+      if: runner.os == 'Linux'
     - name: run-test
       run: |
         cd promptExecutor
