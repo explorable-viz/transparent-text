@@ -4,8 +4,12 @@ on:
   workflow_dispatch: 
 
 jobs:
-  run-commands:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, macOS-14]
+    runs-on: ${{ matrix.os }}
+
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
