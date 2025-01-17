@@ -20,4 +20,6 @@ jobs:
         yarn install
         set -x -e
         yarn fluid publish -w Misc -l
+        yarn puppeteer browsers install chrome
+        yarn puppeteer browsers install firefox
         yarn website-test misc
