@@ -1,8 +1,7 @@
-let d = ##DATA##;
 let modelProbs = [
      { model: "SSP1-1.9", probability: 0.92 }
 ];
-let newDataTable offset = map (fun s -> { scenario: s.scenario, bE2140: s.bestEst2140 + offset, low2140: s.low2140, high2140: s.high2140, bE4160: s.bestEst4160, low4160: s.low4160, high4160: s.high4160, bE81100: s.bestEst81100, low81100: s.low81100, high81100: s.high81100}) d;
+let newDataTable offset = map (fun s -> { scenario: s.scenario, bE2140: s.bestEst2140 + offset, low2140: s.low2140, high2140: s.high2140, bE4160: s.bestEst4160, low4160: s.low4160, high4160: s.high4160, bE81100: s.bestEst81100, low81100: s.low81100, high81100: s.high81100}) tableData;
 let newModel offset = map (fun s -> { model: s.model, probability: s.probability + offset}) modelProbs;
 
 let getByScenario scenario data =
@@ -33,5 +32,6 @@ let findLikelihood (min, max) target =
     then 0.0
     else if target < min
     then 1.0
-    else (target - min)/(max - min);##CODE##
+    else (target - min)/(max - min);
+##CODE##
 in ##EXPRESSION##
