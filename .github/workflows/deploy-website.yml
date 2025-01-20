@@ -17,7 +17,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-22.04]
+        os: [ubuntu-22.04, macos-14]
     runs-on: ${{ matrix.os }}
 
     steps:
@@ -35,9 +35,7 @@ jobs:
         set -x -e
         yarn fluid publish -w Misc -l
         export PUPPETEER_CACHE_DIR=/home/runner/work/transparent-text/transparent-text/promptExecutor/
-        # seem to need to fix these at versions associated with Puppeteer version used in Fluid
-        # npx @puppeteer/browsers install chrome@128.0.6613.84
-        # npx @puppeteer/browsers install firefox@stable_129.0.2
+        # requires Puppeteer to be installed at same version as used in Fluid
         yarn puppeteer browsers install chrome
         yarn puppeteer browsers install firefox
         yarn website-test misc
