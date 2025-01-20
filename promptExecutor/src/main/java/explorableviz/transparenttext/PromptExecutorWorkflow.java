@@ -80,8 +80,8 @@ public class PromptExecutorWorkflow {
      */
     public ValidationResult validate(String response) {
 
-        String data = query.getDataset();
-        String code = query.getImports();
+        String data = "";
+        String code = query.getCode();
         String text = query.getFile();
 
         try {
@@ -93,9 +93,15 @@ public class PromptExecutorWorkflow {
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            String command = bashPrefix + "yarn fluid evaluate -f " + tempFile;
+            StringBuilder command = new StringBuilder(bashPrefix + "yarn fluid evaluate -f " + tempFile);
+            query.getDataset().forEach((key, path) -> {
+                command.append(" -d \"(").append(key).append(", ").append(path).append(")\"");
+            });
+            query.getImports().forEach(path -> {
+                command.append(" -i ").append(path);
+            });
             logger.info("Running command: " + command);
-            Process process = Runtime.getRuntime().exec(command);
+            Process process = Runtime.getRuntime().exec(command.toString());
             process.waitFor();
 
             //Reading command output
@@ -218,8 +224,7 @@ public class PromptExecutorWorkflow {
      */
     private void writeFluidFile(String data, String code, String response) throws FileNotFoundException {
         PrintWriter out = new PrintWriter(STR."fluid/example/\{Settings.getInstance().get(Settings.FLUID_TEMP_FILE)}.fld");
-        String result = template.replaceAll("##DATA##", data);
-        result = result.replaceAll("##CODE##", code);
+        String result = template.replaceAll("##CODE##", query.getCode());
         result = result.replaceAll("##EXPRESSION##", response);
         out.println(result);
         out.flush();

@@ -7,7 +7,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.logging.Logger;
@@ -26,11 +28,11 @@ public class Main {
         final String agent = args[0];
         final String promptPath = args[1];
         final String settingsPath = args[2];
-        final String queryPath = args[3];
+        final String testPath = args[3];
         final String fluitTemplatePath = args[6];
         final ArrayList<QueryContext> queries;
         try {
-            queries = loadQueries(queryPath);
+            queries = loadTestCases(testPath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -63,7 +65,7 @@ public class Main {
 
         /*
          * Accuracy measure
-         */
+
         if (args.length >= 5) {
             String[] expectedResult = null;
             int correct = 0;
@@ -82,18 +84,27 @@ public class Main {
         } else {
             System.out.println("Accuracy: 0.0");
         }
-
+        */
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
-    public static ArrayList<QueryContext> loadQueries(String queryPath) throws IOException {
-        String content = new String(Files.readAllBytes(Paths.get(new File(queryPath).toURI())));
-        JSONArray queries = new JSONArray(content);
+    public static ArrayList<QueryContext> loadTestCases(String testPath) throws IOException {
+        Path folder = Paths.get(testPath);
+
+        // Check if the folder exists and is a directory
+        if (!Files.exists(folder) || !Files.isDirectory(folder)) {
+            throw new RuntimeException("Invalid folder path: " + testPath);
+        }
+        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(folder);
         ArrayList<QueryContext> outputQueries = new ArrayList<>();
-        for (int i = 0; i < queries.length(); i++) {
-            JSONObject o = queries.getJSONObject(i);
-            QueryContext queryContext = QueryContext.importFromJson(o);
-            outputQueries.add(queryContext);
+        for (Path filePath : directoryStream) {
+            if(filePath.getFileName().toString().startsWith("expression")) continue;
+            if (Files.isRegularFile(filePath)) { // Ensure it's a file
+                String content = new String(Files.readAllBytes(filePath));
+                JSONObject o = new JSONObject(content);
+                QueryContext queryContext = QueryContext.importFromJson(o);
+                outputQueries.add(queryContext);
+            }
         }
         return outputQueries;
     }
