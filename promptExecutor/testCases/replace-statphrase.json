@@ -1,0 +1,9 @@
+{
+  "datasets": [{
+    "var": "tableData",
+    "file": "dataset/test-dataset"
+  }],
+  "imports": [],
+  "code": "let dataSet = newDataTable 16;\n    analysisModel = newModel 0.50;\n    stressedScenario = getByScenario \"SSP3-7.0\" dataSet;\n    highEmissionScenario = getByScenario \"SSP5-8.5\" dataSet",
+  "text": "In the SSP3-7.0 framework, there's a [REPLACE value=\"likely\"] chance of temperatures surpassing 2°C. Meanwhile, the high-emission SSP5-8.5 scenario significantly elevates the risk of exceeding this critical temperature threshold."
+}
