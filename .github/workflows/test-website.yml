@@ -19,7 +19,7 @@ jobs:
         cd promptExecutor
         yarn install
         set -x -e
-        yarn install puppeteer
+        yarn add puppeteer
         yarn puppeteer browsers install chrome
         yarn puppeteer browsers install firefox
         yarn fluid publish -w Misc -l
