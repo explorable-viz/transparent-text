@@ -31,5 +31,8 @@
   "dependencies": {
     "@explorable-viz/fluid": "^0.7.30",
     "seedrandom": "^3.0.5"
+  },
+  "devDependencies": {
+    "puppeteer": "23.2.0"
   }
 }
