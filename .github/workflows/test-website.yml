@@ -20,7 +20,7 @@ jobs:
         yarn install
         set -x -e
         yarn add puppeteer
-        npx @puppeteer/browsers install chrome@128.0.6613.84
-        npx @puppeteer/browsers install firefox
+        yarn puppeteer browsers install chrome
+        yarn puppeteer browsers install firefox
         yarn fluid publish -w Misc -l
         yarn website-test misc
