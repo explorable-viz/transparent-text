@@ -4,23 +4,27 @@ on:
   workflow_dispatch: 
 
 jobs:
-  run-commands:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        os: [ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+
     steps:
     - uses: actions/checkout@v4
     - uses: actions/setup-node@v4
       with:
         node-version: 22
-    - name: enable-glob
-      run: | 
+    - run: | 
         shopt -s extglob nullglob globstar
+      if: runner.os == 'Linux'
     - name: run-test
       run: |
         cd promptExecutor
         yarn install
         set -x -e
-        yarn add puppeteer
-        yarn puppeteer browsers install chrome
-        yarn puppeteer browsers install firefox
         yarn fluid publish -w Misc -l
+        export PUPPETEER_CACHE_DIR=/home/runner/work/transparent-text/transparent-text/promptExecutor/
+        npx @puppeteer/browsers install chrome@128.0.6613.84
+        npx @puppeteer/browsers install firefox@stable_129.0.2
         yarn website-test misc
