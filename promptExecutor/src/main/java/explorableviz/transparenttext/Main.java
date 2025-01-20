@@ -85,6 +85,7 @@ public class Main {
             System.out.println("Accuracy: 0.0");
         }
         */
+        System.out.println("Accuracy: 0.0");
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 

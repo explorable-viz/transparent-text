@@ -203,7 +203,7 @@ public class PromptExecutorWorkflow {
             throw new Exception("Output format is invalid");
         }
 
-        String value = outputLines[2].replaceAll("^\"|\"$", "");
+        String value = outputLines[1].replaceAll("^\"|\"$", "");
 
         if (value.equals(expectedValue)) {
             logger.info("Validation passed");
