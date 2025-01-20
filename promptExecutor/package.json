@@ -23,7 +23,7 @@
     "ollama-install": "./script/ollama-install.sh",
     "ollama-serve": "./script/ollama-serve.sh",
     "ollama-run": "./script/ollama-steps.sh",
-    "generate-output-training-data": "node ./script/output-training-data.js ./input/input-prompt-expression.json ./output/prompt-expression.json seed",
+    "generate-in-context-learning-data": "node ./script/generate-in-context-learning-data.js ./input/input-prompt-expression.json ./output/in-context-learning-data.json seed",
     "test": "./script/prompt-executor.sh it.unisa.cluelab.lllm.llm.agents.Llama31EvaluatorAgent output/prompt-expression.json input/settings.json input/expression.json input/expression-expected.txt 0 1 input/templateFluid.fld",
     "test-mock": "./script/prompt-executor.sh explorableviz.transparenttext.llm.LLMDummyAgent output/prompt-expression.json input/settings.json input/expression.json input/expression-expected.txt 0 1 input/templateFluid.fld"
   },
