@@ -1,6 +1,6 @@
-#Launch prompts workflow
 name: PromptExecutorMocked
-'on':
+
+on:
   workflow_dispatch:
   push:
     paths:
