@@ -1,6 +1,16 @@
-name: test-misc-website
+name: DeployWebsiteSPM
 
 on:
+  push:
+    paths-ignore:
+      - 'obsolete/**'
+      - 'sec/**'
+      - 'tex/**'
+  pull_request:
+    paths-ignore:
+      - 'obsolete/**'
+      - 'sec/**'
+      - 'tex/**'
   workflow_dispatch: 
 
 jobs:
@@ -28,3 +38,21 @@ jobs:
         npx @puppeteer/browsers install chrome@128.0.6613.84
         npx @puppeteer/browsers install firefox@stable_129.0.2
         yarn website-test misc
+  deploy-website-spm:
+    runs-on: ubuntu-22.04
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: build
+        run: |
+          cd promptExecutor
+          yarn install
+          set -x -e 
+          yarn fluid publish -w Misc -l
+      - name: gh-pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: promptExecutor/dist/misc
+          keep_files: false
