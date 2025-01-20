@@ -17,11 +17,11 @@ public class PromptExecutorWorkflow {
 
     public final Logger logger = Logger.getLogger(PromptExecutorWorkflow.class.getName());
     private final PromptList prompts;
-    private final String query;
+    private final QueryContext query;
     private final String template;
     private final LLMEvaluatorAgent llm;
 
-    public PromptExecutorWorkflow(String promptPath, String query, String agentClassName, String fluidTemplatePath) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public PromptExecutorWorkflow(String promptPath, QueryContext query, String agentClassName, String fluidTemplatePath) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         this.query = query;
         this.prompts = new PromptList();
         String content = new String(Files.readAllBytes(Paths.get(new File(promptPath).toURI())));
@@ -46,7 +46,7 @@ public class PromptExecutorWorkflow {
         int limit = Integer.parseInt(Settings.getInstance().get(Settings.LIMIT));
         // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
-        prompts.addPrompt(PromptList.USER, query);
+        prompts.addPrompt(PromptList.USER, query.toString());
         for (int attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info("Attempt #" + attempts);
             // Send the query to the LLM to be processed
@@ -79,10 +79,10 @@ public class PromptExecutorWorkflow {
      * @return null
      */
     public ValidationResult validate(String response) {
-        JSONObject parsedQuery = new JSONObject(query);
-        String data = parsedQuery.getString("data");
-        String code = parsedQuery.getString("code");
-        String text = parsedQuery.getString("text");
+
+        String data = query.getDataset();
+        String code = query.getImports();
+        String text = query.getFile();
 
         try {
             writeFluidFile(data, code, response);
@@ -197,7 +197,7 @@ public class PromptExecutorWorkflow {
             throw new Exception("Output format is invalid");
         }
 
-        String value = outputLines[1].replaceAll("^\"|\"$", "");
+        String value = outputLines[2].replaceAll("^\"|\"$", "");
 
         if (value.equals(expectedValue)) {
             logger.info("Validation passed");

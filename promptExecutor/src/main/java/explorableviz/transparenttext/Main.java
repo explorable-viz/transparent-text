@@ -28,13 +28,13 @@ public class Main {
         final String settingsPath = args[2];
         final String queryPath = args[3];
         final String fluitTemplatePath = args[6];
-        final ArrayList<String> queries;
+        final ArrayList<QueryContext> queries;
         try {
             queries = loadQueries(queryPath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final int numQueries = (args.length == 6) ? Integer.parseInt(args[5]) : queries.size();
+        final int numQueries = (args.length == 7) ? Integer.parseInt(args[5]) : queries.size();
         final ArrayList<String> results = new ArrayList<>();
 
         /*
@@ -47,14 +47,15 @@ public class Main {
         }
 
         for (int i = 0; i < numQueries; i++) {
-            String query = queries.get(i);
+            QueryContext query = queries.get(i);
             logger.info(STR."Analysing query id=\{i}");
             PromptExecutorWorkflow promptExecutorWorkflow = null;
             try {
                 promptExecutorWorkflow = new PromptExecutorWorkflow(promptPath, query, agent, fluitTemplatePath);
                 results.add(promptExecutorWorkflow.execute());
             }  catch (Exception e) {
-                System.err.println(e.getMessage());
+                System.err.println(e);
+                e.printStackTrace();
                 System.exit(1);
                 results.add("ERROR " + e.getMessage());
             }
@@ -85,13 +86,14 @@ public class Main {
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
-    public static ArrayList<String> loadQueries(String queryPath) throws IOException {
+    public static ArrayList<QueryContext> loadQueries(String queryPath) throws IOException {
         String content = new String(Files.readAllBytes(Paths.get(new File(queryPath).toURI())));
         JSONArray queries = new JSONArray(content);
-        ArrayList<String> outputQueries = new ArrayList<>();
+        ArrayList<QueryContext> outputQueries = new ArrayList<>();
         for (int i = 0; i < queries.length(); i++) {
             JSONObject o = queries.getJSONObject(i);
-            outputQueries.add(o.toString());
+            QueryContext queryContext = QueryContext.importFromJson(o);
+            outputQueries.add(queryContext);
         }
         return outputQueries;
     }
