@@ -35,8 +35,8 @@ jobs:
         set -x -e
         yarn fluid publish -w Misc -l
         export PUPPETEER_CACHE_DIR=/home/runner/work/transparent-text/transparent-text/promptExecutor/
-        npx @puppeteer/browsers install chrome@128.0.6613.84
-        npx @puppeteer/browsers install firefox@stable_129.0.2
+        npx @puppeteer/browsers install chrome
+        npx @puppeteer/browsers install firefox
         yarn website-test misc
   deploy-website:
     runs-on: ubuntu-22.04
