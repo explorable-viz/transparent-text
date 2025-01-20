@@ -1,0 +1,9 @@
+{
+  "dataset": [{
+    "var": "tableData",
+    "file": "fluid/dataset/test-dataset"
+  }],
+  "imports": [],
+  "code": "let envDataTable = newDataTable 13;\n    probMetric = newModel 0.35;\n    earlyScenario = getByScenario \"SSP3-7.0\" envDataTable;\n    lateScenario = getByScenario \"SSP1-1.9\" envDataTable",
+  "text": "The scenario [REPLACE value=\"SSP3-7.0\"] outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [REPLACE value=\"more likely than not\"]. Meanwhile, [SCEN_REPLACE value=\"SSP1-1.9\"] charts a different course, with a restrained [NUM_REPLACE value=\"1.4\"] rise, making such an exceedance [STAT_REPLACE value=\"very unlikely\"]."
+}
