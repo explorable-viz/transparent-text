@@ -1,4 +1,4 @@
-name: DeployWebsiteSPM
+name: DeployWebsite
 
 on:
   push:
