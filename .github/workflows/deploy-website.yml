@@ -50,7 +50,7 @@ jobs:
           cd promptExecutor
           yarn install
           set -x -e
-          yarn fluid publish -w Misc -l
+          yarn fluid publish -w Ar6Wg1SPM -l
       - name: gh-pages
         uses: peaceiris/actions-gh-pages@v3
         with:
