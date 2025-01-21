@@ -1,4 +1,4 @@
-![PromptExecutor](https://github.com/explorable-viz/transparent-text/actions/workflows/prompt-executor.yml/badge.svg) 
+![PromptExecutor](https://github.com/explorable-viz/transparent-text/actions/workflows/prompt-executor.yml/badge.svg)
 ![PromptExecutorMocked](https://github.com/explorable-viz/transparent-text/actions/workflows/prompt-executor-mocked.yml/badge.svg)
 
 ## PromptExecutor
@@ -19,14 +19,14 @@ where:
 
 ### List of available agents
 
-| Class                      | Model                  | Token Needed | 
-|----------------------------|------------------------|--------------| 
-| ClaudeSonnetEvaluatorAgent | claude-sonnet-20241022 | yes          | 
-| GeminiPro15EvaluationAgent | gemini-pro             | yes          | 
-| Gpt4oEvaluationAgent       | gpt-4o                 | yes          | 
-| Gpt35EvaluationAgent       | gpt-3.5                | yes          | 
-| Llama3EvaluatorAgent       | llama3:8b              | no           | 
-| Llama31EvaluatorAgent      | llama3.1:8b            | no           | 
+| Class                      | Model                  | Token Needed |
+|----------------------------|------------------------|--------------|
+| ClaudeSonnetEvaluatorAgent | claude-sonnet-20241022 | yes          |
+| GeminiPro15EvaluationAgent | gemini-pro             | yes          |
+| Gpt4oEvaluationAgent       | gpt-4o                 | yes          |
+| Gpt35EvaluationAgent       | gpt-3.5                | yes          |
+| Llama3EvaluatorAgent       | llama3:8b              | no           |
+| Llama31EvaluatorAgent      | llama3.1:8b            | no           |
 
 
 ### Scripts
@@ -45,30 +45,27 @@ All the scripts are integrated with yarn scripts.
 - `yarn ollama-serve` provides to start the ollama server
 - `yarn test` provides to launch the test with the file in the input folder.
 
-### Webtools 
+### Webtools
 
 There are two web-based tools which allow to edit the prompt base-knowledge and the input queries. These tools are in the folder `./webapp`
 
 | Tool          | Description                           | Link                                                           |
-|---------------|---------------------------------------|----------------------------------------------------------------| 
+|---------------|---------------------------------------|----------------------------------------------------------------|
 | Prompt Editor | Tool for the editing of the prompt    | [./webapp/prompt-editor.html](./webapp/prompt-editor.html)     |
 | Query Editor  | Tool for the editing of the queries | [./webapp/queries-editor.html](./webapp/queries-editor.html) |
 
 ## Websites
-All commands to be run from `promptExecutor`
-### Creating Websites
-1. Create a folder in `promptExecutor/website/`: `mkdir website/$WEBSITE_NAME`
-2. For each subpage, create an html file: `touch website/$WEBSITE_NAME/$PAGE_NAME.html$`
-3. Configure the json and html files appropriately, for examples look in `promptExecutor/website/Ar6Wg1SPM`
-4. Add symlinks for shared files 
-5. (Optional): include a `test.mjs` file in the root of your website's directory
+
+Paths are relative to folder containing these instructions. `$WEBSITE_NAME` refers to any of the website
+folders under `website`.
+
 ### Bundling/Testing Websites
-To bundle a website, run the command `yarn fluid publish -w $WEBSITE_NAME -L`.
-This will create a folder in `promptExecutor/dist` with a lisp-cased version of `$WEBSITE_NAME`.
+To bundle a website, run the command `yarn fluid publish -w $WEBSITE_NAME -l`.
+This will create a folder in `dist` with a Lisp-cased version of `$WEBSITE_NAME`.
 
-To test the website in the browser: 
+To test the website in the browser:
 1. run `npx http-serve dist/$WEBSITE_NAME_LISP_CASE -a 127.0.0.1 -c-1`
-2. Open your browser, and navigate to the available address shown in your terminal, e.g: `https://127.0.0.1:8080/$PAGE_NAME_LISP_CASE`
+2. Open your browser at localhost
 
-To run `test.mjs`:
+To run your website tests:
 1. Run the command `yarn website-test $WEBSITE_NAME_LISP_CASE`
