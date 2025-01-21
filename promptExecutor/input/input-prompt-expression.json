@@ -23,7 +23,13 @@
     },
     {
       "role": "user",
-      "data": "[\n    { scenario: \"$random_scenario1$\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, $random_key1$: $random_value_1$, low81100: 1.0, high81100: 1.8},\n    { scenario: \"$random_scenario2$\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.1, low4160: 1.7, high4160: 2.6, bestEst81100: 3.6, low81100: 2.8, high81100: 4.6}\n]",
+      "datasets": [
+        {
+          "var": "tableData",
+          "file": "dataset/test-dataset"
+        }
+      ],
+      "imports": ["test"],
       "code": "let newDataTable offset = map (fun s -> { scenario: s.scenario, bE2140: s.bestEst2140 + offset, low2140: s.low2140, high2140: s.high2140, bE4160: s.bestEst4160, low4160: s.low4160, high4160: s.high4160, bE81100: s.bestEst81100, low81100: s.low81100, high81100: s.high81100}) d;\nlet realTable = newDataTable 7;\n    probTable = newModel 0.7;\n    $random_var_name1$= getByScenario \"$random_scenario1$\" realTable;\n    $random_var_name2$= getByScenario \"$random_scenario2$\" realTable",
       "text": "The [REPLACE value=\"$random_scenario1$\"] forecast shows a modest $random_value_1$ increase by century's end, making a 2°C exceedance unlikely. In contrast, $random_scenario2$ makes it very likely.",
       "content": "[\n    { scenario: \"2jm8Qtzu\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, aiWBLSZI: 88.637445, low81100: 1.0, high81100: 1.8},\n    { scenario: \"9WWb188K\", bestEst2140: 1.5, low2140: 1.2, high2140: 1.8, bestEst4160: 2.1, low4160: 1.7, high4160: 2.6, bestEst81100: 3.6, low81100: 2.8, high81100: 4.6}\n]\nlet newDataTable offset = map (fun s -> { scenario: s.scenario, bE2140: s.bestEst2140 + offset, low2140: s.low2140, high2140: s.high2140, bE4160: s.bestEst4160, low4160: s.low4160, high4160: s.high4160, bE81100: s.bestEst81100, low81100: s.low81100, high81100: s.high81100}) d;\nlet realTable = newDataTable 7;\n    probTable = newModel 0.7;\n    ReanAEJB= getByScenario \"2jm8Qtzu\" realTable;\n    sdtyGL3n= getByScenario \"9WWb188K\" realTable\nThe [REPLACE value=\"2jm8Qtzu\"] forecast shows a modest 88.637445 increase by century's end, making a 2°C exceedance unlikely. In contrast, 9WWb188K makes it very likely."
