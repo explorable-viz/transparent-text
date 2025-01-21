@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
@@ -21,24 +22,25 @@ public class Main {
 
     public static void main(String... args)  {
 
+        HashMap<String, String> arguments = parseArguments(args);
         if (args.length < 4) {
             System.err.println("missing arguments, 2 expected but " + args.length + " given");
             System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts] [settings] [queries] [expected] [maxQueries]");
             System.exit(0);
         }
 
-        final String agent = args[0];
-        final String promptPath = args[1];
-        final String settingsPath = args[2];
-        final String testPath = args[3];
-        final String fluitTemplatePath = args[6];
+        final String agent = arguments.get("agent");
+        final String promptPath = arguments.get("inContextLearningPath");
+        final String settingsPath = arguments.get("settingsPath");
+        final String testPath = arguments.get("testPath");
+        final String fluitTemplatePath = arguments.get("fluidTemplatePath");
         final ArrayList<QueryContext> queries;
         try {
-            queries = loadTestCases(testPath, Integer.parseInt(args[5]));
+            queries = loadTestCases(testPath, Integer.parseInt(arguments.get("numTestToGenerate")));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final int numQueries = (args.length == 7) ? Integer.parseInt(args[5]) : queries.size();
+        final int numQueries = (arguments.containsKey("numTestToExecute")) ? Integer.parseInt(arguments.get("numTestToExecute")) : queries.size();
         final ArrayList<String> results = new ArrayList<>();
 
         /*
@@ -124,6 +126,24 @@ public class Main {
         out.close();
     }
 
+    public static HashMap<String, String> parseArguments(String[] args) {
+        HashMap<String, String> arguments = new HashMap<>();
+
+        for (String arg : args) {
+            if (arg.contains("=")) {
+                String[] keyValue = arg.split("=", 2); // Split into key and value
+                if (keyValue.length == 2) {
+                    arguments.put(keyValue[0], keyValue[1]);
+                } else {
+                    System.err.println("Invalid argument format: " + arg);
+                }
+            } else {
+                System.err.println("Skipping argument without '=': " + arg);
+            }
+        }
+
+        return arguments;
+    }
 
 
 }
