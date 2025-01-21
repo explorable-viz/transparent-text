@@ -69,9 +69,9 @@
     w3c-keyname "^2.2.4"
 
 "@explorable-viz/fluid@^0.7.30":
-  version "0.7.56"
-  resolved "https://registry.yarnpkg.com/@explorable-viz/fluid/-/fluid-0.7.56.tgz#a931dd993d94f06e2c1a85611bb263eb1bbff0b8"
-  integrity sha512-XYxsGpf3dfkQ+OeLqXMlfeCk8f15RhKVh8DQdMNhf7KWKvwMkkQD1xVlGKGaj1OufrYxYDTHcO8U6LGgPPuzGw==
+  version "0.7.59"
+  resolved "https://registry.yarnpkg.com/@explorable-viz/fluid/-/fluid-0.7.59.tgz#422734081a93251136836530e9a9f1da024a6d30"
+  integrity sha512-Tp0/TdhK7KFPdEbt+B/lTBIs7SqxKLOH0gkBBfVy01LkwVwgiSufKWMj594h5T6dEo6/QDLd4si3lOkrOfIJXA==
   dependencies:
     "@codemirror/commands" "6.2.2"
     "@codemirror/state" "6.2.0"

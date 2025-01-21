@@ -1,5 +1,4 @@
 name: DeployWebsite
-
 on:
   push:
     paths-ignore:
@@ -39,6 +38,7 @@ jobs:
         yarn puppeteer browsers install chrome
         yarn puppeteer browsers install firefox
         yarn website-test misc
+
   deploy-website:
     runs-on: ubuntu-22.04
     needs: test
