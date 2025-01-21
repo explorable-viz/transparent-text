@@ -60,12 +60,12 @@ Paths are relative to folder containing these instructions. `$WEBSITE_NAME` refe
 folders under `website`.
 
 ### Bundling/Testing Websites
-To bundle a website, run the command `yarn fluid publish -w $WEBSITE_NAME -l`.
-This will create a folder in `dist` with a Lisp-cased version of `$WEBSITE_NAME`.
+To bundle a website, run the command `yarn fluid publish -w $WEBSITE_NAME -l`. This will create a folder in
+`dist` with a Lisp-cased version of `$WEBSITE_NAME`.
 
 To test the website in the browser:
 1. run `npx http-serve dist/$WEBSITE_NAME_LISP_CASE -a 127.0.0.1 -c-1`
-2. Open your browser at localhost
+2. Open browser at localhost
 
 To run your website tests:
-1. Run the command `yarn website-test $WEBSITE_NAME_LISP_CASE`
+1. Run `yarn website-test $WEBSITE_NAME_LISP_CASE`
