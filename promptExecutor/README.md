@@ -54,3 +54,21 @@ There are two web-based tools which allow to edit the prompt base-knowledge and 
 | Prompt Editor | Tool for the editing of the prompt    | [./webapp/prompt-editor.html](./webapp/prompt-editor.html)     |
 | Query Editor  | Tool for the editing of the queries | [./webapp/queries-editor.html](./webapp/queries-editor.html) |
 
+## Websites
+All commands to be run from `promptExecutor`
+### Creating Websites
+1. Create a folder in `promptExecutor/website/`: `mkdir website/$WEBSITE_NAME`
+2. For each subpage, create an html file: `touch website/$WEBSITE_NAME/$PAGE_NAME.html$`
+3. Configure the json and html files appropriately, for examples look in `promptExecutor/website/Ar6Wg1SPM`
+4. Add symlinks for shared files 
+5. (Optional): include a `test.mjs` file in the root of your website's directory
+### Bundling/Testing Websites
+To bundle a website, run the command `yarn fluid publish -w $WEBSITE_NAME -L`.
+This will create a folder in `promptExecutor/dist` with a lisp-cased version of `$WEBSITE_NAME`.
+
+To test the website in the browser: 
+1. run `npx http-serve dist/$WEBSITE_NAME_LISP_CASE -a 127.0.0.1 -c-1`
+2. Open your browser, and navigate to the available address shown in your terminal, e.g: `https://127.0.0.1:8080/$PAGE_NAME_LISP_CASE`
+
+To run `test.mjs`:
+1. Run the command `yarn website-test $WEBSITE_NAME_LISP_CASE`
