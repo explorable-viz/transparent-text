@@ -8,22 +8,61 @@ function clearAll() {
     document.getElementById('prompt-count').textContent = `(0 prompts)`;
 }
 
+function addDataset(element) {
+    const dataset = document.createElement('div');
+    dataset.classList.add("data-row");
+    dataset.classList.add("row");
+    dataset.innerHTML = `
+          <div class="col">
+            <input type="text" name="key" class="form-control" placeholder="key" />
+          </div>
+          <div class="col">
+            <input type="text" name="file" class="form-control" placeholder="path"/>
+          </div>
+    `;
+    element.parentElement.appendChild(dataset)
+}
+
 // Function to add a new prompt
-function addPrompt(userText = '', assistantResponse = '', userData = '', userCode = '') {
+function addPrompt(userText = '', assistantResponse = '', userData = [], userCode = '', imports = '') {
     promptCount++;
 
     // Create new prompt elements
     const row = document.createElement('div');
-    row.className = 'row g-3 align-items-start mb-3';
+    row.className = 'row prompt-row g-3 align-items-start mb-3';
 
     // User Prompt Column
     const userCol = document.createElement('div');
     userCol.className = 'col-md-6';
+    let dataset_html = "";
+    dataset_html += ""
+    if(Array.isArray(userData)) {
+        userData.forEach(item => {
+            dataset_html += `
+        <div class="data-row row">
+          <div class="col">
+            <input type="text" name="key" class="form-control" value="${item.var}" />
+          </div>
+          <div class="col">
+            <input type="text" name="file" class="form-control" value="${item.file}" />
+          </div>
+        </div>
+      `;
+        });
+    }
+
     userCol.innerHTML = `
                 <label class="form-label">User Prompt #${promptCount}</label>
+                <div class="mb-3 prompt-datasets">
+                    <p class="form-label">Datasets</p>
+                    <button style='margin-top: 5px' class=\"btn btn-secondary\" onclick=\"addDataset(this)\">Add Dataset</button>
+                    <div class="dataset-list">
+                        ${dataset_html}
+                    </div>
+                </div>
                 <div class="mb-3">
-                    <label class="form-label">Data</label>
-                    <textarea class="form-control prompt-data" rows="5" placeholder="Enter data...">${userData}</textarea>
+                    <label class="form-label">Fluid Imports</label>
+                    <textarea class="form-control prompt-imports" rows="5" placeholder="Enter imports (one for line)...">${imports}</textarea>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Fluid Code</label>
@@ -82,7 +121,7 @@ function importJson() {
 
         Object.entries(variables).forEach(([key, value]) => {
             const row = document.createElement('div');
-            row.className = 'row g-3 align-items-center mb-2';
+            row.className = 'row g-3 align-items-center mb-2 var-row';
             row.innerHTML = `
                 <div class="col-md-5">
                     <input type="text" class="form-control" placeholder="Variable name" value="${key}">
@@ -108,10 +147,11 @@ function importJson() {
         // Handle user and assistant prompts
         parsedData.prompts.forEach((prompt) => {
             if (prompt.role === 'user') {
-                const userData = prompt.data || '';
+                const userData = prompt.datasets || '';
                 const userCode = prompt.code || '';
                 const userText = prompt.text || '';
-                addPrompt(userText, '', userData, userCode);
+                const imports = prompt.imports || '';
+                addPrompt(userText, '', userData, userCode, imports);
             } else if (prompt.role === 'assistant') {
                 const assistantContent = prompt.raw_content || prompt.content || '';
                 const lastRowAssistant = document.querySelectorAll('#prompt-list .row:last-child .col-md-6:nth-child(2) textarea');
@@ -145,21 +185,6 @@ function exportJson(mode = 0) {
 
     });
 
-    // Process the system prompt
-    let processedSystemPrompt = systemPrompt;
-    for (const [key, value] of Object.entries(variables)) {
-        const variablePlaceholder = `$${key}$`;
-        var v = value;
-        if (value === 'RANDOM_INT') {
-            v = Math.floor(Math.random() * (100));
-        } else if (value === 'RANDOM_FLOAT') {
-            const rand = Math.random() * (100);
-            v = parseFloat(rand.toFixed(6));
-        } else if (value === 'RANDOM_STRING') {
-            v = getRandomString(8);
-        }
-        processedSystemPrompt = processedSystemPrompt.replaceAll(variablePlaceholder, v);
-    }
 
     // Initialize prompts array
     const prompts = [];
@@ -167,82 +192,51 @@ function exportJson(mode = 0) {
     if (systemPrompt) {
         prompts.push({
             role: 'system',
-            content: processedSystemPrompt, // Processed system prompt
             raw_content: systemPrompt       // Raw system prompt with variables
         });
     }
 
     // Process user and assistant prompts
-    const promptList = document.querySelectorAll('#prompt-list .row');
+    const promptList = document.querySelectorAll('#prompt-list .prompt-row');
     promptList.forEach((row, index) => {
-        const userData = row.querySelector('textarea.prompt-data').value.trim();
+        const userData = row.querySelector('.prompt-datasets .dataset-list');
+
         const userCode = row.querySelector('textarea.prompt-code').value.trim();
+        const imports = row.querySelector('textarea.prompt-imports').value.trim();
         const userText = row.querySelector('textarea.prompt-text').value.trim();
         const assistantResponse = row.querySelector('textarea.prompt-assistant').value.trim();
 
-        // Replace variables in content (concatenated fields)
-        let processedContent = [userData, userCode, userText].join('\n');
-        for (const [key, value] of Object.entries(variables)) {
-            const variablePlaceholder = `$${key}$`;
-            var v = value;
-            if (value === 'RANDOM_INT') {
-                v = Math.floor(Math.random() * (100));
-            } else if (value === 'RANDOM_FLOAT') {
-                const rand = Math.random() * (100);
-                v = parseFloat(rand.toFixed(6));
-            } else if (value === 'RANDOM_STRING') {
-                v = getRandomString(8);
-            }
-            processedContent = processedContent.replaceAll(variablePlaceholder, v);
-        }
-
+        let datasets = []
+        userData.querySelectorAll(".data-row").forEach(item => {
+            datasets.push({
+                "key": item.querySelector("[name=key]").value.trim() ,
+                "file": item.querySelector("[name=file]").value.trim()
+            })
+        })
         // Add user content
-        if (userData || userCode || userText) {
+        if (datasets || userCode || userText) {
             prompts.push({
                 role: 'user',
-                data: userData,        // Unprocessed data with variables
+                datasets: datasets,        // Unprocessed data with variables
+                imports: imports === "" ? [] : imports.split("\n"),
                 code: userCode,        // Unprocessed code with variables
                 text: userText,  // Unprocessed text with variables
-                content: processedContent // Processed content with variables replaced
             });
         }
-
-        // Replace variables in assistant response
-        const processedAssistantResponse = assistantResponse.replaceAll(/\$([A-Za-z0-9_]+)\$/g, (match, varName) => {
-            var v = variables[varName];
-            if (variables[varName] === 'RANDOM_INT') {
-                v = Math.floor(Math.random() * (100));
-            } else if (variables[varName] === 'RANDOM_FLOAT') {
-                const rand = Math.random() * (100);
-                v = parseFloat(rand.toFixed(6));
-            } else if (variables[varName] === 'RANDOM_STRING') {
-                v = getRandomString(8);
-            }
-            return v; // Replace or leave as-is if no match
-        });
 
         // Add assistant response
         if (assistantResponse) {
             prompts.push({
                 role: 'assistant',
                 raw_content: assistantResponse,
-                content: processedAssistantResponse
             });
         }
     });
 
     // Create final JSON
     let jsonOutput;
-    if (mode === 1) {
-        jsonOutput = JSON.stringify(prompts.map(p => {
-            return {
-                "role": p.role,
-                "content": p.content
-            }
-        }), null, 2);
-    } else {
-        jsonOutput = JSON.stringify({variables, prompts}, null, 2);
-    }
+    jsonOutput = JSON.stringify({variables, prompts}, null, 2);
+
     const blob = new Blob([jsonOutput], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
 
@@ -272,7 +266,7 @@ function addVariable(key = '', value = '') {
 
     // Create a row for the variable
     const row = document.createElement('div');
-    row.className = 'row g-2 align-items-center mb-2';
+    row.className = 'row var-row g-2 align-items-center mb-2';
 
     // Key Input
     const keyCol = document.createElement('div');
