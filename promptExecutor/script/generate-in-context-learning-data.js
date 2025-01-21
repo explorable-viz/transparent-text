@@ -7,17 +7,21 @@ let generator;
 // Funzione per caricare il JSON da un file
 function loadJson(filePath) {
     try {
-        const rawData = fs.readFileSync(filePath, 'utf8');
+        const rawData = file_get_content(filePath)
         return JSON.parse(rawData);
     } catch (error) {
-        console.error(`Errore durante il caricamento del file JSON: ${error.message}`);
+        console.error(`Error during the loading of the JSON file: ${error.message}`);
         process.exit(1);
     }
 }
 
+function file_get_content(filePath) {
+    return fs.readFileSync(filePath, 'utf8');
+}
+
 function saveJson(filePath, data) {
     try {
-        fs.mkdir(path.dirname(filePath), { recursive: true}, function (err) {
+        fs.mkdir(path.dirname(filePath), {recursive: true}, function (err) {
             if (err) return cb(err);
             fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
         });
@@ -32,9 +36,17 @@ function transformJson(inputData) {
     const variables = inputData.variables;
     //Generating and replacing value variables
     return inputData.prompts.map(prompt => {
+
+
         let content = "";
         if (prompt.role === "user") {
-            content = prompt.data + "\n" + prompt.code + "\n" + prompt.text;
+            prompt.datasets.forEach(item => {
+                item.file = file_get_content("fluid/" + item.file + ".fld");
+            })
+            prompt.imports.forEach(item => {
+                item = file_get_content("fluid/" + item + ".fld");
+            })
+            content = JSON.stringify({datasets: prompt.datasets, imports: prompt.imports, code: prompt.code, text: prompt.text});
         } else {
             content = prompt.raw_content;
         }
