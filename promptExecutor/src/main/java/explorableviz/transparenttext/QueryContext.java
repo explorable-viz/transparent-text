@@ -41,24 +41,6 @@ public class QueryContext {
         loadFiles();
     }
 
-    public static QueryContext importFromJson(JSONObject object) {
-        JSONArray json_datasets = object.getJSONArray("datasets");
-        //Load Datasets
-        HashMap<String, String> dataset = new HashMap<>();
-        for(int i = 0; i < json_datasets.length(); i++) {
-            dataset.put(json_datasets.getJSONObject(i).getString("var"), json_datasets.getJSONObject(i).getString("file"));
-        }
-        //Load Imports
-        JSONArray json_imports = object.getJSONArray("imports");
-        ArrayList<String> imports = new ArrayList<>();
-        for(int i = 0; i < json_imports.length(); i++) {
-            imports.add(json_imports.getString(i));
-        }
-        String code = object.getString("code");
-        String file = object.getString("text");
-        return new QueryContext(dataset, imports, code, file);
-    }
-
     public HashMap<String, String> getDataset() {
         return dataset;
     }
@@ -102,14 +84,14 @@ public class QueryContext {
         });
     }
     public void writeFiles() {
-
+        //@todo generate the needed files for the fluid evaluation
     }
 
     @Override
     public String toString() {
         JSONObject object = new JSONObject();
         object.put("dataset", this._loadedDataset);
-        object.put("code", this.imports);
+        object.put("code", this.code);
         object.put("text", this.file);
         return object.toString();
     }

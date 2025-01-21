@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Random;
 import java.util.logging.Logger;
 
 public class Main {
@@ -32,7 +34,7 @@ public class Main {
         final String fluitTemplatePath = args[6];
         final ArrayList<QueryContext> queries;
         try {
-            queries = loadTestCases(testPath);
+            queries = loadTestCases(testPath, Integer.parseInt(args[5]));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -89,7 +91,7 @@ public class Main {
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
-    public static ArrayList<QueryContext> loadTestCases(String testPath) throws IOException {
+    public static ArrayList<QueryContext> loadTestCases(String testPath, int nTest) throws IOException {
         Path folder = Paths.get(testPath);
 
         // Check if the folder exists and is a directory
@@ -103,8 +105,8 @@ public class Main {
             if (Files.isRegularFile(filePath)) { // Ensure it's a file
                 String content = new String(Files.readAllBytes(filePath));
                 JSONObject o = new JSONObject(content);
-                QueryContext queryContext = QueryContext.importFromJson(o);
-                outputQueries.add(queryContext);
+                TestQueryContext queryContext = TestQueryContext.importFromJson(o);
+                outputQueries.addAll(queryContext.generate(nTest));
             }
         }
         return outputQueries;
@@ -121,5 +123,7 @@ public class Main {
         out.flush();
         out.close();
     }
+
+
 
 }
