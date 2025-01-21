@@ -1,10 +1,7 @@
-#Launch prompts workflow
 name: PromptExecutor
-'on':
+on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - promptExecutor/**
+
 jobs:
   prompt-test-ubuntu:
     runs-on: ubuntu-latest
