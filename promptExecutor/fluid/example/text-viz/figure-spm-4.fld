@@ -1,4 +1,19 @@
-let getByX x table = fromSome (findWithKey "x" x table);
+-- Histogram Step
+let predictions data = [ model.changed | model <- data ];
+
+let ssp126Histogram = cut (predictions ssp126) 10;
+
+let ssp245Histogram = cut (predictions ssp245) 10;
+
+let ssp126Surpasses2 = likelihoodGE (predictions ssp126) 2;
+
+let ssp126TotalWarming = mean (predictions ssp126);
+
+let ssp245Surpasses2 = likelihoodGE (predictions ssp245) 2;
+
+let ssp245TotalWarming = mean (predictions ssp245);
+
+-- Bar Chart Step
 
 let referToBar bar = "the bar representing scenario " ++ bar.x ++ " has a z value of " ++ (numToStr (head bar.bars).z);
 
@@ -7,11 +22,6 @@ let stackedBarHeight stackedBar = sum [ bar.z | bar <- stackedBar.bars ];
 let getTotal (BarChart record) = fromSome (findWithKey "x" "Total" record.stackedBars);
 let getCO2 (BarChart record)= fromSome (findWithKey "x" "CO2" record.stackedBars);
 let getNonCO2 (BarChart record) = fromSome (findWithKey "x" "Non-CO2" record.stackedBars);
-
-
-let barHeight (BarChart bc) x =
-    let bar = fromSome (findWithKey "x" x bc.stackedBars)
-    in sum [ segment.z | segment <- bar.bars ];
 
 let explainBars bars x = 
     if length bars == length (filter (fun bar -> bar.x == x) bars)
@@ -27,15 +37,15 @@ let mkBarChart scenName table =
 
 let getHeight bar offset = (head bar.bars).z + offset;
 
-let ssp119 = mkBarChart "SSP1-1.9" ssp119Source;
-    ssp245 = mkBarChart "SSP2-4.5" ssp245Source;
-    total = map getTotal [ssp119, ssp245];
-    co2 = map getCO2 [ssp119, ssp245];
-    nonco2 = map getNonCO2 [ssp119, ssp245];
+let ssp119Chart = mkBarChart "SSP1-1.9" ssp119Source;
+    ssp245Chart = mkBarChart "SSP2-4.5" ssp245Source;
+    total = map getTotal [ssp119Chart, ssp245Chart];
+    co2 = map getCO2 [ssp119Chart, ssp245Chart];
+    nonco2 = map getNonCO2 [ssp119Chart, ssp245Chart];
     meanTotal = (sum (map stackedBarHeight total)) / (length total)
 in MultiView {
-    leftBarChart: ssp119,
-    rightBarChart: ssp245,
+    leftBarChart: ssp119Chart,
+    rightBarChart: ssp245Chart,
     explanation:
         LinkedText [ "Within each scenario bar plot, the bars represent: total warming ", explainBars total "Total",
                      ", warming contributions from CO2 ", explainBars co2 "CO2", " and from non-CO2 GHG's ", explainBars nonco2 "Non-CO2"]

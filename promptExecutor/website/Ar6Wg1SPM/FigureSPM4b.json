@@ -1,6 +1,12 @@
 {
-    "datasets": [["likelihoods", "example/text-viz/likelihoods"], ["ssp119Source", "example/text-viz/left-barchart-table"], ["ssp245Source", "example/text-viz/right-barchart-table"]],
-    "imports": [ "lib/text-viz", "example/text-viz/histogram-processing" ],
+    "datasets": [
+        ["likelihoods", "example/text-viz/likelihoods"],
+        ["ssp119Source", "example/text-viz/left-barchart-table"],
+        ["ssp245Source", "example/text-viz/right-barchart-table"],
+        ["ssp126", "example/text-viz/datasets/ssp126-2081-2100"],
+        ["ssp245", "example/text-viz/datasets/ssp245-2081-2100"]
+    ],
+    "imports": [ "lib/text-viz", "lib/stats" ],
     "file": "text-viz/figure-spm-4",
     "inputs": [ "ssp119Source", "ssp245Source" ]
 }
