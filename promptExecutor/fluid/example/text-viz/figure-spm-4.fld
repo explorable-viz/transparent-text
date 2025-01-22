@@ -7,11 +7,11 @@ let ssp245Histogram = cut (predictions ssp245) 10;
 
 let ssp126Surpasses2 = likelihoodGE (predictions ssp126) 2;
 
-let ssp126TotalWarming = mean (predictions ssp126);
+let ssp126TotalWarming = findPercentile 50 (mergesort (predictions ssp126));
 
 let ssp245Surpasses2 = likelihoodGE (predictions ssp245) 2;
 
-let ssp245TotalWarming = mean (predictions ssp245);
+let ssp245TotalWarming = findPercentile 50 (mergesort (predictions ssp245));
 
 -- Bar Chart Step
 
@@ -37,16 +37,17 @@ let mkBarChart scenName table =
 
 let getHeight bar offset = (head bar.bars).z + offset;
 
-let ssp119Chart = mkBarChart "SSP1-1.9" ssp119Source;
-    ssp245Chart = mkBarChart "SSP2-4.5" ssp245Source;
-    total = map getTotal [ssp119Chart, ssp245Chart];
-    co2 = map getCO2 [ssp119Chart, ssp245Chart];
-    nonco2 = map getNonCO2 [ssp119Chart, ssp245Chart];
+let ssp126Chart = mkBarChart "SSP1-2.6" ({ type: "Total", emissions: ssp126TotalWarming } : ssp126Source);
+    ssp245Chart = mkBarChart "SSP2-4.5" ({ type: "Total", emissions: ssp245TotalWarming } : ssp245Source);
+    total = map getTotal [ssp126Chart, ssp245Chart];
+    co2 = map getCO2 [ssp126Chart, ssp245Chart];
+    nonco2 = map getNonCO2 [ssp126Chart, ssp245Chart];
     meanTotal = (sum (map stackedBarHeight total)) / (length total)
 in MultiView {
-    leftBarChart: ssp119Chart,
+    leftBarChart: ssp126Chart,
     rightBarChart: ssp245Chart,
     explanation:
         LinkedText [ "Within each scenario bar plot, the bars represent: total warming ", explainBars total "Total",
-                     ", warming contributions from CO2 ", explainBars co2 "CO2", " and from non-CO2 GHG's ", explainBars nonco2 "Non-CO2"]
+                     ", warming contributions from CO2 ", explainBars co2 "CO2", " and from non-CO2 GHG's ", explainBars nonco2 "Non-CO2",
+                     ". In SSP126, the median total warming is ", numToStr ssp126TotalWarming, "°C, with a ", numToStr ssp126Surpasses2, " probability of exceeding 2°C."]
 }
