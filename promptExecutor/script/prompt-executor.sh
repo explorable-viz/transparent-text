@@ -53,11 +53,9 @@ agent_class=$1
 prompt_configuration=$2
 testCases=$4
 settings=$3
-expected_results=${5:-}
-threshold=${6:-}
-max_testCases=${7:-}
-templatePath=${8:-}
-numTestToGenerate=${9:-}
+threshold=${5:-}
+max_testCases=${6:-}
+numTestToGenerate=${7:-}
 
 if [ -z "$threshold" ]; then
     threshold=0.7
@@ -67,8 +65,8 @@ base_command="java --enable-preview -jar target/PromptExecutor-0.1-jar-with-depe
 
 command="$base_command inContextLearningPath=$prompt_configuration settingsPath=$settings testPath=$testCases"
 
-if [ -n "$expected_results" ]; then
-    command="$command numTestToExecute=$max_testCases fluidTemplatePath=$templatePath expectedResultsPath=$expected_results numTestToGenerate=$numTestToGenerate"
+if [ -n "$numTestToGenerate" ]; then
+    command="$command numQueryToExecute=$max_testCases numTestToGenerate=$numTestToGenerate"
 fi
 
 output=$(eval "$command")
