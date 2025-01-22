@@ -1371,9 +1371,9 @@ node-process@^1.0.1:
   integrity sha512-XsyyLcJiMecF9AKVL3Ojd+7ViJ0Y23zigEpzgXQgos76wVqmgSkOQ6kizxQ3EFYKnD4vswEt8UjbCl4hVO1r9g==
 
 node@^22.11.0:
-  version "22.13.0"
-  resolved "https://registry.yarnpkg.com/node/-/node-22.13.0.tgz#f1f761bcd0c191cca898237c057e55c4616066e4"
-  integrity sha512-9JuLZ1CHSB9BtpcA+QMd0xNb9oxomuSg81Zf9XaLaZI0Sr7PDu7aRFYqgt6fUPeud/A6p60ssS7AIUCU15HK9w==
+  version "22.13.1"
+  resolved "https://registry.yarnpkg.com/node/-/node-22.13.1.tgz#1448c83be730d67ffd83767ed5c178c843a6a523"
+  integrity sha512-hwHS6l0BK0P37GTVavXkwohGUJBDQRBHeaKXq96X/EFiTkYP2ZjxO4huw0eoNdZhvLBSzwRXkLN1VpBaS351dw==
   dependencies:
     node-bin-setup "^1.0.0"
 

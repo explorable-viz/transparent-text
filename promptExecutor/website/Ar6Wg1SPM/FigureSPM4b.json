@@ -1,6 +1,6 @@
 {
     "datasets": [["likelihoods", "example/text-viz/likelihoods"], ["ssp119Source", "example/text-viz/left-barchart-table"], ["ssp245Source", "example/text-viz/right-barchart-table"]],
-    "imports": [ "lib/text-viz" ],
+    "imports": [ "lib/text-viz", "example/text-viz/histogram-processing" ],
     "file": "text-viz/figure-spm-4",
     "inputs": [ "ssp119Source", "ssp245Source" ]
 }

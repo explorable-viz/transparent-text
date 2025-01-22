@@ -1,0 +1,85 @@
+let ssp126 = [
+  { world: 15.76, changed: 1.01 },
+  { world: 15.22, changed: 1.05 },
+  { world: 14.82, changed: 1.07 },
+  { world: 15.13, changed: 1.09 },
+  { world: 16.29, changed: 1.22 },
+  { world: 14.79, changed: 1.23 },
+  { world: 14.3, changed: 1.24 },
+  { world: 15.03, changed: 1.24 },
+  { world: 14.64, changed: 1.25 },
+  { world: 15.56, changed: 1.32 },
+  { world: 15.51, changed: 1.32 },
+  { world: 16.72, changed: 1.35 },
+  { world: 16.6, changed: 1.39 },
+  { world: 15.47, changed: 1.47 },
+  { world: 14.22, changed: 1.57 },
+  { world: 15.72, changed: 1.72 },
+  { world: 15.64, changed: 1.73 },
+  { world: 16.54, changed: 1.75 },
+  { world: 15.65, changed: 1.76 },
+  { world: 16.02, changed: 1.83 },
+  { world: 15.0, changed: 1.87 },
+  { world: 16.21, changed: 1.94 },
+  { world: 15.17, changed: 2.04 },
+  { world: 16.23, changed: 2.14 },
+  { world: 16.27, changed: 2.18 },
+  { world: 16.06, changed: 2.36 },
+  { world: 16.15, changed: 2.37 },
+  { world: 16.34, changed: 2.38 },
+  { world: 16.87, changed: 2.52 },
+  { world: 15.12, changed: 2.54 },
+  { world: 16.39, changed: 2.61 },
+  { world: 16.47, changed: 2.67 }
+];
+
+let ssp2245 = [
+  { world: 15.84, changed: 1.8 },
+  { world: 16.0, changed: 1.83 },
+  { world: 16.59, changed: 1.84 },
+  { world: 15.65, changed: 1.9 },
+  { world: 15.58, changed: 2.02 },
+  { world: 17.43, changed: 2.06 },
+  { world: 15.45, changed: 2.06 },
+  { world: 15.17, changed: 2.11 },
+  { world: 17.2, changed: 2.13 },
+  { world: 16.39, changed: 2.15 },
+  { world: 16.34, changed: 2.15 },
+  { world: 15.95, changed: 2.16 },
+  { world: 17.45, changed: 2.23 },
+  { world: 16.43, changed: 2.43 },
+  { world: 15.17, changed: 2.52 },
+  { world: 16.64, changed: 2.64 },
+  { world: 15.68, changed: 2.66 },
+  { world: 16.59, changed: 2.68 },
+  { world: 17.51, changed: 2.72 },
+  { world: 16.55, changed: 2.77 },
+  { world: 16.71, changed: 2.82 },
+  { world: 17.07, changed: 2.88 },
+  { world: 16.02, changed: 2.89 },
+  { world: 17.25, changed: 2.98 },
+  { world: 17.1, changed: 3.02 },
+  { world: 17.18, changed: 3.09 },
+  { world: 17.67, changed: 3.32 },
+  { world: 16.45, changed: 3.32 },
+  { world: 17.18, changed: 3.4 },
+  { world: 17.42, changed: 3.46 },
+  { world: 17.36, changed: 3.56 },
+  { world: 16.2, changed: 3.62 },
+  { world: 17.39, changed: 3.69 },
+  { world: 17.73, changed: 3.94 }
+]
+
+let predictions data = [ model.changed | model <- data ];
+
+let ssp126Histogram = cut (predictions ssp126) 10;
+
+let ssp245Histogram = cut (predictions ssp245) 10;
+
+let ssp126Surpasses2 = likelihoodGE (predictions ssp126) 2;
+
+let ssp126TotalWarming = mean (predictions ssp126);
+
+let ssp245Surpasses2 = likelihoodGE (predictions ssp245) 2;
+
+let ssp245TotalWarming = mean (predictions ssp245);
