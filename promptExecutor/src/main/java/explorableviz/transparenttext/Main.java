@@ -1,6 +1,5 @@
 package explorableviz.transparenttext;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -13,58 +12,49 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.logging.Logger;
 
 public class Main {
     public static Logger logger = Logger.getLogger(Main.class.getName());
 
-    public static void main(String... args)  {
+    public static void main(String... args) {
 
         HashMap<String, String> arguments = parseArguments(args);
-        if (args.length < 4) {
-            System.err.println("missing arguments, 2 expected but " + args.length + " given");
-            System.err.println("java -jar prompt-executorCLI.jar [AgentClass] [prompts] [settings] [queries] [expected] [maxQueries]");
-            System.exit(0);
-        }
 
         final String agent = arguments.get("agent");
-        final String promptPath = arguments.get("inContextLearningPath");
+        final String inContextLearningPath = arguments.get("inContextLearningPath");
         final String settingsPath = arguments.get("settingsPath");
         final String testPath = arguments.get("testPath");
-        final String fluitTemplatePath = arguments.get("fluidTemplatePath");
-        final ArrayList<QueryContext> queries;
+        final int numTestToGenerate = Integer.parseInt(arguments.get("numTestToGenerate"));
+        final ArrayList<QueryContext> queryContexts;
+        final Optional<Integer> numQueryToExecute = Optional.of(Integer.parseInt(arguments.get("numQueryToExecute")));
         try {
-            queries = loadTestCases(testPath, Integer.parseInt(arguments.get("numTestToGenerate")));
+            queryContexts = loadTestCases(testPath, numTestToGenerate);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        final int numQueries = (arguments.containsKey("numTestToExecute")) ? Integer.parseInt(arguments.get("numTestToExecute")) : queries.size();
+        final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
+
         final ArrayList<String> results = new ArrayList<>();
 
         /*
          * Workflow execution
          */
+
         try {
             Settings.getInstance().loadSettings(settingsPath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+            for (int i = 0; i < queryLimit; i++) {
+                QueryContext queryContext = queryContexts.get(i);
+                logger.info(STR."Analysing query id=\{i}");
 
-        for (int i = 0; i < numQueries; i++) {
-            QueryContext query = queries.get(i);
-            logger.info(STR."Analysing query id=\{i}");
-            PromptExecutorWorkflow promptExecutorWorkflow = null;
-            try {
-                promptExecutorWorkflow = new PromptExecutorWorkflow(promptPath, query, agent, fluitTemplatePath);
-                results.add(promptExecutorWorkflow.execute());
-            }  catch (Exception e) {
-                System.err.println(e);
-                e.printStackTrace();
-                System.exit(1);
-                results.add("ERROR " + e.getMessage());
+                PromptExecutorWorkflow workflow = new PromptExecutorWorkflow(inContextLearningPath, queryContext, agent);
+                results.add(workflow.execute());
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
 
         /*
@@ -83,7 +73,7 @@ public class Main {
                     correct++;
                 }
             }
-            float rate = (float) correct / numQueries;
+            float rate = (float) correct / queryLimit;
             System.out.println("Accuracy: " + rate);
         } else {
             System.out.println("Accuracy: 0.0");
@@ -93,25 +83,23 @@ public class Main {
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
-    public static ArrayList<QueryContext> loadTestCases(String testPath, int nTest) throws IOException {
-        Path folder = Paths.get(testPath);
+    public static ArrayList<QueryContext> loadTestCases(String testCasesFolder, int numInstances) throws IOException {
+        Path folder = Paths.get(testCasesFolder);
 
         // Check if the folder exists and is a directory
         if (!Files.exists(folder) || !Files.isDirectory(folder)) {
-            throw new RuntimeException("Invalid folder path: " + testPath);
+            throw new RuntimeException("Invalid folder path: " + testCasesFolder);
         }
-        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(folder);
-        ArrayList<QueryContext> outputQueries = new ArrayList<>();
+        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(folder, Files::isRegularFile);
+        ArrayList<QueryContext> queryContexts = new ArrayList<>();
+        Random random = new Random(0);
         for (Path filePath : directoryStream) {
-            if(filePath.getFileName().toString().startsWith("expression")) continue;
-            if (Files.isRegularFile(filePath)) { // Ensure it's a file
-                String content = new String(Files.readAllBytes(filePath));
-                JSONObject o = new JSONObject(content);
-                TestQueryContext queryContext = TestQueryContext.importFromJson(o);
-                outputQueries.addAll(queryContext.generate(nTest));
-            }
+            String content = new String(Files.readAllBytes(filePath));
+            JSONObject jsonTestCase = new JSONObject(content);
+            TestQueryContext testQueryContext = TestQueryContext.importFromJson(jsonTestCase, random);
+            queryContexts.addAll(testQueryContext.instantiate(numInstances));
         }
-        return outputQueries;
+        return queryContexts;
     }
 
     public static String[] loadExpectedResults(String queriesPath) throws IOException {
