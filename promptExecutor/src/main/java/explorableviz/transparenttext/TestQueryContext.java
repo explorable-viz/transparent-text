@@ -1,5 +1,6 @@
 package explorableviz.transparenttext;
 
+import kotlin.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -13,17 +14,18 @@ public class TestQueryContext extends QueryContext {
     private final HashMap<String, String> variables;
     private final Random random;
     private int seed = 0;
-    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, String file, Random random) throws IOException {
+    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, String file, Random random, String expected) throws IOException {
         super(dataset, imports, code, file);
         this.random = random;
         this.variables = variables;
+        this.setExpected(expected);
     }
 
     public ArrayList<QueryContext> instantiate(int number) throws IOException {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         for(int i = 0; i < number; i++) {
-            String code_replaced = replaceVariables(this.getCode());
-            queryContexts.add(new QueryContext(this.getDataset(), this.getImports(), code_replaced, getFile()));
+            Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
+            queryContexts.add(new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getFile(), replacedVariables.getSecond()));
         }
         return queryContexts;
     }
@@ -34,6 +36,7 @@ public class TestQueryContext extends QueryContext {
         JSONArray json_imports = testCase.getJSONArray("imports");
         String code = testCase.getString("code");
         String file = testCase.getString("text");
+        String expected = testCase.getString("expected");
 
         HashMap<String, String> variables = new HashMap<>();
         HashMap<String, String> datasets = new HashMap<>();
@@ -49,7 +52,7 @@ public class TestQueryContext extends QueryContext {
             imports.add(json_imports.getString(i));
         }
 
-        return new TestQueryContext(datasets, imports, variables, code, file, random);
+        return new TestQueryContext(datasets, imports, variables, code, file, random, expected);
     }
 
     private static String getRandomString(int length, Random generator) {
@@ -62,7 +65,7 @@ public class TestQueryContext extends QueryContext {
         return sb.toString();
     }
 
-    private String replaceVariables(String code) {
+    private Pair<String,String> replaceVariables(String code, String expected) {
 
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             String key = entry.getKey();
@@ -76,9 +79,10 @@ public class TestQueryContext extends QueryContext {
             };
 
             code = code.replace(variablePlaceholder, replacement);
+            expected = expected.replace(variablePlaceholder, replacement);
 
         }
 
-        return code;
+        return new Pair<>(code, expected);
     }
 }

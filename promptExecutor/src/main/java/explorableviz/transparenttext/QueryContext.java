@@ -29,6 +29,7 @@ public class QueryContext {
     private String code;
     private String file;
 
+    private String expected;
 
     public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, String file) throws IOException {
         this.dataset = dataset;
@@ -38,6 +39,11 @@ public class QueryContext {
         this._loadedImports = new ArrayList<>();
         this._loadedDatasets = new HashMap<>();
         loadFiles();
+    }
+
+    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, String file, String expected) throws IOException {
+        this(dataset,imports,code,file);
+        this.expected = expected;
     }
 
     public HashMap<String, String> getDataset() {
@@ -86,5 +92,13 @@ public class QueryContext {
         object.put("code", this.code);
         object.put("text", this.file);
         return object.toString();
+    }
+
+    public String getExpected() {
+        return expected;
+    }
+
+    public void setExpected(String expected) {
+        this.expected = expected;
     }
 }
