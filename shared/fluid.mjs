@@ -24828,17 +24828,18 @@ var parseProgram = (loadFile2) => (folder) => (file) => (dictMonadAff) => (dictM
 })());
 var module_2 = (dictMonadAff) => {
   const Monad0 = dictMonadAff.MonadEffect0().Monad0();
-  const $0 = Monad0.Bind1();
+  const Bind1 = Monad0.Bind1();
+  const Applicative0 = Monad0.Applicative0();
   return (dictMonadError) => {
     const parse1 = parse(dictMonadError);
     const desugarModuleFwd = moduleFwd(dictMonadError)(boundedLattice2);
-    return (loadFile2) => (file) => (v) => {
-      const $1 = v.mods;
-      return $0.bind(loadFile2("fluid")(file)(dictMonadAff)(dictMonadError))((src) => $0.bind($0.bind(parse1(src)(module_))(desugarModuleFwd))((mod) => Monad0.Applicative0().pure({
+    return (loadFile2) => (folder) => (file) => (v) => {
+      const $0 = v.mods;
+      return Bind1.bind(Applicative0.pure())(() => Bind1.bind(loadFile2(folder)(file)(dictMonadAff)(dictMonadError))((src) => Bind1.bind(Bind1.bind(parse1(src)(module_))(desugarModuleFwd))((mod) => Applicative0.pure({
         primitives: v.primitives,
-        mods: $List("Cons", mod, $1),
+        mods: $List("Cons", mod, $0),
         datasets: v.datasets
-      })));
+      }))));
     };
   };
 };
@@ -24872,7 +24873,7 @@ var prepConfig = (dictMonadAff) => {
   return (dictMonadError) => {
     const desug1 = exprFwd(boundedLattice2)(dictMonadError)(joinSemilatticeUnit);
     const initialConfig1 = initialConfig(dictMonadError)(fVExpr);
-    return (loadFile2) => (file) => (progCxt) => $0.bind(parseProgram(loadFile2)("fluid/example")(file)(dictMonadAff)(dictMonadError))((s) => $0.bind(desug1(s))((e) => $0.bind(initialConfig1(e)(progCxt))((gconfig) => Monad0.Applicative0().pure({
+    return (v) => (file) => (progCxt) => $0.bind(parseProgram(v.loadFile)(v.fluidSrcPath)(file)(dictMonadAff)(dictMonadError))((s) => $0.bind(desug1(s))((e) => $0.bind(initialConfig1(e)(progCxt))((gconfig) => Monad0.Applicative0().pure({
       s,
       e,
       gconfig
@@ -24884,10 +24885,10 @@ var datasetAs = (dictMonadAff) => {
   const $0 = Monad0.Bind1();
   return (dictMonadError) => {
     const desug1 = exprFwd(boundedLattice2)(dictMonadError)(joinSemilatticeUnit);
-    return (loadFile2) => (v) => (v1) => {
+    return (loadFile2) => (folder) => (v) => (v1) => {
       const $1 = v1.datasets;
       const $2 = v._1;
-      return $0.bind($0.bind(parseProgram(loadFile2)("fluid")(v._2)(dictMonadAff)(dictMonadError))(desug1))((e\u03B1) => Monad0.Applicative0().pure({
+      return $0.bind($0.bind(parseProgram(loadFile2)(folder)(v._2)(dictMonadAff)(dictMonadError))(desug1))((e\u03B1) => Monad0.Applicative0().pure({
         primitives: v1.primitives,
         mods: v1.mods,
         datasets: $List("Cons", $Tuple($2, e\u03B1), $1)
@@ -24904,12 +24905,12 @@ var loadProgCxt = (dictMonadAff) => {
   return (dictMonadError) => {
     const module_22 = module_1(dictMonadError);
     const datasetAs2 = datasetAs1(dictMonadError);
-    return (loadFile2) => (mods) => (datasets) => $0.bind($0.bind(Monad0.Applicative0().pure({
+    return (v) => (mods) => (datasets) => $0.bind($0.bind(Monad0.Applicative0().pure({
       primitives,
       mods: Nil,
       datasets: Nil
-    }))(concatM1(arrayMap(module_22(loadFile2))(["lib/prelude", ...mods]))))(concatM1(arrayMap((() => {
-      const $1 = datasetAs2(loadFile2);
+    }))(concatM1(arrayMap(module_22(v.loadFile)(v.fluidSrcPath))(["lib/prelude", ...mods]))))(concatM1(arrayMap((() => {
+      const $1 = datasetAs2(v.loadFile)(v.fluidSrcPath);
       return (x) => $1($Tuple(x._1, x._2));
     })())(datasets)));
   };
@@ -25067,6 +25068,20 @@ var toAff2 = (f) => (a) => (b) => {
 var loadFile = (v) => (v1) => (dictMonadAff) => {
   const Monad0 = dictMonadAff.MonadEffect0().Monad0();
   return (dictMonadError) => Monad0.Bind1().bind(dictMonadAff.liftAff(toAff2(readTextFile)(UTF8)(v + "/" + v1 + ".fld")))((buffer) => Monad0.Applicative0().pure(buffer));
+};
+var loadProgCxt2 = (dictMonadAff) => {
+  const loadProgCxt1 = loadProgCxt(dictMonadAff);
+  return (dictMonadError) => {
+    const loadProgCxt22 = loadProgCxt1(dictMonadError);
+    return (fluidSrcPath) => loadProgCxt22({ loadFile, fluidSrcPath });
+  };
+};
+var prepConfig2 = (dictMonadAff) => {
+  const prepConfig1 = prepConfig(dictMonadAff);
+  return (dictMonadError) => {
+    const prepConfig22 = prepConfig1(dictMonadError);
+    return (fluidSrcPath) => prepConfig22({ loadFile, fluidSrcPath });
+  };
 };
 
 // output-es/Node.ChildProcess/foreign.js
@@ -28359,8 +28374,8 @@ var execParserPure = (pprefs) => (pinfo) => (args) => {
 // output-es/Fluid/index.js
 var $Command = (tag, _1, _2) => ({ tag, _1, _2 });
 var $Program = (_1) => ({ tag: "Program", _1 });
-var loadProgCxt2 = /* @__PURE__ */ loadProgCxt(monadAffAff)(monadErrorAff)(loadFile);
-var prepConfig2 = /* @__PURE__ */ prepConfig(monadAffAff)(monadErrorAff)(loadFile);
+var loadProgCxt3 = /* @__PURE__ */ loadProgCxt2(monadAffAff)(monadErrorAff);
+var prepConfig3 = /* @__PURE__ */ prepConfig2(monadAffAff)(monadErrorAff);
 var graphEval2 = /* @__PURE__ */ graphEval(monadErrorAff);
 var fromFoldable29 = /* @__PURE__ */ (() => fromFoldableImpl(foldableList.foldr))();
 var Evaluate = (value0) => $Command("Evaluate", value0);
@@ -28368,7 +28383,7 @@ var Publish = (value0) => (value1) => $Command("Publish", value0, value1);
 var parseImports = /* @__PURE__ */ $Parser(
   "BindP",
   /* @__PURE__ */ manyM(/* @__PURE__ */ option(readerAsk)(/* @__PURE__ */ (() => {
-    const $0 = help("A comma separated list of import file locations");
+    const $0 = help("Comma-separated list of files to import");
     const $1 = $0._2._1.tag === "Nothing" ? Nothing : $0._2._1;
     const $2 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
     return $Mod(
@@ -28384,7 +28399,7 @@ var parseImports = /* @__PURE__ */ $Parser(
 );
 var evaluate = (v) => {
   const $0 = v._1.fileName;
-  return _bind(loadProgCxt2(v._1.imports)(v._1.datasets))((progCxt) => _bind(prepConfig2($0)(progCxt))((v1) => _bind(graphEval2(v1.gconfig)(v1.e))((v2) => _pure($Val(
+  return _bind(loadProgCxt3("fluid")(v._1.imports)(v._1.datasets))((progCxt) => _bind(prepConfig3("fluid")($0)(progCxt))((v1) => _bind(graphEval2(v1.gconfig)(v1.e))((v2) => _pure($Val(
     void 0,
     functorBaseVal.map((v$1) => {
     })(v2["out\u03B1"]._2)
@@ -28401,19 +28416,22 @@ var copyOptions = {
   encoding: Nothing,
   shell: Nothing
 };
-var publish = (website) => ($$package) => exec2($$package ? "./node_modules/@explorable-viz/fluid/script/bundle-website.sh -w " + website + " -r true" : "./script/bundle-website.sh -w " + website)(copyOptions)((v) => {
-  if (v.error.tag === "Just") {
-    return log(showErrorImpl(v.error._1));
-  }
-  if (v.error.tag === "Nothing") {
-    const $0 = toString2(monadEffect)(ASCII)(v.stdout);
-    return () => {
-      const $1 = $0();
-      return log($1)();
-    };
-  }
-  fail();
-});
+var publish = (website) => ($$package) => {
+  const cmd$p = "/script/bundle-website.sh -w " + website;
+  return exec2($$package ? "./node_modules/@explorable-viz/fluid" + cmd$p + " -r true" : "." + cmd$p)(copyOptions)((v) => {
+    if (v.error.tag === "Just") {
+      return log(showErrorImpl(v.error._1));
+    }
+    if (v.error.tag === "Nothing") {
+      const $0 = toString2(monadEffect)(ASCII)(v.stdout);
+      return () => {
+        const $1 = $0();
+        return log($1)();
+      };
+    }
+    fail();
+  });
+};
 var dispatchCommand = (v) => {
   if (v.tag === "Evaluate") {
     return _bind(evaluate(v._1))((v1) => _liftEffect(log(intercalate4("\n")(removeDocWS(prettyVal(highlightableUnit).pretty(v1)).lines))));
@@ -28459,24 +28477,10 @@ var parsePair = /* @__PURE__ */ between3("(")(")")((s) => {
   }
   return $Either("Left", "Expected a pair but got " + s);
 });
-var parseDataset$p = (s) => {
-  const $0 = parsePair(s);
-  return (() => {
-    if ($0.tag === "Left") {
-      const $1 = $0._1;
-      return (v) => $Either("Left", $1);
-    }
-    if ($0.tag === "Right") {
-      const $1 = $0._1;
-      return (f) => f($1);
-    }
-    fail();
-  })()((dataset) => $Either("Right", dataset));
-};
 var parseDatasets = /* @__PURE__ */ $Parser(
   "BindP",
-  /* @__PURE__ */ manyM(/* @__PURE__ */ option(/* @__PURE__ */ eitherReader(parseDataset$p))(/* @__PURE__ */ (() => {
-    const $0 = help("A comma separated list of datasets");
+  /* @__PURE__ */ manyM(/* @__PURE__ */ option(/* @__PURE__ */ eitherReader(parsePair))(/* @__PURE__ */ (() => {
+    const $0 = help("Comma-separated list of datasets");
     const $1 = $0._2._1.tag === "Nothing" ? Nothing : $0._2._1;
     const $2 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
     return $Mod(

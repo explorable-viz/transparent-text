@@ -43673,17 +43673,18 @@ var parseProgram = (loadFile2) => (folder) => (file) => (dictMonadAff) => (dictM
 })());
 var module_2 = (dictMonadAff) => {
   const Monad0 = dictMonadAff.MonadEffect0().Monad0();
-  const $0 = Monad0.Bind1();
+  const Bind1 = Monad0.Bind1();
+  const Applicative0 = Monad0.Applicative0();
   return (dictMonadError) => {
     const parse1 = parse(dictMonadError);
     const desugarModuleFwd = moduleFwd(dictMonadError)(boundedLattice2);
-    return (loadFile2) => (file) => (v) => {
-      const $1 = v.mods;
-      return $0.bind(loadFile2("fluid")(file)(dictMonadAff)(dictMonadError))((src) => $0.bind($0.bind(parse1(src)(module_))(desugarModuleFwd))((mod) => Monad0.Applicative0().pure({
+    return (loadFile2) => (folder) => (file) => (v) => {
+      const $0 = v.mods;
+      return Bind1.bind(Applicative0.pure())(() => Bind1.bind(loadFile2(folder)(file)(dictMonadAff)(dictMonadError))((src) => Bind1.bind(Bind1.bind(parse1(src)(module_))(desugarModuleFwd))((mod) => Applicative0.pure({
         primitives: v.primitives,
-        mods: $List("Cons", mod, $1),
+        mods: $List("Cons", mod, $0),
         datasets: v.datasets
-      })));
+      }))));
     };
   };
 };
@@ -43717,7 +43718,7 @@ var prepConfig = (dictMonadAff) => {
   return (dictMonadError) => {
     const desug1 = exprFwd(boundedLattice2)(dictMonadError)(joinSemilatticeUnit);
     const initialConfig1 = initialConfig(dictMonadError)(fVExpr);
-    return (loadFile2) => (file) => (progCxt) => $0.bind(parseProgram(loadFile2)("fluid/example")(file)(dictMonadAff)(dictMonadError))((s) => $0.bind(desug1(s))((e) => $0.bind(initialConfig1(e)(progCxt))((gconfig) => Monad0.Applicative0().pure({
+    return (v) => (file) => (progCxt) => $0.bind(parseProgram(v.loadFile)(v.fluidSrcPath)(file)(dictMonadAff)(dictMonadError))((s) => $0.bind(desug1(s))((e) => $0.bind(initialConfig1(e)(progCxt))((gconfig) => Monad0.Applicative0().pure({
       s,
       e,
       gconfig
@@ -43729,10 +43730,10 @@ var datasetAs = (dictMonadAff) => {
   const $0 = Monad0.Bind1();
   return (dictMonadError) => {
     const desug1 = exprFwd(boundedLattice2)(dictMonadError)(joinSemilatticeUnit);
-    return (loadFile2) => (v) => (v1) => {
+    return (loadFile2) => (folder) => (v) => (v1) => {
       const $1 = v1.datasets;
       const $2 = v._1;
-      return $0.bind($0.bind(parseProgram(loadFile2)("fluid")(v._2)(dictMonadAff)(dictMonadError))(desug1))((e\u03B1) => Monad0.Applicative0().pure({
+      return $0.bind($0.bind(parseProgram(loadFile2)(folder)(v._2)(dictMonadAff)(dictMonadError))(desug1))((e\u03B1) => Monad0.Applicative0().pure({
         primitives: v1.primitives,
         mods: v1.mods,
         datasets: $List("Cons", $Tuple($2, e\u03B1), $1)
@@ -43749,12 +43750,12 @@ var loadProgCxt = (dictMonadAff) => {
   return (dictMonadError) => {
     const module_22 = module_1(dictMonadError);
     const datasetAs2 = datasetAs1(dictMonadError);
-    return (loadFile2) => (mods) => (datasets) => $0.bind($0.bind(Monad0.Applicative0().pure({
+    return (v) => (mods) => (datasets) => $0.bind($0.bind(Monad0.Applicative0().pure({
       primitives,
       mods: Nil,
       datasets: Nil
-    }))(concatM1(arrayMap(module_22(loadFile2))(["lib/prelude", ...mods]))))(concatM1(arrayMap((() => {
-      const $1 = datasetAs2(loadFile2);
+    }))(concatM1(arrayMap(module_22(v.loadFile)(v.fluidSrcPath))(["lib/prelude", ...mods]))))(concatM1(arrayMap((() => {
+      const $1 = datasetAs2(v.loadFile)(v.fluidSrcPath);
       return (x2) => $1($Tuple(x2._1, x2._2));
     })())(datasets)));
   };
@@ -43765,9 +43766,10 @@ var loadFile = (v) => (v1) => (dictMonadAff) => {
   const MonadEffect0 = dictMonadAff.MonadEffect0();
   const Monad0 = MonadEffect0.Monad0();
   const Bind1 = Monad0.Bind1();
+  const Applicative0 = Monad0.Applicative0();
   return (dictMonadError) => Bind1.bind(dictMonadAff.liftAff(request(driver)({
     method: $Either("Left", GET),
-    url: "/" + v + "/" + v1 + ".fld",
+    url: v + "/" + v1 + ".fld",
     headers: [],
     content: Nothing,
     username: Nothing,
@@ -43781,12 +43783,27 @@ var loadFile = (v) => (v1) => (dictMonadAff) => {
       return Bind1.bind(MonadEffect0.liftEffect(log2("Failed with " + printError($0))))(() => dictMonadError.MonadThrow0().throwError(error(printError($0))));
     }
     if (result.tag === "Right") {
-      return Monad0.Applicative0().pure(result._1.body);
+      const $0 = result._1;
+      return Bind1.bind(Applicative0.pure())(() => Applicative0.pure($0.body));
     }
     fail();
   });
 };
 var loadFile$p = (folder) => (file) => (dictMonadAff) => (dictMonadError) => dictMonadAff.MonadEffect0().Monad0().Bind1().Apply0().Functor0().map((v) => $Tuple(file, v))(loadFile(folder)(file)(dictMonadAff)(dictMonadError));
+var loadProgCxt2 = (dictMonadAff) => {
+  const loadProgCxt1 = loadProgCxt(dictMonadAff);
+  return (dictMonadError) => {
+    const loadProgCxt22 = loadProgCxt1(dictMonadError);
+    return (fluidSrcPath) => loadProgCxt22({ loadFile, fluidSrcPath });
+  };
+};
+var prepConfig2 = (dictMonadAff) => {
+  const prepConfig1 = prepConfig(dictMonadAff);
+  return (dictMonadError) => {
+    const prepConfig22 = prepConfig1(dictMonadError);
+    return (fluidSrcPath) => prepConfig22({ loadFile, fluidSrcPath });
+  };
+};
 
 // output-es/App.Fig/index.js
 var highlightableSelState2 = /* @__PURE__ */ highlightableSelState(highlightableBoolean)(joinSemilatticeBoolean);
@@ -43972,67 +43989,68 @@ var lift3 = /* @__PURE__ */ lift(applyVal)(applyEnv);
 var loadFig = (v) => (dictMonadAff) => {
   const Monad0 = dictMonadAff.MonadEffect0().Monad0();
   const $0 = Monad0.Bind1();
-  const loadProgCxt1 = loadProgCxt(dictMonadAff);
-  const prepConfig1 = prepConfig(dictMonadAff);
+  const loadProgCxt3 = loadProgCxt2(dictMonadAff);
+  const prepConfig3 = prepConfig2(dictMonadAff);
   return (dictMonadError) => {
-    const prepConfig1$1 = prepConfig1(dictMonadError)(loadFile);
+    const prepConfig1 = prepConfig3(dictMonadError);
     const graphEval2 = graphEval(dictMonadError);
     const $1 = v.file;
-    const $2 = v.inputs;
-    return $0.bind(loadProgCxt1(dictMonadError)(loadFile)(v.imports)(v.datasets))((progCxt) => $0.bind(prepConfig1$1($1)(progCxt))((v1) => {
-      const $3 = v1.s;
+    const $2 = v.fluidSrcPath;
+    const $3 = v.inputs;
+    return $0.bind(loadProgCxt3(dictMonadError)($2)(v.imports)(v.datasets))((progCxt) => $0.bind(prepConfig1($2)($1)(progCxt))((v1) => {
+      const $4 = v1.s;
       return $0.bind(graphEval2(v1.gconfig)(v1.e))((v2) => {
         const v3 = functorEnvExpr.map((v$1) => {
         })(v2["in\u03B1"]);
         const \u03B30 = _fmapObject(v2["in\u03B1"]._1, functorVal.map((v$1) => false));
         const v0 = $Val(false, functorBaseVal.map((v$1) => false)(v2["out\u03B1"]._2));
-        const $4 = unrestrictGC(boundedMeetSemilatticeBoo)(v3._1)(fromFoldable28($2));
-        const $5 = unprojExpr(boundedMeetSemilatticeBoo)($EnvExpr(v3._1, v3._2));
-        const focus = { fwd: (x2) => $5.fwd($4.fwd(x2)), bwd: (x2) => $4.bwd($5.bwd(x2)) };
-        const $6 = graphGC1(v2);
-        const gc = { fwd: (x2) => $6.fwd(focus.fwd(x2)), bwd: (x2) => focus.bwd($6.bwd(x2)) };
-        const $7 = gc.fwd(\u03B30);
-        const vInert = $Val(selState($7._1), functorBaseVal.map(selState)($7._2));
+        const $5 = unrestrictGC(boundedMeetSemilatticeBoo)(v3._1)(fromFoldable28($3));
+        const $6 = unprojExpr(boundedMeetSemilatticeBoo)($EnvExpr(v3._1, v3._2));
+        const focus = { fwd: (x2) => $6.fwd($5.fwd(x2)), bwd: (x2) => $5.bwd($6.bwd(x2)) };
+        const $7 = graphGC1(v2);
+        const gc = { fwd: (x2) => $7.fwd(focus.fwd(x2)), bwd: (x2) => focus.bwd($7.bwd(x2)) };
+        const $8 = gc.fwd(\u03B30);
+        const vInert = $Val(selState($8._1), functorBaseVal.map(selState)($8._2));
         const \u03B3Inert = _fmapObject(
           _fmapObject(gc.bwd($Val(true, functorBaseVal.map((v$1) => true)(v2["out\u03B1"]._2))), functorVal.map(boolNot)),
           functorVal.map(selState)
         );
-        const $8 = graphGC22({
+        const $9 = graphGC22({
           g: $GraphImpl({ out: v2.g._1.in_, in_: v2.g._1.out, sinks: v2.g._1.sources, sources: v2.g._1.sinks, vertices: v2.g._1.vertices }),
           graph_fwd: v2.graph_fwd,
           graph_bwd: v2.graph_bwd,
           "in\u03B1": v2["out\u03B1"],
           "out\u03B1": v2["in\u03B1"]
         });
-        const $9 = dual(focus);
-        const gc_dual = { fwd: (x2) => $9.fwd($8.fwd(x2)), bwd: (x2) => $8.bwd($9.bwd(x2)) };
+        const $10 = dual(focus);
+        const gc_dual = { fwd: (x2) => $10.fwd($9.fwd(x2)), bwd: (x2) => $9.bwd($10.bwd(x2)) };
         return Monad0.Applicative0().pure({
           spec: v,
-          s: $3,
+          s: $4,
           "\u03B3": intersectionWith_Object(apply)(_fmapObject(
             intersectionWith_Object(apply)(_fmapObject(\u03B3Inert, applyVal.apply))(\u03B30),
             applyVal.apply
           ))(\u03B30),
           v: applyVal.apply(applyVal.apply(vInert)(v0))(v0),
           linkedOutputs: (() => {
-            const $10 = lift3(vInert)(\u03B3Inert)(gc_dual);
-            const $11 = lift1(\u03B3Inert)(vInert)(gc);
+            const $11 = lift3(vInert)(\u03B3Inert)(gc_dual);
+            const $12 = lift1(\u03B3Inert)(vInert)(gc);
             return {
-              fwd: (x2) => $11.fwd(meet1.fwd($Tuple($10.fwd(x2._1), categoryGaloisConnection.identity.fwd(x2._2)))),
+              fwd: (x2) => $12.fwd(meet1.fwd($Tuple($11.fwd(x2._1), categoryGaloisConnection.identity.fwd(x2._2)))),
               bwd: (x2) => {
-                const $12 = meet1.bwd($11.bwd(x2));
-                return $Tuple($10.bwd($12._1), categoryGaloisConnection.identity.bwd($12._2));
+                const $13 = meet1.bwd($12.bwd(x2));
+                return $Tuple($11.bwd($13._1), categoryGaloisConnection.identity.bwd($13._2));
               }
             };
           })(),
           linkedInputs: (() => {
-            const $10 = lift1(\u03B3Inert)(vInert)(gc);
-            const $11 = lift3(vInert)(\u03B3Inert)(gc_dual);
+            const $11 = lift1(\u03B3Inert)(vInert)(gc);
+            const $12 = lift3(vInert)(\u03B3Inert)(gc_dual);
             return {
-              fwd: (x2) => $11.fwd(meet.fwd($Tuple($10.fwd(x2._1), categoryGaloisConnection.identity.fwd(x2._2)))),
+              fwd: (x2) => $12.fwd(meet.fwd($Tuple($11.fwd(x2._1), categoryGaloisConnection.identity.fwd(x2._2)))),
               bwd: (x2) => {
-                const $12 = meet.bwd($11.bwd(x2));
-                return $Tuple($10.bwd($12._1), categoryGaloisConnection.identity.bwd($12._2));
+                const $13 = meet.bwd($12.bwd(x2));
+                return $Tuple($11.bwd($13._1), categoryGaloisConnection.identity.bwd($13._2));
               }
             };
           })(),
@@ -44250,34 +44268,7 @@ var gDecodeJsonCons = (dictDecodeJsonField) => (dictGDecodeJson) => (dictIsSymbo
 var monadAffAff = { liftAff: (x2) => x2, MonadEffect0: () => monadEffectAff };
 
 // output-es/App.LoadFigure/index.js
-var gDecodeJsonCons2 = /* @__PURE__ */ gDecodeJsonCons(/* @__PURE__ */ (() => {
-  const $0 = decodeArray(caseJsonString($Either(
-    "Left",
-    $JsonDecodeError("TypeMismatch", "String")
-  ))(Right));
-  return {
-    decodeJsonField: (j) => {
-      if (j.tag === "Just") {
-        return $Maybe("Just", $0(j._1));
-      }
-      return Nothing;
-    }
-  };
-})());
-var jsonToSpec = /* @__PURE__ */ (() => decodeRecord(gDecodeJsonCons((() => {
-  const $0 = decodeArray(decodeTuple(caseJsonString($Either(
-    "Left",
-    $JsonDecodeError("TypeMismatch", "String")
-  ))(Right))(caseJsonString($Either("Left", $JsonDecodeError("TypeMismatch", "String")))(Right)));
-  return {
-    decodeJsonField: (j) => {
-      if (j.tag === "Just") {
-        return $Maybe("Just", $0(j._1));
-      }
-      return Nothing;
-    }
-  };
-})())(gDecodeJsonCons({
+var gDecodeJsonCons2 = /* @__PURE__ */ gDecodeJsonCons({
   decodeJsonField: (j) => {
     if (j.tag === "Just") {
       return $Maybe(
@@ -44295,22 +44286,56 @@ var jsonToSpec = /* @__PURE__ */ (() => decodeRecord(gDecodeJsonCons((() => {
     }
     return Nothing;
   }
-})(gDecodeJsonCons2(gDecodeJsonCons2(gDecodeJsonNil)({ reflectSymbol: () => "inputs" })()())({ reflectSymbol: () => "imports" })()())({
-  reflectSymbol: () => "file"
-})()())({ reflectSymbol: () => "datasets" })()())().decodeJson)();
-var figSpecFromJson = (spec) => ({ datasets: spec.datasets, imports: spec.imports, file: spec.file, inputs: spec.inputs });
+});
+var gDecodeJsonCons1 = /* @__PURE__ */ gDecodeJsonCons(/* @__PURE__ */ (() => {
+  const $0 = decodeArray(caseJsonString($Either(
+    "Left",
+    $JsonDecodeError("TypeMismatch", "String")
+  ))(Right));
+  return {
+    decodeJsonField: (j) => {
+      if (j.tag === "Just") {
+        return $Maybe("Just", $0(j._1));
+      }
+      return Nothing;
+    }
+  };
+})());
+var decodeJson = /* @__PURE__ */ (() => decodeRecord(gDecodeJsonCons((() => {
+  const $0 = decodeArray(decodeTuple(caseJsonString($Either(
+    "Left",
+    $JsonDecodeError("TypeMismatch", "String")
+  ))(Right))(caseJsonString($Either("Left", $JsonDecodeError("TypeMismatch", "String")))(Right)));
+  return {
+    decodeJsonField: (j) => {
+      if (j.tag === "Just") {
+        return $Maybe("Just", $0(j._1));
+      }
+      return Nothing;
+    }
+  };
+})())(gDecodeJsonCons2(gDecodeJsonCons2(gDecodeJsonCons1(gDecodeJsonCons1(gDecodeJsonNil)({ reflectSymbol: () => "inputs" })()())({
+  reflectSymbol: () => "imports"
+})()())({ reflectSymbol: () => "fluidSrcPath" })()())({ reflectSymbol: () => "file" })()())({ reflectSymbol: () => "datasets" })()())().decodeJson)();
+var figSpecFromJson = (spec) => ({ fluidSrcPath: spec.fluidSrcPath, datasets: spec.datasets, imports: spec.imports, file: spec.file, inputs: spec.inputs });
 var loadFigure = (fileName) => runAffs_((v) => drawFig(v._1)(v._2))([
   _bind($$get(driver)($ResponseFormat("Json", identity))(fileName))((result) => {
     if (result.tag === "Left") {
       return throwException(error("Json fetching failed with " + printError(result._1)))();
     }
     if (result.tag === "Right") {
-      const v = jsonToSpec(result._1.body);
+      const v = decodeJson(result._1.body);
       if (v.tag === "Left") {
         return throwException(error("JSON decoding failed with " + showJsonDecodeError.show(v._1)))();
       }
       if (v.tag === "Right") {
-        return _map((v1) => $Tuple("fig", v1))(loadFig({ datasets: v._1.datasets, imports: v._1.imports, file: v._1.file, inputs: v._1.inputs })(monadAffAff)(monadErrorAff));
+        return _map((v1) => $Tuple("fig", v1))(loadFig({
+          fluidSrcPath: v._1.fluidSrcPath,
+          datasets: v._1.datasets,
+          imports: v._1.imports,
+          file: v._1.file,
+          inputs: v._1.inputs
+        })(monadAffAff)(monadErrorAff));
       }
     }
     fail();
@@ -44318,9 +44343,10 @@ var loadFigure = (fileName) => runAffs_((v) => drawFig(v._1)(v._2))([
 ]);
 var drawCode2 = (folder) => (file) => runAffs_(drawFile)([loadFile$p(folder)(file)(monadAffAff)(monadErrorAff)]);
 export {
+  decodeJson,
   drawCode2 as drawCode,
   figSpecFromJson,
   gDecodeJsonCons2 as gDecodeJsonCons,
-  jsonToSpec,
+  gDecodeJsonCons1,
   loadFigure
 };
