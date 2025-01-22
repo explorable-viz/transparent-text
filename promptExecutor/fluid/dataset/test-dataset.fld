@@ -1,0 +1,4 @@
+[
+    { scenario: "SSP3-7.0", bestEst2140: 1.5, low2140: 1.2, high2140: 1.7, bestEst4160: 1.6, low4160: 1.2, high4160: 2.0, bestEst81100: 1.4, low81100: 1.0, high81100: 1.8},
+    { scenario: "SSP1-1.9", bestEst2140: 1.4, low2140: 1.2, high2140: 1.8, bestEst4160: 2.0, low4160: 1.6, high4160: 2.5, bestEst81100: 2.7, low81100: 2.1, high81100: 3.5}
+]

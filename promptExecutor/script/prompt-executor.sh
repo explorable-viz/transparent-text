@@ -37,35 +37,36 @@ fi
 
 # Check that at least the first two parameters are provided
 if [ $# -lt 3 ]; then
-    echo "Usage: $0 <agent_class> <prompt_configuration> <queries> [expected_results] [threshold]"
+    echo "Usage: $0 <agent_class> <prompt_configuration> <testCases> [expected_results] [threshold]"
     echo "  agent_class                   (mandatory): LLMAgent to execute"
     echo "  prompt_configuration          (mandatory): prompt configuration path  (format: JSON)"
     echo "  settings path                 (mandatory): settings configuration path  (format: JSON)"
-    echo "  queries                       (mandatory): input file"
+    echo "  testCases                       (mandatory): input file"
     echo "  expected_results              (optional) : expected output file (for validation only)"
     echo "  threshold                     (optional) : the minimum accuracy to consider successfully the test execution"
-    echo "  max_queries                   (optional) : number of queries to test during the execution"
+    echo "  max_testCases                   (optional) : number of testCases to test during the execution"
+    echo "  templatePath                  (optional) : fluid templatePath"
     exit 1
 fi
 # [@todo comment]
 agent_class=$1
 prompt_configuration=$2
-queries=$4
+testCases=$4
 settings=$3
-expected_results=${5:-}
-threshold=${6:-}
-max_queries=${7:-}
+threshold=${5:-}
+max_testCases=${6:-}
+numTestToGenerate=${7:-}
 
 if [ -z "$threshold" ]; then
     threshold=0.7
 fi
 
-base_command="java --enable-preview -jar target/PromptExecutor-0.1-jar-with-dependencies.jar $agent_class"
+base_command="java --enable-preview -jar target/PromptExecutor-0.1-jar-with-dependencies.jar agent=$agent_class"
 
-command="$base_command $prompt_configuration $settings $queries"
+command="$base_command inContextLearningPath=$prompt_configuration settingsPath=$settings testPath=$testCases"
 
-if [ -n "$expected_results" ]; then
-    command="$command $expected_results $max_queries"
+if [ -n "$numTestToGenerate" ]; then
+    command="$command numQueryToExecute=$max_testCases numTestToGenerate=$numTestToGenerate"
 fi
 
 output=$(eval "$command")
