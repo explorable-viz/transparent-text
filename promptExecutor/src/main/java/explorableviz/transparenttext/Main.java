@@ -22,7 +22,8 @@ public class Main {
     public static void main(String... args) {
 
         HashMap<String, String> arguments = parseArguments(args);
-
+        logger.info("Arguments passed from command line");
+        logger.info(arguments.toString().replace(",", "\n"));
         final String agent = arguments.get("agent");
         final String inContextLearningPath = arguments.get("inContextLearningPath");
         final String settingsPath = arguments.get("settingsPath");
@@ -57,29 +58,21 @@ public class Main {
             System.exit(1);
         }
 
-        /*
-         * Accuracy measure
-
-        if (args.length >= 5) {
-            String[] expectedResult = null;
-            int correct = 0;
-            try {
-                expectedResult = loadExpectedResults(args[4]);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-            for (int i = 0; i < results.size(); i++) {
-                if (expectedResult[i].equals(results.get(i))) {
-                    correct++;
-                }
-            }
-            float rate = (float) correct / queryLimit;
-            System.out.println("Accuracy: " + rate);
-        } else {
-            System.out.println("Accuracy: 0.0");
+        logger.info("Printing generated expression");
+        for(String result : results) {
+            logger.info(result);
         }
-        */
-        System.out.println("Accuracy: 0.0");
+
+        logger.info("Computing accuracy");
+        int correct = 0;
+        for (int i = 0; i < results.size(); i++) {
+            if (queryContexts.get(i).getExpected().equals(results.get(i))) {
+                correct++;
+            }
+        }
+        float rate = (float) correct / queryLimit;
+        System.out.println("Accuracy: " + rate);
+
         //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
