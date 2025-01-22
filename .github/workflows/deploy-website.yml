@@ -42,7 +42,8 @@ jobs:
   deploy-website:
     runs-on: ubuntu-22.04
     needs: test
-    if: github.ref == 'refs/heads/main'
+    # Use branch 'website' to experiment with deploy-website
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/website'
     steps:
       - uses: actions/checkout@v4
       - name: build
