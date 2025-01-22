@@ -1,11 +1,10 @@
 {
-  "variables": {
-    "random_var_1" : "RANDOM_STRING"
-  },
+  "variables": {},
   "datasets": [{
     "var": "tableData",
     "file": "dataset/test-dataset"
   }],
+  "expected": "numToStr scenarioI.bestEst2140",
   "imports": [],
   "code": "let $random_var_1$ = newDataTable 18;\n    probEstimate = newModel 0.85;\n    scenarioI = getByScenario \"SSP1-1.9\" $random_var_1$;\n    scenarioII = getByScenario \"SSP5-8.5\" $random_var_1$",
   "text": "The scenario SSP1-1.9 charts a restricted temperature elevation up to [REPLACE value=\"1.4\"], ensuring an unlikely breach of the established 2°C limit. Contrastively, SSP5-8.5 exacerbates the potential for significant warming, making such an event practically certain."
