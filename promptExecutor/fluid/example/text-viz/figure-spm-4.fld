@@ -1,27 +1,21 @@
 -- Histogram Step
-let predictions data = [ model.changed | model <- data ];
+let extractChange data = [ model.changed | model <- data ];
 
-let ssp126Histogram = cut (predictions ssp126) 10;
+let predictions = { ssp126: extractChange ssp126, ssp245: extractChange ssp245 };
 
-let ssp245Histogram = cut (predictions ssp245) 10;
+let histograms = { ssp126: cut predictions.ssp126 10, ssp245: cut predictions.ssp245 10 };
 
-let ssp126Surpasses2 = likelihoodGE (predictions ssp126) 2;
+let probSurpasses2 = { ssp126: likelihoodGE predictions.ssp126 2, ssp245: likelihoodGE predictions.ssp245 2 };
 
-let ssp126TotalWarming = findPercentile 50 (mergesort (predictions ssp126));
+let medianWarming = { ssp126: findPercentile 50 (mergesort predictions.ssp126), ssp245: findPercentile 50 (mergesort predictions.ssp245) };
 
-let ssp245Surpasses2 = likelihoodGE (predictions ssp245) 2;
-
-let ssp245TotalWarming = findPercentile 50 (mergesort (predictions ssp245));
-
--- Bar Chart Step
-
-let referToBar bar = "the bar representing scenario " ++ bar.x ++ " has a z value of " ++ (numToStr (head bar.bars).z);
+let ghgBreakdown = { ssp126: [ { source: "CO2", warming: 1.42 }, { source: "Non-CO2", warming: 0.43 }],
+                     ssp245: [ { source: "CO2", warming: 2.12 }, { source: "Non-CO2", warming: 0.75 }]
+                    };
 
 let stackedBarHeight stackedBar = sum [ bar.z | bar <- stackedBar.bars ];
 
-let getTotal (BarChart record) = fromSome (findWithKey "x" "Total" record.stackedBars);
-let getCO2 (BarChart record)= fromSome (findWithKey "x" "CO2" record.stackedBars);
-let getNonCO2 (BarChart record) = fromSome (findWithKey "x" "Non-CO2" record.stackedBars);
+let get source (BarChart record) = fromSome (findWithKey "x" source record.stackedBars);
 
 let explainBars bars x = 
     if length bars == length (filter (fun bar -> bar.x == x) bars)
@@ -32,22 +26,25 @@ let mkBarChart scenName table =
     BarChart {
         caption: "Example bar chart for scenario " ++ scenName,
         size: { width: 275, height: 185 },
-        stackedBars: map (fun record -> { x: record.type, bars: [ { y: "emissions", z: record.emissions } ]}) table
+        stackedBars: map (fun record -> { x: record.source, bars: [ { y: "emissions", z: record.warming } ]}) table
     };
 
 let getHeight bar offset = (head bar.bars).z + offset;
 
-let ssp126Chart = mkBarChart "SSP1-2.6" ({ type: "Total", emissions: ssp126TotalWarming } : ssp126Source);
-    ssp245Chart = mkBarChart "SSP2-4.5" ({ type: "Total", emissions: ssp245TotalWarming } : ssp245Source);
-    total = map getTotal [ssp126Chart, ssp245Chart];
-    co2 = map getCO2 [ssp126Chart, ssp245Chart];
-    nonco2 = map getNonCO2 [ssp126Chart, ssp245Chart];
+let barCharts = {
+    ssp126: mkBarChart "SSP1-2.6" ({ source: "Total", warming: medianWarming.ssp126 } : ghgBreakdown.ssp126),
+    ssp245: mkBarChart "SSP2-4.5" ({ source: "Total", warming: medianWarming.ssp245 } : ghgBreakdown.ssp245)
+};
+
+let total = map (get "Total") [barCharts.ssp126, barCharts.ssp245];
+    co2 = map (get "CO2") [barCharts.ssp126, barCharts.ssp245];
+    nonco2 = map (get "Non-CO2") [barCharts.ssp126, barCharts.ssp245];
     meanTotal = (sum (map stackedBarHeight total)) / (length total)
 in MultiView {
-    leftBarChart: ssp126Chart,
-    rightBarChart: ssp245Chart,
+    leftBarChart: barCharts.ssp126,
+    rightBarChart: barCharts.ssp245,
     explanation:
         LinkedText [ "Within each scenario bar plot, the bars represent: total warming ", explainBars total "Total",
                      ", warming contributions from CO2 ", explainBars co2 "CO2", " and from non-CO2 GHG's ", explainBars nonco2 "Non-CO2",
-                     ". In SSP126, the median total warming is ", numToStr ssp126TotalWarming, "°C, with a ", numToStr ssp126Surpasses2, " probability of exceeding 2°C."]
+                     ". In SSP126, the median total warming is ", numToStr medianWarming.ssp126, "°C, with a ", numToStr probSurpasses2.ssp126, " probability of exceeding 2°C."]
 }

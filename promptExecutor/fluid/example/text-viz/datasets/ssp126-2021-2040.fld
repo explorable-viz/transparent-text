@@ -1,130 +1,98 @@
 [
   {
-    world: 14.82,
     changed: 0.78
   },
   {
-    world: 14.96,
     changed: 0.79
   },
   {
-    world: 15.55,
     changed: 0.8
   },
   {
-    world: 14.63,
     changed: 0.88
   },
   {
-    world: 16.07,
     changed: 1.0
   },
   {
-    world: 16.39,
     changed: 1.02
   },
   {
-    world: 14.86,
     changed: 1.07
   },
   {
-    world: 14.96,
     changed: 1.07
   },
   {
-    world: 14.64,
     changed: 1.08
   },
   {
-    world: 16.31,
     changed: 1.09
   },
   {
-    world: 15.32,
     changed: 1.13
   },
   {
-    world: 15.4,
     changed: 1.16
   },
   {
-    world: 14.23,
     changed: 1.17
   },
   {
-    world: 14.57,
     changed: 1.18
   },
   {
-    world: 16.02,
     changed: 1.23
   },
   {
-    world: 15.25,
     changed: 1.25
   },
   {
-    world: 15.39,
     changed: 1.3
   },
   {
-    world: 14.45,
     changed: 1.32
   },
   {
-    world: 15.66,
     changed: 1.39
   },
   {
-    world: 15.41,
     changed: 1.41
   },
   {
-    world: 15.78,
     changed: 1.42
   },
   {
-    world: 15.34,
     changed: 1.43
   },
   {
-    world: 15.43,
     changed: 1.47
   },
   {
-    world: 14.13,
     changed: 1.48
   },
   {
-    world: 15.68,
     changed: 1.49
   },
   {
-    world: 15.2,
     changed: 1.5
   },
   {
-    world: 14.63,
     changed: 1.51
   },
   {
-    world: 15.6,
     changed: 1.51
   },
   {
-    world: 14.38,
     changed: 1.81
   },
   {
-    world: 15.59,
     changed: 1.81
   },
   {
-    world: 15.77,
     changed: 1.98
   },
   {
-    world: 15.88,
     changed: 2.08
   }
 ]
