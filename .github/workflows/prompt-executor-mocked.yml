@@ -28,5 +28,4 @@ jobs:
       - name: Launch Prompt Tests
         run: |
           yarn install
-          yarn generate-in-context-learning-data
           yarn test-mock
