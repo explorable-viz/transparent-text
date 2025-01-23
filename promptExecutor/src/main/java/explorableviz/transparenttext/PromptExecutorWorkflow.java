@@ -20,12 +20,9 @@ public class PromptExecutorWorkflow {
     private final QueryContext query;
     private final LLMEvaluatorAgent llm;
 
-    public PromptExecutorWorkflow(String promptPath, QueryContext query, String agentClassName) throws IOException, ClassNotFoundException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+    public PromptExecutorWorkflow(LearningQueryContext learningQueryContext, QueryContext query, String agentClassName) throws Exception {
         this.query = query;
-        this.prompts = new PromptList();
-        String content = new String(Files.readAllBytes(Paths.get(new File(promptPath).toURI())));
-        JSONArray jsonContent = new JSONArray(content);
-        prompts.parseJSONContent(jsonContent);
+        this.prompts = learningQueryContext.generateInContextLearningJSON();
         llm = initialiseAgent(agentClassName);
     }
 

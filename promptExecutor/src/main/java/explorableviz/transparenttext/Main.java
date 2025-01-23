@@ -30,8 +30,11 @@ public class Main {
         final String testPath = arguments.get("testPath");
         final int numTestToGenerate = Integer.parseInt(arguments.get("numTestToGenerate"));
         final ArrayList<QueryContext> queryContexts;
+        final LearningQueryContext learningQueryContext;
         final Optional<Integer> numQueryToExecute = Optional.of(Integer.parseInt(arguments.get("numQueryToExecute")));
+
         try {
+            learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(inContextLearningPath, 10);
             queryContexts = loadTestCases(testPath, numTestToGenerate);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -50,7 +53,7 @@ public class Main {
                 QueryContext queryContext = queryContexts.get(i);
                 logger.info(STR."Analysing query id=\{i}");
 
-                PromptExecutorWorkflow workflow = new PromptExecutorWorkflow(inContextLearningPath, queryContext, agent);
+                PromptExecutorWorkflow workflow = new PromptExecutorWorkflow(learningQueryContext, queryContext, agent);
                 results.add(workflow.execute());
             }
         } catch (Exception e) {
