@@ -2,9 +2,11 @@
 ![PromptExecutorMocked](https://github.com/explorable-viz/transparent-text/actions/workflows/prompt-executor-mocked.yml/badge.svg)
 
 ## PromptExecutor
+
 PromptExecutor is a command line tool which allows to execute the prompts into a Large Language Model. At this time the only supported model is llama3, but further versions will offer the possibility to use also other models.
 
 ### The Java Application
+
 The folder jar, host the java application. It is possible to run the app through the command
 
 `java -jar jar/prompt-executor.jar <agent> <prompt> <settings> <queries> [expected]`
@@ -28,7 +30,6 @@ where:
 | Llama3EvaluatorAgent       | llama3:8b              | no           |
 | Llama31EvaluatorAgent      | llama3.1:8b            | no           |
 
-
 ### Scripts
 There are four main bash scripts, placed in the script folder, for the installation and the execution of the Prompt Executor
 1. **ollama-install.sh**. This script provides the installation of the ollama platform.
@@ -36,14 +37,14 @@ There are four main bash scripts, placed in the script folder, for the installat
 3. **ollama-serve.sh** This script starts the ollama platform (generally on port 11434).
 4. **prompt-executor.sh**. This script executes the Java application. It requires the parameters described in the section "The Java Application"
 
-### yarn integration
+### Yarn integration
 
 All the scripts are integrated with yarn scripts.
 
-- `yarn ollama-install` provides to install ollama
-- `yarn pull-llama3` provides to pull the llama3 model
-- `yarn ollama-serve` provides to start the ollama server
-- `yarn test` provides to launch the test with the file in the input folder.
+- `yarn ollama-install` to install ollama
+- `yarn pull-llama3` to pull llama3 model
+- `yarn ollama-serve` to start ollama server
+- `yarn test` to launch test with file in input folder
 
 ### Webtools
 
@@ -60,8 +61,11 @@ Paths are relative to folder containing these instructions. `$WEBSITE_NAME` refe
 folders under `website`.
 
 ### Bundling/Testing Websites
-To bundle a website, run the command `yarn fluid publish -w $WEBSITE_NAME -l`. This will create a folder in
-`dist` with a Lisp-cased version of `$WEBSITE_NAME`.
+
+To bundle a website:
+1. Run `yarn fluid publish -w $WEBSITE_NAME -l`
+
+This will create a folder in `dist` with a Lisp-cased version of `$WEBSITE_NAME`.
 
 To test the website in the browser:
 1. run `npx http-serve dist/$WEBSITE_NAME_LISP_CASE -a 127.0.0.1 -c-1`

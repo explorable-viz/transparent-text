@@ -68,7 +68,11 @@
     style-mod "^4.1.0"
     w3c-keyname "^2.2.4"
 
+<<<<<<< HEAD
 "@explorable-viz/fluid@^0.7.30":
+=======
+"@explorable-viz/fluid@^0.7.61":
+>>>>>>> main
   version "0.7.61"
   resolved "https://registry.yarnpkg.com/@explorable-viz/fluid/-/fluid-0.7.61.tgz#9c4e5fb1e34d397d0d0e3ff9760c3e7aace7c815"
   integrity sha512-PW2q9UjcVsezb5EaG4Rlz38U/bEeoBfWl6yBeFf7fAu1Zz/YMTOf9Z0/CE0M37gJYmaTPrFgClkAiu8+pxMf7w==
