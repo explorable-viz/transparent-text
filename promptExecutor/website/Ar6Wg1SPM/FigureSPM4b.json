@@ -1,10 +1,11 @@
 {
+    "fluidSrcPath": "../fluid",
     "datasets": [
         ["likelihoods", "example/text-viz/likelihoods"],
         ["ssp126", "example/text-viz/datasets/ssp126-2081-2100"],
         ["ssp245", "example/text-viz/datasets/ssp245-2081-2100"]
     ],
     "imports": [ "lib/text-viz", "lib/stats" ],
-    "file": "text-viz/figure-spm-4",
+    "file": "example/text-viz/figure-spm-4",
     "inputs": [ "ssp126", "ssp245"]
 }
