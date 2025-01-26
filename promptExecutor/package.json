@@ -1,16 +1,11 @@
 {
   "name": "@explorable-viz/prompt-executor",
   "version": "0.1",
-  "description": "PromptExecutor is a command line tool which allows to execute the prompts into an LLM. At this time the only supported model is llama3, but further versions will offer the possibility to use also other models.\n",
+  "description": "PromptExecutor is a command line tool which allows to execute the prompts into an LLM. At this time the only supported model is llama3, but further versions will offer the possibility to use also other models.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/explorable-viz/transparent-text.git#automation-prompting"
+    "url": "git+https://github.com/explorable-viz/transparent-text.git"
   },
-  "keywords": [
-    "Java",
-    "LLM",
-    "Prompting"
-  ],
   "author": "explorable-viz",
   "license": "MIT",
   "bugs": {
