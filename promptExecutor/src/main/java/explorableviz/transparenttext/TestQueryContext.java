@@ -25,7 +25,13 @@ public class TestQueryContext extends QueryContext {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         for(int i = 0; i < number; i++) {
             Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
-            queryContexts.add(new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getFile(), replacedVariables.getSecond()));
+            QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getFile(), replacedVariables.getSecond());
+            queryContext.setResponse(queryContext.getExpected());
+            if(queryContext.validate().isValid()) {
+                queryContexts.add(queryContext);
+            } else {
+                throw new RuntimeException("Invalid test exception");
+            }
         }
         return queryContexts;
     }
@@ -57,7 +63,7 @@ public class TestQueryContext extends QueryContext {
 
     private static String getRandomString(int length, Random generator) {
         StringBuilder sb = new StringBuilder(length);
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         for (int i = 0; i < length; i++) {
             int randomIndex = generator.nextInt(characters.length());
             sb.append(characters.charAt(randomIndex));
@@ -74,7 +80,7 @@ public class TestQueryContext extends QueryContext {
             String replacement = switch (value) {
                 case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
                 case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
-                case "RANDOM_STRING" -> getRandomString(8, random);
+                case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
                 default -> value;
             };
 
@@ -84,5 +90,9 @@ public class TestQueryContext extends QueryContext {
         }
 
         return new Pair<>(code, expected);
+    }
+
+    private void validateExpectedValue() {
+
     }
 }

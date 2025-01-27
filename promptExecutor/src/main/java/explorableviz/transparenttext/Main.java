@@ -34,9 +34,12 @@ public class Main {
         final Optional<Integer> numQueryToExecute = Optional.of(Integer.parseInt(arguments.get("numQueryToExecute")));
 
         try {
+            Settings.getInstance().loadSettings(settingsPath);
             learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(inContextLearningPath, 10);
             queryContexts = loadTestCases(testPath, numTestToGenerate);
         } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
             throw new RuntimeException(e);
         }
         final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
@@ -48,7 +51,6 @@ public class Main {
          */
 
         try {
-            Settings.getInstance().loadSettings(settingsPath);
             for (int i = 0; i < queryLimit; i++) {
                 QueryContext queryContext = queryContexts.get(i);
                 logger.info(STR."Analysing query id=\{i}");
