@@ -211,7 +211,7 @@ public class QueryContext {
      * @throws FileNotFoundException
      */
     private void writeFluidFile(String response) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(STR."fluid/example/\{Settings.getInstance().get(Settings.FLUID_TEMP_FILE)}.fld");
+        PrintWriter out = new PrintWriter(STR."fluid/\{Settings.getInstance().get(Settings.FLUID_TEMP_FILE)}.fld");
         out.println(this.getCode());
         out.println("in " + response);
         out.flush();
