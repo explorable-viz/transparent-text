@@ -144,7 +144,12 @@ public class QueryContext {
                 command.append(" -i ").append(path);
             });
             logger.info("Running command: " + command);
-            Process process = Runtime.getRuntime().exec(command.toString());
+            Process process;
+            if (os.contains("win")) {
+                process = Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c", command.toString()});
+            } else {
+                process = Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", command.toString()});
+            }
             process.waitFor();
 
             //Reading command output
