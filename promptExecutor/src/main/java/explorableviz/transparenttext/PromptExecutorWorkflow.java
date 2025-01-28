@@ -29,7 +29,7 @@ public class PromptExecutorWorkflow {
      */
 
     public String execute() throws Exception {
-        AtomicReference<String> response = null;
+        AtomicReference<String> response = new AtomicReference<>();
         /*
          * Load the maximum number of attempts for each query to process
          */
@@ -94,19 +94,19 @@ public class PromptExecutorWorkflow {
         if (errorDetails.toLowerCase().contains("key") && errorDetails.toLowerCase().contains("not found")) {
             errorMessage = String.format(
                     "KeyNotFound Error. The generated expression %s is trying to access a key that does not exist. " +
-                            "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
+                            "Check the code and regenerate the expression. Remember: reply only with the expression, without any other comment.",
                     response
             );
         } else if (errorDetails.toLowerCase().contains("parseerror")) {
             errorMessage = String.format(
                     "SyntacticError. The generated expression %s caused the following error: \n%s. " +
-                            "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
+                            "Check the code and regenerate the expression. Remember: reply only with the expression, without any other comment.",
                     response, errorDetails
             );
         } else {
             errorMessage = String.format(
                     "ValueMismatchError. The generated expression %s produced an unexpected value. " +
-                            "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
+                            "Check the code and regenerate the expression. Remember: reply only with the expression, without any other comment.",
                     response
             );
         }
