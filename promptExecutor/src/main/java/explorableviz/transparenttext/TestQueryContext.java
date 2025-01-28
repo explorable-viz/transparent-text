@@ -27,7 +27,7 @@ public class TestQueryContext extends QueryContext {
             Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
             QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getFile(), replacedVariables.getSecond());
             queryContext.setResponse(queryContext.getExpected());
-            if(queryContext.validate().isValid()) {
+            if(queryContext.validate().isEmpty()) {
                 queryContexts.add(queryContext);
             } else {
                 throw new RuntimeException("Invalid test exception");

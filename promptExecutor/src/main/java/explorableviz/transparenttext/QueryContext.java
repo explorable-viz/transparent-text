@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -123,7 +124,7 @@ public class QueryContext {
      * and compiling it.
      * @return null
      */
-    public ValidationResult validate() {
+    public Optional<String> validate() {
 
         String text = this.getFile();
 
@@ -175,7 +176,7 @@ public class QueryContext {
      * @return true if the output matches the pattern, false otherwise
      */
 
-    private ValidationResult validateOutput(String output, String text) throws Exception {
+    private Optional<String> validateOutput(String output, String text) throws Exception {
         logger.info("Validating output: " + output);
 
         //Extract value from input query.text
@@ -202,11 +203,11 @@ public class QueryContext {
 
         if (value.equals(expectedValue)) {
             logger.info("Validation passed");
-            return new ValidationResult(true, value, expectedValue);
+            return Optional.empty();
+        } else {
+            logger.info("Validation failed: generated=" + value + ", expected=" + expectedValue);
+            return Optional.of(value);
         }
-
-        logger.info("Validation failed: generated=" + value + ", expected=" + expectedValue);
-        return new ValidationResult(false, value, expectedValue);
     }
 
     /**

@@ -5,6 +5,7 @@ import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 public class PromptExecutorWorkflow {
@@ -28,7 +29,7 @@ public class PromptExecutorWorkflow {
      */
 
     public String execute() throws Exception {
-        String response = null;
+        AtomicReference<String> response = null;
         /*
          * Load the maximum number of attempts for each query to process
          */
@@ -36,7 +37,7 @@ public class PromptExecutorWorkflow {
         // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
         prompts.addPrompt(PromptList.USER, query.toString());
-        for (int attempts = 0; response == null && attempts <= limit; attempts++) {
+        for (int attempts = 0; response.get() == null && attempts <= limit; attempts++) {
             logger.info("Attempt #" + attempts);
             // Send the query to the LLM to be processed
             String candidateResponse = llm.evaluate(prompts, "");
@@ -45,21 +46,19 @@ public class PromptExecutorWorkflow {
             prompts.addPrompt(PromptList.SYSTEM, candidateResponse);
             query.setResponse(candidateResponse);
             // Validate the response
-            ValidationResult validationResult = query.validate(); //validate(candidateResponse);
-            if (!validationResult.isValid()) {
-                //If it is not valid the wf generate a message that will be sent to the LLM
-                //in order to try to correct the once previously generated.
-                prompts.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, validationResult.getLog(), validationResult.getValue()));
-            } else {
-                response = candidateResponse;
-            }
+            query.validate().ifPresentOrElse(value -> {
+                try {
+                    prompts.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, value));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }, () -> response.set(candidateResponse));
         }
-        if (response == null) {
+        if (response.get() == null) {
             logger.warning("Validation failed after " + limit + " attempts");
         }
-        return response;
+        return response.get();
     }
-
 
     /**
      * This method initialise the LLMEvaluator agent dynamically
@@ -90,25 +89,25 @@ public class PromptExecutorWorkflow {
      * @param response : the previous response from the LLM
      * @return a String with a description of the error.
      */
-    private String generateLoopBackMessage(String response, String log, String expected) {
+    private String generateLoopBackMessage(String response, String errorDetails) {
         String errorMessage;
-        if (log.toLowerCase().contains("key") && log.toLowerCase().contains("not found")) {
+        if (errorDetails.toLowerCase().contains("key") && errorDetails.toLowerCase().contains("not found")) {
             errorMessage = String.format(
                     "KeyNotFound Error. The generated expression %s is trying to access a key that does not exist. " +
                             "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
-                    response, expected
+                    response
             );
-        } else if (log.toLowerCase().contains("parseerror")) {
+        } else if (errorDetails.toLowerCase().contains("parseerror")) {
             errorMessage = String.format(
                     "SyntacticError. The generated expression %s caused the following error: \n%s. " +
                             "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
-                    response, log, expected
+                    response, errorDetails
             );
         } else {
             errorMessage = String.format(
                     "ValueMismatchError. The generated expression %s produced an unexpected value. " +
                             "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
-                    response, expected
+                    response
             );
         }
         return errorMessage;
