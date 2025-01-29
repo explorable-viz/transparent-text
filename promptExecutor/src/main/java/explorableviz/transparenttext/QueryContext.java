@@ -34,16 +34,16 @@ public class QueryContext {
     }
 
     private String code;
-    private String file;
+    private String paragraph;
 
     private String expected;
 
     private String response;
 
-    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, String file) throws IOException {
+    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, String paragraph) throws IOException {
         this.dataset = dataset;
         this.imports = imports;
-        this.file = file;
+        this.paragraph = paragraph;
         this.code = code;
         this._loadedImports = new ArrayList<>();
         this._loadedDatasets = new HashMap<>();
@@ -75,12 +75,12 @@ public class QueryContext {
         this.imports = imports;
     }
 
-    public String getFile() {
-        return file;
+    public String getParagraph() {
+        return paragraph;
     }
 
     public void setFile(String file) {
-        this.file = file;
+        this.paragraph = file;
     }
 
     public void loadFiles() throws IOException {
@@ -99,7 +99,7 @@ public class QueryContext {
         object.put("loadedDatasets", this._loadedDatasets);
         object.put("loadedImports", this._loadedImports);
         object.put("code", this.code);
-        object.put("text", this.file);
+        object.put("paragraph", this.paragraph);
         return object.toString();
     }
 
@@ -126,7 +126,7 @@ public class QueryContext {
      */
     public Optional<String> validate() {
 
-        String text = this.getFile();
+        //String text = this.getParagraph();
 
         try {
             writeFluidFile(this.response);
@@ -160,7 +160,7 @@ public class QueryContext {
             logger.info("Command output: " + output);
             logger.info("Error output (if any): " + errorOutput);
             //Output validation
-            return validateOutput(output, text);
+            return validateOutput(output, this.getParagraph());
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during validation", e);
         } catch (Exception e) {

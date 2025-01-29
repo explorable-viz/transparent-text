@@ -25,7 +25,7 @@ public class TestQueryContext extends QueryContext {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         for(int i = 0; i < number; i++) {
             Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
-            QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getFile(), replacedVariables.getSecond());
+            QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getParagraph(), replacedVariables.getSecond());
             queryContext.setResponse(queryContext.getExpected());
             if(queryContext.validate().isEmpty()) {
                 queryContexts.add(queryContext);
@@ -41,7 +41,7 @@ public class TestQueryContext extends QueryContext {
         JSONObject json_variables = testCase.getJSONObject("variables");
         JSONArray json_imports = testCase.getJSONArray("imports");
         String code = testCase.getString("code");
-        String file = testCase.getString("text");
+        String paragraph = testCase.getString("paragraph");
         String expected = testCase.getString("expected");
 
         HashMap<String, String> variables = new HashMap<>();
@@ -58,7 +58,7 @@ public class TestQueryContext extends QueryContext {
             imports.add(json_imports.getString(i));
         }
 
-        return new TestQueryContext(datasets, imports, variables, code, file, random, expected);
+        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected);
     }
 
     private static String getRandomString(int length, Random generator) {
