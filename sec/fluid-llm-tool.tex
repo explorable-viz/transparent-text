@@ -56,47 +56,14 @@ If either validation step fails, the errors are returned to the FluidGenerator A
     \label{fig:fluid-llm-architecture}
 \end{figure}
 
-\subsubsection{Input}
+\subsubsection{QueryContext}
 The input for this system needs to describe the following information:
 \begin{itemize}
-    \item \textbf{Data}: the data that the fluid program is using in the program. This data have a JSON-like format.
-    \item \textbf{Fluid Code}: Parts (or entire) Fluid program, used to link the variables to the text
+    \item \textbf{Datasets}: the datasets that the fluid program is using in it. These datasets are files that have a JSON-like format.
+    \item \textbf{Imports}: the fluid libraries that the program needs for working. The imports is modelled as a list of path.
+    \item \textbf{Fluid Code}: The fluid program, used to link the variables to the text.
     \item \textbf{Text}: text element that the system will work on, replacing informations that can be extracted from variables or functions with the relate fluid elements.
 \end{itemize}
-
-Given the necessity to provide to the system both the content and its meaning, these informations will be passed to the system through a JSON string which has to respect the schema reported in Table \ref{tab:schema_fluid_input}.
-
-\begin{table*}[!ht]
-    \centering
-    \caption{Input JSON Schema \label{tab:schema_fluid_input}}
-    \begin{tabular}{p{13cm}}
-    \hline
-    \hline
-    \begin{verbatim}
-{
-  "$schema": "http://json-schema.org/draft-04/schema#",
-  "type": "object",
-  "properties": {
-    "data": {
-      "type": "string"
-    },
-    "code": {
-      "type": "string"
-    },
-    "caption": {
-      "type": "string"
-    }
-  },
-  "required": [
-    "data",
-    "code",
-    "caption"
-  ]
-}
-    \end{verbatim}\\
-    \hline \hline
-    \end{tabular}
-\end{table*}
 
 \begin{table*}[!ht]
     \centering
@@ -124,21 +91,8 @@ Given the necessity to provide to the system both the content and its meaning, t
     \end{tabular}
 \end{table*}
 
-\subsubsection{Recognition Agent}
-The Recognition Agent role is \textit{identify} the parts in the input that need to be processed to the \textit{FluidGenerator Agent}. In particular, there are three categories that need to be replaced:
-\begin{itemize}
-    \item \textbf{Scenario names}. Name of the scenario that the text is descring.
-    \item \textbf{Data values}. Values in the text that are reported in the \textit{data} part of the input.
-    \item \textbf{Function outputs}. Values that could be computed by a function (like \textit{likelihoodMap} function, for statistical phrases like \textit{likely}.
-\end{itemize}
-
-The Recognition Agent replaces the text with a tag in order to give the FluidGenerator Agent the indications about where it has to work.
-
-\paragraph{Implementation Details}
-This agent can be implemented through a Large Language Model (like llama3, gpt-3.5 or gpt\-4o) or also through a specific model that will be trained.
-
-\subsubsection{FluidGenerator Agent}.
-The \textit{FluidGenerator Agent} has to replace the tag from the input with the respective variables or function calls. For example, if the input contains the tag \textbf{[SCENARIO\_NAME value='SSP1-2.6']}, the agent replaces the tag with the variable that generates the string in the value attribute. Table \ref{tab:agent_execution_sample} describes the input, the results of the Recognition Agent (in the \textit{Input after Recognition Agent} part), and the expected output after the FluidGenerator Agent execution.
+\subsubsection{FluidGenerator}.
+The \textit{FluidGenerator} has to replace the tag from the input with the respective variables or function calls. For example, if the input contains the tag \textbf{[REPLACE value='SSP1-2.6']}, the component replaces the tag with the variable that generates the string in the value attribute. Table \ref{tab:agent_execution_sample} describes the input, and the expected output after the FluidGenerator execution.
 
 \begin{table*}[!ht]
     \centering
@@ -167,9 +121,9 @@ The \textit{FluidGenerator Agent} has to replace the tag from the input with the
             "code": "let realTable = newDataTable 3;
                          probTable = newModel 0.3;
                         sspone = getByScenario "SSP1-2.6" realTable;",
-            "caption": "For [SCENARIO_REPLACE value='SSP1-1.90, the rise in
+            "caption": "For [REPLACE value='SSP1-1.90, the rise in
                         global temperature by century's end
-                        is contained at [NUM_REPLACE value='2']."
+                        is contained at [REPLACE value='2']."
         }
     \end{verbatim}\\
     \hline
@@ -211,7 +165,7 @@ Specifically, we investigate the following research question. \textbf{RQ1}: How 
 
 \textbf{Related work (links)}
 \begin{itemize}
-    \item \textit{On the Effectiveness of Large Language Models in Statement-level Code Summarization.} They analysed (among other things) the effectiveness of the temperature parameter for the generation of comments, but in my opinion not in depth.
+    \item \href{https://ieeexplore.ieee.org/document/10684656}{On the Effectiveness of Large Language Models in Statement-level Code Summarization.} They analysed (among other things) the effectiveness of the temperature parameter for the generation of comments, but in my opinion not in depth.
 \end{itemize}
 
 
@@ -220,7 +174,7 @@ In this section, we analyse the impact of in-context learning dataset structure 
 
 \textbf{Related work (links)}
 \begin{itemize}
-    \item \textit{Scaling Data Diversity for Fine-Tuning Language Models in Human Alignment} - not strongly related to dsl, but interesting about diversity in prompt.
+    \item \href{http://www.lrec-conf.org/proceedings/lrec-coling-2024/pdf/2024.main-1.1251.pdf}{Scaling Data Diversity for Fine-Tuning Language Models in Human Alignment} - not strongly related to dsl, but interesting about diversity in prompt.
 \end{itemize}
 
 Specifically, we investigate the following research question. \textbf{RQ2}: How do factors like example diversity and annotation granularity impact an LLM’s ability to generalize in DSL contexts?
@@ -231,9 +185,9 @@ In this section, we analyse the impact of formal models, such as Context-Free Gr
 
 \textbf{Related work (links)}
 \begin{itemize}
-    \item From a Natural to a Formal Language with DSL Assistant.
-    \item Grammar Prompting for Domain Specific Languages
-    \item Grammar-obeying program synthesis: A novel approach using large language models and many-objective genetic programming
+    \item \href{https://dl.acm.org/doi/10.1145/3652620.3687811}{From a Natural to a Formal Language with DSL Assistant.}
+    \item \href{https://proceedings.neurips.cc/paper_files/paper/2023/file/cd40d0d65bfebb894ccc9ea822b47fa8-Paper-Conference.pdf}{Grammar Prompting for Domain Specific Languages}
+    \item \href{https://www.sciencedirect.com/science/article/abs/pii/S0920548924001077}{Grammar-obeying program synthesis: A novel approach using large language models and many-objective genetic programming}
 
 \end{itemize}
 
