@@ -41,7 +41,11 @@ public class TestQueryContext extends QueryContext {
         JSONObject json_variables = testCase.getJSONObject("variables");
         JSONArray json_imports = testCase.getJSONArray("imports");
         String code = testCase.getString("code");
-        String paragraph = testCase.getString("paragraph");
+        JSONArray paragraph = testCase.getJSONArray("paragraph");
+        StringBuilder text = new StringBuilder();
+        for(int i = 0; i < paragraph.length(); i++) {
+            text.append(paragraph.getJSONObject(i).getString("value"));
+        }
         String expected = testCase.getString("expected");
 
         HashMap<String, String> variables = new HashMap<>();
@@ -58,7 +62,7 @@ public class TestQueryContext extends QueryContext {
             imports.add(json_imports.getString(i));
         }
 
-        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected);
+        return new TestQueryContext(datasets, imports, variables, code, text.toString(), random, expected);
     }
 
     private static String getRandomString(int length, Random generator) {
