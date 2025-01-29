@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.Optional;
 import java.util.Random;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 
 public class Main {
     public static Logger logger = Logger.getLogger(Main.class.getName());
@@ -34,21 +35,16 @@ public class Main {
         final Optional<Integer> numQueryToExecute = Optional.of(Integer.parseInt(arguments.get("numQueryToExecute")));
 
         try {
+            Settings.getInstance().loadSettings(settingsPath);
             learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(inContextLearningPath, 10);
             queryContexts = loadTestCases(testPath, numTestToGenerate);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
+            final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
+            final ArrayList<String> results = new ArrayList<>();
 
-        final ArrayList<String> results = new ArrayList<>();
+            /*
+             * Workflow execution
+             */
 
-        /*
-         * Workflow execution
-         */
-
-        try {
-            Settings.getInstance().loadSettings(settingsPath);
             for (int i = 0; i < queryLimit; i++) {
                 QueryContext queryContext = queryContexts.get(i);
                 logger.info(STR."Analysing query id=\{i}");
@@ -56,27 +52,27 @@ public class Main {
                 PromptExecutorWorkflow workflow = new PromptExecutorWorkflow(learningQueryContext, queryContext, agent);
                 results.add(workflow.execute());
             }
+            logger.info("Printing generated expression");
+            for (String result : results) {
+                logger.info(result);
+            }
+
+            logger.info("Computing accuracy");
+
+            int correct = (int) IntStream.range(0, results.size())
+                    .filter(i -> queryContexts.get(i).getExpected().equals(results.get(i)))
+                    .count();
+
+            float rate = (float) correct / queryLimit;
+            System.out.println("Accuracy: " + rate);
+
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
 
-        logger.info("Printing generated expression");
-        for(String result : results) {
-            logger.info(result);
-        }
 
-        logger.info("Computing accuracy");
-        int correct = 0;
-        for (int i = 0; i < results.size(); i++) {
-            if (queryContexts.get(i).getExpected().equals(results.get(i))) {
-                correct++;
-            }
-        }
-        float rate = (float) correct / queryLimit;
-        System.out.println("Accuracy: " + rate);
 
-        //writeResults(results, Settings.getInstance().get(Settings.LOG_PATH));
     }
 
     public static ArrayList<QueryContext> loadTestCases(String testCasesFolder, int numInstances) throws IOException {

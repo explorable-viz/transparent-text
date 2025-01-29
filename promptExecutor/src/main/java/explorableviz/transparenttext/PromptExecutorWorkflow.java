@@ -2,16 +2,11 @@ package explorableviz.transparenttext;
 
 import it.unisa.cluelab.lllm.llm.LLMEvaluatorAgent;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class PromptExecutorWorkflow {
 
@@ -34,7 +29,7 @@ public class PromptExecutorWorkflow {
      */
 
     public String execute() throws Exception {
-        String response = null;
+        AtomicReference<String> response = new AtomicReference<>();
         /*
          * Load the maximum number of attempts for each query to process
          */
@@ -42,74 +37,27 @@ public class PromptExecutorWorkflow {
         // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
         prompts.addPrompt(PromptList.USER, query.toString());
-        for (int attempts = 0; response == null && attempts <= limit; attempts++) {
+        for (int attempts = 0; response.get() == null && attempts <= limit; attempts++) {
             logger.info("Attempt #" + attempts);
             // Send the query to the LLM to be processed
             String candidateResponse = llm.evaluate(prompts, "");
             logger.info("Received response: " + candidateResponse);
 
             prompts.addPrompt(PromptList.SYSTEM, candidateResponse);
-
+            query.setResponse(candidateResponse);
             // Validate the response
-            ValidationResult validationResult = validate(candidateResponse);
-            if (!validationResult.result) {
-                //If it is not valid the wf generate a message that will be sent to the LLM
-                //in order to try to correct the once previously generated.
-                prompts.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, validationResult.log, validationResult.value));
-            } else {
-                response = candidateResponse;
-            }
+            query.validate().ifPresentOrElse(value -> {
+                try {
+                    prompts.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, value));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }, () -> response.set(candidateResponse));
         }
-        if (response == null) {
+        if (response.get() == null) {
             logger.warning("Validation failed after " + limit + " attempts");
         }
-        return response;
-    }
-
-    /**
-     * Executes the validation task, generating a fluid program
-     * and compiling it.
-     *
-     * @param response the input parameter for the task
-     * @return null
-     */
-    public ValidationResult validate(String response) {
-
-        String text = query.getFile();
-
-        try {
-            writeFluidFile(response);
-
-            //Generate the fluid program that will be processed and evaluated by the compiler
-            String tempFile = Settings.getInstance().get(Settings.FLUID_TEMP_FILE);
-            String os = System.getProperty("os.name").toLowerCase();
-            String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
-
-            //Command construction
-            StringBuilder command = new StringBuilder(bashPrefix + "yarn fluid evaluate -f " + tempFile);
-            query.getDataset().forEach((key, path) -> {
-                command.append(" -d \"(").append(key).append(", ").append(path).append(")\"");
-            });
-            query.getImports().forEach(path -> {
-                command.append(" -i ").append(path);
-            });
-            logger.info("Running command: " + command);
-            Process process = Runtime.getRuntime().exec(command.toString());
-            process.waitFor();
-
-            //Reading command output
-            String output = new String(process.getInputStream().readAllBytes());
-            String errorOutput = new String(process.getErrorStream().readAllBytes());
-
-            logger.info("Command output: " + output);
-            logger.info("Error output (if any): " + errorOutput);
-            //Output validation
-            return validateOutput(output, text);
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error during validation", e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return response.get();
     }
 
     /**
@@ -141,96 +89,27 @@ public class PromptExecutorWorkflow {
      * @param response : the previous response from the LLM
      * @return a String with a description of the error.
      */
-    private String generateLoopBackMessage(String response, String log, String expected) {
+    private String generateLoopBackMessage(String response, String errorDetails) {
         String errorMessage;
-        if (log.toLowerCase().contains("key") && log.toLowerCase().contains("not found")) {
+        if (errorDetails.toLowerCase().contains("key") && errorDetails.toLowerCase().contains("not found")) {
             errorMessage = String.format(
                     "KeyNotFound Error. The generated expression %s is trying to access a key that does not exist. " +
-                            "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
-                    response, expected
+                            "Check the code and regenerate the expression. Remember: reply only with the expression, without any other comment.",
+                    response
             );
-        } else if (log.toLowerCase().contains("parseerror")) {
+        } else if (errorDetails.toLowerCase().contains("parseerror")) {
             errorMessage = String.format(
                     "SyntacticError. The generated expression %s caused the following error: \n%s. " +
-                            "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
-                    response, log, expected
+                            "Check the code and regenerate the expression. Remember: reply only with the expression, without any other comment.",
+                    response, errorDetails
             );
         } else {
             errorMessage = String.format(
                     "ValueMismatchError. The generated expression %s produced an unexpected value. " +
-                            "Check the code and regenerate the expression for the value: %s. Remember: reply only with the expression, without any other comment.",
-                    response, expected
+                            "Check the code and regenerate the expression. Remember: reply only with the expression, without any other comment.",
+                    response
             );
         }
         return errorMessage;
-    }
-
-    /**
-     * Checks the validity of the given output against a specific pattern within a provided string.
-     *
-     * @param output the output to be validated
-     * @param text   the string containing the pattern to match against the output
-     * @return true if the output matches the pattern, false otherwise
-     */
-
-    private ValidationResult validateOutput(String output, String text) throws Exception {
-        logger.info("Validating output: " + output);
-
-        //Extract value from input query.text
-        //The scenario [REPLACE value="SSP5-8.5"] framework foresees a considerable escalation in temperatures
-        //Return: SSP5-8.5
-        String regex = "value=\\\"(.*?)\\\"";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(text);
-
-        if (!matcher.find()) {
-            throw new Exception("No matching value found in text");
-        }
-
-        //expectedValue: SSP5-8.5
-        String expectedValue = matcher.group(1);
-
-        // Extract and clean the generated expression
-        String[] outputLines = output.split("\n");
-        if (outputLines.length < 2) {
-            throw new Exception("Output format is invalid");
-        }
-
-        String value = outputLines[1].replaceAll("^\"|\"$", "");
-
-        if (value.equals(expectedValue)) {
-            logger.info("Validation passed");
-            return new ValidationResult(true, value, expectedValue);
-        }
-
-        logger.info("Validation failed: generated=" + value + ", expected=" + expectedValue);
-        return new ValidationResult(false, value, expectedValue);
-    }
-
-    /**
-     * This function write the generated fluid code in a file
-     *
-     * @param response: the expression generated by the LLM
-     * @throws FileNotFoundException
-     */
-    private void writeFluidFile(String response) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(STR."fluid/example/\{Settings.getInstance().get(Settings.FLUID_TEMP_FILE)}.fld");
-        out.println(query.getCode());
-        out.println("in " + response);
-        out.flush();
-        out.close();
-    }
-
-    static class ValidationResult {
-        private final String log, value;
-        private final boolean result;
-        ValidationResult(boolean result, String log, String value) {
-            this.result = result;
-            this.log = log;
-            this.value = value;
-
-        }
-
-
     }
 }
