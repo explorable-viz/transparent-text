@@ -12,6 +12,8 @@ import java.util.Random;
 
 public class TestQueryContext extends QueryContext {
     private final HashMap<String, String> variables;
+    private static final String STRING_KEY = "singleString";
+    private static final String EXPR_KEY = "expr";
     private final Random random;
     private int seed = 0;
     public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, String file, Random random, String expected) throws IOException {
@@ -44,7 +46,12 @@ public class TestQueryContext extends QueryContext {
         JSONArray paragraph = testCase.getJSONArray("paragraph");
         StringBuilder text = new StringBuilder();
         for(int i = 0; i < paragraph.length(); i++) {
-            text.append(paragraph.getJSONObject(i).getString("value"));
+            JSONObject paragraph_element = paragraph.getJSONObject(i);
+            if(paragraph_element.getString("type").equals("string")) {
+                text.append(paragraph.getJSONObject(i).getString(STRING_KEY));
+            } else {
+                text.append(paragraph.getJSONObject(i).getString(EXPR_KEY));
+            }
         }
         String expected = testCase.getString("expected");
 
