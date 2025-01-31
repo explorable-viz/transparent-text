@@ -12,10 +12,7 @@ import java.util.Random;
 
 public class TestQueryContext extends QueryContext {
     private final HashMap<String, String> variables;
-    private static final String STRING_KEY = "singleString";
-    private static final String EXPR_KEY = "expr";
     private final Random random;
-    private int seed = 0;
     public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, String file, Random random, String expected) throws IOException {
         super(dataset, imports, code, file);
         this.random = random;
@@ -48,9 +45,9 @@ public class TestQueryContext extends QueryContext {
         for(int i = 0; i < paragraph.length(); i++) {
             JSONObject paragraph_element = paragraph.getJSONObject(i);
             if(paragraph_element.getString("type").equals("string")) {
-                text.append(paragraph.getJSONObject(i).getString(STRING_KEY));
+                text.append(paragraph.getJSONObject(i).getString("value"));
             } else {
-                text.append(paragraph.getJSONObject(i).getString(EXPR_KEY));
+                text.append(paragraph.getJSONObject(i).getString("expr"));
             }
         }
         String expected = testCase.getString("expected");
@@ -99,11 +96,6 @@ public class TestQueryContext extends QueryContext {
             expected = expected.replace(variablePlaceholder, replacement);
 
         }
-
         return new Pair<>(code, expected);
-    }
-
-    private void validateExpectedValue() {
-
     }
 }

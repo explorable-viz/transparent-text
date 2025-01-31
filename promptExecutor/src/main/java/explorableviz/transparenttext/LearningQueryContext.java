@@ -1,6 +1,5 @@
 package explorableviz.transparenttext;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
 

@@ -79,10 +79,6 @@ public class QueryContext {
         return paragraph;
     }
 
-    public void setFile(String file) {
-        this.paragraph = file;
-    }
-
     public void loadFiles() throws IOException {
         for(Map.Entry<String, String> dataset : this.dataset.entrySet()) {
             String path = "fluid/" + dataset.getValue();
@@ -125,8 +121,6 @@ public class QueryContext {
      * @return null
      */
     public Optional<String> validate() {
-
-        //String text = this.getParagraph();
 
         try {
             writeFluidFile(this.response);
