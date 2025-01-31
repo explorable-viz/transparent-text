@@ -209,3 +209,52 @@ Specifically, we investigate the following research question.
 \begin{itemize}
     \item \href{https://ieeexplore.ieee.org/document/10684656}{On the Effectiveness of Large Language Models in Statement-level Code Summarization.} They analysed (among other things) the effectiveness of the temperature parameter for the generation of comments, but in my opinion not in depth.
 \end{itemize}
+
+\subsection{Draft results}
+
+Table \ref{tab:result0} presents the results obtained from tests that varied the size of the in-context learning dataset, as well as key parameters such as temperature and context window.
+Table \ref{tab:result_shuffled} displays the results from experiments where all parameters remained fixed, with the only variation being the order of examples within the in-context learning dataset.
+
+\begin{table}[!ht]
+    \centering
+    \small
+    \label{tab:result0}
+    \begin{tabular}{|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{1.5cm}|p{2cm}|}
+        \hline
+        \textbf{Size Examples} & \textbf{Temperature} & \textbf{Context} & \textbf{Model} & \textbf{Accuracy measure} & \textbf{\#Test Set} & \textbf{Techincal Detail} \\ \hline
+        20 & 0.4 & 8192 & llama3.1:7b & 0.6 & 10 & ~ \\ \hline
+        20 & 0.4 & 4096 & llama3.1:7b & 0.6 & 10 & ~ \\ \hline
+        20 & 0.4 & 2048 & llama3.1:7b & 0.3 & 10 & ~ \\ \hline
+        20 & 0.5 & 4096 & llama3.1:7b & 0.5 & 10 & ~ \\ \hline
+        20 & 0.3 & 4096 & llama3.1:7b & 0.6 & 10 & ~ \\ \hline
+        20 & 0.1 & 4096 & llama3.1:7b & 0.6 & 10 & ~ \\ \hline
+        20 & 0.1 & 8192 & llama3.1:7b & 0.6 & 10 & ~ \\ \hline
+        20 & 0.4 & 2048 & llama3.1:7b & 0.6 & 10 & Tag addition [stat\_replace] \\ \hline
+        20 & 0.3 & 2048 & llama3.1:7b & 0.6 & 10 & ~ \\ \hline
+        20 & 0.3 & 4096 & llama3.1:7b & 0.8 & 10 & ~ \\ \hline
+        20 & 0.3 & 8192 & llama3.1:7b & 0.8 & 10 & ~ \\ \hline
+        20 & 0.3 & 8192 & llama3.1:7b & 0.8 & 10 & JSON Input \\ \hline
+        20 & 0.2 & 16384 & gpt-4o & 0.63 & 30 & ~ \\ \hline
+        20 & 0.2 & 16384 & llama3.1:7b & 0.56 & 30 & ~ \\ \hline
+        20 & 0.2 & 32768 & llama3.1:7b & 0.56 & 30 & ~ \\ \hline
+        25 & 0.3 & 16000 & llama3.1:7b & 0.1 & 10 & No System prompt \\ \hline
+        25 & 0.3 & 8000 & gpt-4o & 0.9 & 10 & With System Prompt \\ \hline
+        25 & 0.3 & 8000 & llama3.1:7b & 0.8 & 10 & ~ \\ \hline
+    \end{tabular}
+\end{table}
+
+
+\begin{table}[!ht]
+    \centering
+    \small
+    \label{tab:result_shuffled}
+    \begin{tabular}{|l|l|l|l|l|l|}
+        \hline
+        \textbf{Size} & \textbf{Temperature} & \textbf{Context} & \textbf{Model} & \textbf{Accuracy measure} & \textbf{\#Test Set} \\ \hline
+        20 \#shuffled0 & 0.2 & 8192 & llama3.1:7b & 0.53 & 30 \\ \hline
+        20 \#shuffled1 & 0.2 & 8192 & llama3.1:7b & 0.53 & 30 \\ \hline
+        20 \#shuffled3 & 0.2 & 8192 & llama3.1:7b & 0.63 & 30 \\ \hline
+        20 \#shuffled4 & 0.2 & 8192 & llama3.1:7b & 0.6 & 30 \\ \hline
+        20 \#shuffled5 & 0.2 & 8192 & llama3.1:7b & 0.56 & 30 \\ \hline
+    \end{tabular}
+\end{table}
