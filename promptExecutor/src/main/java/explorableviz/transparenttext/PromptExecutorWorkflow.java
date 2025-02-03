@@ -62,7 +62,6 @@ public class PromptExecutorWorkflow {
         if (response.get() == null) {
             logger.warning("Validation failed after " + limit + " attempts");
         }
-        //@todo EditorLoop #61
         return response.get();
     }
 
