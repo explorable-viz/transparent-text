@@ -17,7 +17,8 @@
     "ollama-install": "./script/ollama-install.sh",
     "ollama-serve": "./script/ollama-serve.sh",
     "ollama-run": "./script/ollama-steps.sh",
-    "test": "./script/prompt-executor.sh it.unisa.cluelab.lllm.llm.agents.Gpt4oEvaluationAgent input/system-prompt.json input/settings.json testCases 0 3 1 true",
+    "test": "./script/prompt-executor.sh it.unisa.cluelab.lllm.llm.agents.Llama31EvaluatorAgent input/system-prompt.json input/settings.json testCases 0 3 1 true",
+    "test-gpt4o": "./script/prompt-executor.sh it.unisa.cluelab.lllm.llm.agents.Llama31EvaluatorAgent input/system-prompt.json input/settings.json testCases 0 3 1 true",
     "test-mock": "./script/prompt-executor.sh explorableviz.transparenttext.llm.LLMDummyAgent input/system-prompt.json input/settings.json testCases 0 3 1 true"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
