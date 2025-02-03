@@ -15,9 +15,13 @@ public class PromptExecutorWorkflow {
     private final QueryContext query;
     private final LLMEvaluatorAgent llm;
 
-    public PromptExecutorWorkflow(LearningQueryContext learningQueryContext, QueryContext query, String agentClassName) throws Exception {
+    public PromptExecutorWorkflow(LearningQueryContext learningQueryContext, QueryContext query, String agentClassName, PromptList prevKnowledge) throws Exception {
         this.query = query;
-        this.prompts = learningQueryContext.generateInContextLearningJSON();
+        if(prevKnowledge == null) {
+            this.prompts = learningQueryContext.generateInContextLearningJSON();
+        } else {
+            this.prompts = prevKnowledge;
+        }
         llm = initialiseAgent(agentClassName);
     }
 
@@ -37,6 +41,7 @@ public class PromptExecutorWorkflow {
         // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
         prompts.addPrompt(PromptList.USER, query.toString());
+        logger.info("In Learning Context Dataset Size = " + prompts.size());
         for (int attempts = 0; response.get() == null && attempts <= limit; attempts++) {
             logger.info("Attempt #" + attempts);
             // Send the query to the LLM to be processed
@@ -57,7 +62,12 @@ public class PromptExecutorWorkflow {
         if (response.get() == null) {
             logger.warning("Validation failed after " + limit + " attempts");
         }
+        //@todo EditorLoop #61
         return response.get();
+    }
+
+    public PromptList getPrompts() {
+        return prompts;
     }
 
     /**

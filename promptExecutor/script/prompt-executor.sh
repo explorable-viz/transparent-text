@@ -56,7 +56,7 @@ settings=$3
 threshold=${5:-}
 max_testCases=${6:-}
 numTestToGenerate=${7:-}
-
+editorLoopEnabled=${8:-}
 if [ -z "$threshold" ]; then
     threshold=0.7
 fi
@@ -66,7 +66,7 @@ base_command="java --enable-preview -jar target/PromptExecutor-0.1-jar-with-depe
 command="$base_command inContextLearningPath=$prompt_configuration settingsPath=$settings testPath=$testCases"
 
 if [ -n "$numTestToGenerate" ]; then
-    command="$command numQueryToExecute=$max_testCases numTestToGenerate=$numTestToGenerate"
+    command="$command numQueryToExecute=$max_testCases numTestToGenerate=$numTestToGenerate editorLoopEnabled=$editorLoopEnabled"
 fi
 
 output=$(eval "$command")

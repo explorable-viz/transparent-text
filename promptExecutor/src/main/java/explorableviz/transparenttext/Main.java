@@ -1,5 +1,6 @@
 package explorableviz.transparenttext;
 
+import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -30,6 +31,7 @@ public class Main {
         final String settingsPath = arguments.get("settingsPath");
         final String testPath = arguments.get("testPath");
         final int numTestToGenerate = Integer.parseInt(arguments.get("numTestToGenerate"));
+        final boolean editorLoopEnabled = Boolean.parseBoolean(arguments.get("editorLoopEnabled"));
         final ArrayList<QueryContext> queryContexts;
         final LearningQueryContext learningQueryContext;
         final Optional<Integer> numQueryToExecute = Optional.of(Integer.parseInt(arguments.get("numQueryToExecute")));
@@ -44,13 +46,16 @@ public class Main {
             /*
              * Workflow execution
              */
-
+            PromptList previousKnowledge = null;
             for (int i = 0; i < queryLimit; i++) {
                 QueryContext queryContext = queryContexts.get(i);
                 logger.info(STR."Analysing query id=\{i}");
-
-                PromptExecutorWorkflow workflow = new PromptExecutorWorkflow(learningQueryContext, queryContext, agent);
-                results.add(workflow.execute());
+                PromptExecutorWorkflow workflow = new PromptExecutorWorkflow(learningQueryContext, queryContext, agent, previousKnowledge);
+                String result = workflow.execute();
+                if(editorLoopEnabled && result != null && !result.isEmpty()) {
+                    previousKnowledge = workflow.getPrompts();
+                }
+                results.add(result);
             }
             logger.info("Printing generated expression");
             for (String result : results) {
