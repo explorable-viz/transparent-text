@@ -1,11 +1,18 @@
 {
   "variables": {},
-  "datasets": [{
-    "var": "tableData",
-    "file": "dataset/test-dataset"
-  }],
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "dataset/test-dataset"
+    }
+  ],
   "imports": [],
   "expected": "likelihoodMap(findLikelihood(stressedScenario.low81100, stressedScenario.high81100) 0.6)",
   "code": "let modelProbs = [\n     { model: \"SSP1-1.9\", probability: 0.92 }\n];\nlet newDataTable offset = map (fun s -> { scenario: s.scenario, bE2140: s.bestEst2140 + offset, low2140: s.low2140, high2140: s.high2140, bE4160: s.bestEst4160, low4160: s.low4160, high4160: s.high4160, bE81100: s.bestEst81100, low81100: s.low81100, high81100: s.high81100}) tableData;\nlet newModel offset = map (fun s -> { model: s.model, probability: s.probability + offset}) modelProbs;\n\nlet getByScenario scenario data =\n   let helper [] = [];\n      helper (x: xs) =\n            if x.scenario == scenario\n            then x\n            else helper xs\n   in helper data;\nlet likelihoods = [\n    { prob: 0.99, msg: \"virtually certain\" },\n    { prob: 0.9, msg: \"very likely\"},\n    { prob: 0.66, msg: \"likely\"},\n    { prob: 0.33, msg: \"about as likely as not\"},\n    { prob: 0.1, msg: \"unlikely\"},\n    { prob: 0.01, msg: \"very unlikely\"},\n    { prob: 0.0, msg: \"exceptionally unlikely\"}\n];let likelihoodMap prob =\n    let go (x:xs) =\n        if x.prob < prob\n        then x.msg\n        else go xs;\n        go [] = \"not found\"\n    in go likelihoods;\n\nlet findLikelihood (min, max) target =\n    if target > max\n    then 0.0\n    else if target < min\n    then 1.0\n    else (target - min)/(max - min);\nlet dataSet = newDataTable 16;\n    analysisModel = newModel 0.50;\n    stressedScenario = getByScenario \"SSP3-7.0\" dataSet;\n    highEmissionScenario = getByScenario \"SSP5-8.5\" dataSet",
-  "text": "In the SSP3-7.0 framework, there's a [REPLACE value=\"virtually certain\"] chance of temperatures surpassing 2°C. Meanwhile, the high-emission SSP5-8.5 scenario significantly elevates the risk of exceeding this critical temperature threshold."
+  "paragraph": [
+    {
+      "type": "string",
+      "value": "In the SSP3-7.0 framework, there's a [REPLACE value=\"virtually certain\"] chance of temperatures surpassing 2°C. Meanwhile, the high-emission SSP5-8.5 scenario significantly elevates the risk of exceeding this critical temperature threshold."
+    }
+  ]
 }
