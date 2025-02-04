@@ -1,5 +1,8 @@
 package explorableviz.transparenttext;
 
+import explorableviz.transparenttext.textfragment.Expression;
+import explorableviz.transparenttext.textfragment.TextFragment;
+import explorableviz.transparenttext.textfragment.Literal;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -15,6 +18,7 @@ import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class QueryContext {
 
@@ -34,13 +38,13 @@ public class QueryContext {
     }
 
     private String code;
-    private String paragraph;
+    private ArrayList<TextFragment> paragraph;
 
     private String expected;
 
     private String response;
 
-    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, String paragraph) throws IOException {
+    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph) throws IOException {
         this.dataset = dataset;
         this.imports = imports;
         this.paragraph = paragraph;
@@ -50,8 +54,8 @@ public class QueryContext {
         loadFiles();
     }
 
-    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, String file, String expected) throws IOException {
-        this(dataset,imports,code,file);
+    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph, String expected) throws IOException {
+        this(dataset,imports,code, paragraph);
         this.expected = expected;
     }
 
@@ -75,7 +79,7 @@ public class QueryContext {
         this.imports = imports;
     }
 
-    public String getParagraph() {
+    public ArrayList<TextFragment> getParagraph() {
         return paragraph;
     }
 
@@ -95,10 +99,17 @@ public class QueryContext {
         object.put("loadedDatasets", this._loadedDatasets);
         object.put("loadedImports", this._loadedImports);
         object.put("code", this.code);
-        object.put("paragraph", this.paragraph);
+        object.put("paragraph", paragraphToString());
         return object.toString();
     }
 
+    public String paragraphToString() {
+        return paragraph.stream().map(e -> {
+            if(e instanceof Literal) return e.getValue();
+            if(e instanceof Expression) return ((Expression) e).getExpr();
+            throw new RuntimeException("Error, it is possible to have only String or Expression element");
+        }).collect(Collectors.joining());
+    }
     public String getExpected() {
         return expected;
     }
@@ -154,7 +165,7 @@ public class QueryContext {
             logger.info("Command output: " + output);
             logger.info("Error output (if any): " + errorOutput);
             //Output validation
-            return validateOutput(output, this.getParagraph());
+            return validateOutput(output);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during validation", e);
         } catch (Exception e) {
@@ -166,11 +177,10 @@ public class QueryContext {
      * Checks the validity of the given output against a specific pattern within a provided string.
      *
      * @param output the output to be validated
-     * @param text   the string containing the pattern to match against the output
      * @return true if the output matches the pattern, false otherwise
      */
 
-    private Optional<String> validateOutput(String output, String text) throws Exception {
+    private Optional<String> validateOutput(String output) throws Exception {
         logger.info("Validating output: " + output);
 
         //Extract value from input query.text
@@ -178,6 +188,8 @@ public class QueryContext {
         //Return: SSP5-8.5
         String regex = "value=\\\"(.*?)\\\"";
         Pattern pattern = Pattern.compile(regex);
+        String text = paragraphToString();
+
         Matcher matcher = pattern.matcher(text);
 
         if (!matcher.find()) {

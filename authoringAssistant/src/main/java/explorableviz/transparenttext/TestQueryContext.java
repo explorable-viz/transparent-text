@@ -1,5 +1,8 @@
 package explorableviz.transparenttext;
 
+import explorableviz.transparenttext.textfragment.Expression;
+import explorableviz.transparenttext.textfragment.TextFragment;
+import explorableviz.transparenttext.textfragment.Literal;
 import kotlin.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +16,8 @@ import java.util.Random;
 public class TestQueryContext extends QueryContext {
     private final HashMap<String, String> variables;
     private final Random random;
-    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, String file, Random random, String expected) throws IOException {
+
+    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, ArrayList<TextFragment> file, Random random, String expected) throws IOException {
         super(dataset, imports, code, file);
         this.random = random;
         this.variables = variables;
@@ -22,11 +26,11 @@ public class TestQueryContext extends QueryContext {
 
     public ArrayList<QueryContext> instantiate(int number) throws IOException {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
-        for(int i = 0; i < number; i++) {
+        for (int i = 0; i < number; i++) {
             Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
             QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getParagraph(), replacedVariables.getSecond());
             queryContext.setResponse(queryContext.getExpected());
-            if(queryContext.validate().isEmpty()) {
+            if (queryContext.validate().isEmpty()) {
                 queryContexts.add(queryContext);
             } else {
                 throw new RuntimeException("Invalid test exception");
@@ -40,14 +44,21 @@ public class TestQueryContext extends QueryContext {
         JSONObject json_variables = testCase.getJSONObject("variables");
         JSONArray json_imports = testCase.getJSONArray("imports");
         String code = testCase.getString("code");
-        JSONArray paragraph = testCase.getJSONArray("paragraph");
-        StringBuilder text = new StringBuilder();
-        for(int i = 0; i < paragraph.length(); i++) {
-            JSONObject paragraph_element = paragraph.getJSONObject(i);
-            if(paragraph_element.getString("type").equals("string")) {
-                text.append(paragraph.getJSONObject(i).getString("value"));
-            } else {
-                text.append(paragraph.getJSONObject(i).getString("expr"));
+        JSONArray json_paragraph = testCase.getJSONArray("paragraph");
+        ArrayList<TextFragment> paragraph = new ArrayList<>();
+
+        for (int i = 0; i < json_paragraph.length(); i++) {
+            JSONObject paragraph_element = json_paragraph.getJSONObject(i);
+            String type = paragraph_element.getString("type");
+            switch (type) {
+                case "literal":
+                    paragraph.add(new Literal(paragraph_element.getString("value")));
+                    break;
+                case "expression":
+                    paragraph.add(new Expression(json_paragraph.getJSONObject(i).getString("expression")));
+                    break;
+                default:
+                    throw new RuntimeException((STR."\{paragraph_element.getString("type")} type is invalid"));
             }
         }
         String expected = testCase.getString("expected");
@@ -59,14 +70,14 @@ public class TestQueryContext extends QueryContext {
         for (String key : json_variables.keySet()) {
             variables.put(key, json_variables.getString(key));
         }
-        for(int i = 0; i < json_datasets.length(); i++) {
+        for (int i = 0; i < json_datasets.length(); i++) {
             datasets.put(json_datasets.getJSONObject(i).getString("var"), json_datasets.getJSONObject(i).getString("file"));
         }
-        for(int i = 0; i < json_imports.length(); i++) {
+        for (int i = 0; i < json_imports.length(); i++) {
             imports.add(json_imports.getString(i));
         }
 
-        return new TestQueryContext(datasets, imports, variables, code, text.toString(), random, expected);
+        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected);
     }
 
     private static String getRandomString(int length, Random generator) {
@@ -79,7 +90,7 @@ public class TestQueryContext extends QueryContext {
         return sb.toString();
     }
 
-    private Pair<String,String> replaceVariables(String code, String expected) {
+    private Pair<String, String> replaceVariables(String code, String expected) {
 
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             String key = entry.getKey();
