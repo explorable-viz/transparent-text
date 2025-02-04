@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD:authoringAssistant/website/Ar6Wg1SPM/TableSPM1.json
     "fluidSrcPath": ["../fluid"],
+=======
+    "fluidSrcPaths": ["../fluid"],
+>>>>>>> main:promptExecutor/website/Ar6Wg1SPM/TableSPM1.json
     "datasets": [["tableData", "example/text-viz/explainable-table"], ["likelihoods", "example/text-viz/likelihoods"]],
     "imports": [ "lib/text-viz" ],
     "file": "example/text-viz/table-spm-1",
