@@ -29,11 +29,11 @@ jobs:
       if: runner.os == 'Linux'
     - name: run-test
       run: |
-        cd promptExecutor
+        cd authoringAssistant
         yarn install
         set -x -e
         yarn fluid publish -w Ar6Wg1SPM -l
-        export PUPPETEER_CACHE_DIR=$GITHUB_WORKSPACE/promptExecutor/
+        export PUPPETEER_CACHE_DIR=$GITHUB_WORKSPACE/authoringAssistant/
         # requires Puppeteer to be installed at same version as used in Fluid
         yarn puppeteer browsers install chrome
         yarn puppeteer browsers install firefox
@@ -48,7 +48,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: build
         run: |
-          cd promptExecutor
+          cd authoringAssistant
           yarn install
           set -x -e
           yarn fluid publish -w Ar6Wg1SPM -l
@@ -56,5 +56,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: promptExecutor/dist/ar6-wg1-spm
+          publish_dir: authoringAssistant/dist/ar6-wg1-spm
           keep_files: false
