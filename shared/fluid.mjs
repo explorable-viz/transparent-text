@@ -222,6 +222,15 @@ var applyMaybe = {
   },
   Functor0: () => functorMaybe
 };
+var altMaybe = {
+  alt: (v) => (v1) => {
+    if (v.tag === "Nothing") {
+      return v1;
+    }
+    return v;
+  },
+  Functor0: () => functorMaybe
+};
 
 // output-es/Data.Either/index.js
 var $Either = (tag, _1) => ({ tag, _1 });
@@ -10153,7 +10162,7 @@ var dataTypes = /* @__PURE__ */ foldrArray(Cons)(Nil)([
   /* @__PURE__ */ dataType("View")([
     /* @__PURE__ */ $Tuple("BarChart", 1),
     /* @__PURE__ */ $Tuple("LineChart", 1),
-    /* @__PURE__ */ $Tuple("LinkedText", 1),
+    /* @__PURE__ */ $Tuple("Paragraph", 1),
     /* @__PURE__ */ $Tuple("MultiView", 1),
     /* @__PURE__ */ $Tuple("ScatterPlot", 1)
   ]),
@@ -10166,12 +10175,12 @@ var dataTypes = /* @__PURE__ */ foldrArray(Cons)(Nil)([
     /* @__PURE__ */ $Tuple("Polyline", 3),
     /* @__PURE__ */ $Tuple("Polymarkers", 2),
     /* @__PURE__ */ $Tuple("Rect", 5),
-    /* @__PURE__ */ $Tuple("Text", 5),
+    /* @__PURE__ */ $Tuple("String", 5),
     /* @__PURE__ */ $Tuple("Viewport", 9)
   ]),
   /* @__PURE__ */ dataType("Transform")([/* @__PURE__ */ $Tuple("Scale", 2), /* @__PURE__ */ $Tuple("Translate", 2)]),
   /* @__PURE__ */ dataType("Marker")([/* @__PURE__ */ $Tuple("Arrowhead", 0)]),
-  /* @__PURE__ */ dataType("Explanation")([/* @__PURE__ */ $Tuple("Explained", 2)])
+  /* @__PURE__ */ dataType("TextFragment")([/* @__PURE__ */ $Tuple("Text", 1), /* @__PURE__ */ $Tuple("Link", 2)])
 ]);
 var ctrToDataType = /* @__PURE__ */ (() => fromFoldable2(foldableList)(bindList.bind(listMap((d) => listMap((v) => $Tuple(
   v,
@@ -24822,7 +24831,7 @@ var parse = (dictMonadError) => {
     };
   };
 };
-var parseProgram = (loadFile2) => (folder) => (file) => (dictMonadAff) => (dictMonadError) => dictMonadAff.MonadEffect0().Monad0().Bind1().bind(loadFile2(folder)(file)(dictMonadAff)(dictMonadError))((() => {
+var parseProgram = (loadFile2) => (folders) => (file) => (dictMonadAff) => (dictMonadError) => dictMonadAff.MonadEffect0().Monad0().Bind1().bind(loadFile2(folders)(file)(dictMonadAff)(dictMonadError))((() => {
   const $0 = parse(dictMonadError);
   return (a) => $0(a)(topLevel(expr_));
 })());
@@ -24833,9 +24842,9 @@ var module_2 = (dictMonadAff) => {
   return (dictMonadError) => {
     const parse1 = parse(dictMonadError);
     const desugarModuleFwd = moduleFwd(dictMonadError)(boundedLattice2);
-    return (loadFile2) => (folder) => (file) => (v) => {
+    return (loadFile2) => (folders) => (file) => (v) => {
       const $0 = v.mods;
-      return Bind1.bind(Applicative0.pure())(() => Bind1.bind(loadFile2(folder)(file)(dictMonadAff)(dictMonadError))((src) => Bind1.bind(Bind1.bind(parse1(src)(module_))(desugarModuleFwd))((mod) => Applicative0.pure({
+      return Bind1.bind(Applicative0.pure())(() => Bind1.bind(loadFile2(folders)(file)(dictMonadAff)(dictMonadError))((src) => Bind1.bind(Bind1.bind(parse1(src)(module_))(desugarModuleFwd))((mod) => Applicative0.pure({
         primitives: v.primitives,
         mods: $List("Cons", mod, $0),
         datasets: v.datasets
@@ -24873,7 +24882,7 @@ var prepConfig = (dictMonadAff) => {
   return (dictMonadError) => {
     const desug1 = exprFwd(boundedLattice2)(dictMonadError)(joinSemilatticeUnit);
     const initialConfig1 = initialConfig(dictMonadError)(fVExpr);
-    return (v) => (file) => (progCxt) => $0.bind(parseProgram(v.loadFile)(v.fluidSrcPath)(file)(dictMonadAff)(dictMonadError))((s) => $0.bind(desug1(s))((e) => $0.bind(initialConfig1(e)(progCxt))((gconfig) => Monad0.Applicative0().pure({
+    return (v) => (file) => (progCxt) => $0.bind(parseProgram(v.loadFile)(v.fluidSrcPaths)(file)(dictMonadAff)(dictMonadError))((s) => $0.bind(desug1(s))((e) => $0.bind(initialConfig1(e)(progCxt))((gconfig) => Monad0.Applicative0().pure({
       s,
       e,
       gconfig
@@ -24885,10 +24894,10 @@ var datasetAs = (dictMonadAff) => {
   const $0 = Monad0.Bind1();
   return (dictMonadError) => {
     const desug1 = exprFwd(boundedLattice2)(dictMonadError)(joinSemilatticeUnit);
-    return (loadFile2) => (folder) => (v) => (v1) => {
+    return (loadFile2) => (folders) => (v) => (v1) => {
       const $1 = v1.datasets;
       const $2 = v._1;
-      return $0.bind($0.bind(parseProgram(loadFile2)(folder)(v._2)(dictMonadAff)(dictMonadError))(desug1))((e\u03B1) => Monad0.Applicative0().pure({
+      return $0.bind($0.bind(parseProgram(loadFile2)(folders)(v._2)(dictMonadAff)(dictMonadError))(desug1))((e\u03B1) => Monad0.Applicative0().pure({
         primitives: v1.primitives,
         mods: v1.mods,
         datasets: $List("Cons", $Tuple($2, e\u03B1), $1)
@@ -24909,8 +24918,8 @@ var loadProgCxt = (dictMonadAff) => {
       primitives,
       mods: Nil,
       datasets: Nil
-    }))(concatM1(arrayMap(module_22(v.loadFile)(v.fluidSrcPath))(["lib/prelude", ...mods]))))(concatM1(arrayMap((() => {
-      const $1 = datasetAs2(v.loadFile)(v.fluidSrcPath);
+    }))(concatM1(arrayMap(module_22(v.loadFile)(v.fluidSrcPaths))(["lib/prelude", ...mods]))))(concatM1(arrayMap((() => {
+      const $1 = datasetAs2(v.loadFile)(v.fluidSrcPaths);
       return (x) => $1($Tuple(x._1, x._2));
     })())(datasets)));
   };
@@ -25051,8 +25060,19 @@ var readTextFile = (encoding) => (file) => (cb) => {
   };
   return () => readFile(file, $0, handleCallback(cb));
 };
+var stat2 = (file) => (cb) => () => stat(file, handleCallback(cb));
 
 // output-es/Node.FS.Aff/index.js
+var toAff1 = (f) => (a) => {
+  const $0 = f(a);
+  return makeAff((k) => {
+    const $1 = $0(k);
+    return () => {
+      $1();
+      return nonCanceler;
+    };
+  });
+};
 var toAff2 = (f) => (a) => (b) => {
   const $0 = f(a)(b);
   return makeAff((k) => {
@@ -25064,23 +25084,48 @@ var toAff2 = (f) => (a) => (b) => {
   });
 };
 
+// output-es/Foreign/foreign.js
+var isArray = Array.isArray || function(value) {
+  return Object.prototype.toString.call(value) === "[object Array]";
+};
+
+// output-es/Node.FS.Stats/foreign.js
+var isFileImpl = (s) => s.isFile();
+
 // output-es/Module.Node/index.js
-var loadFile = (v) => (v1) => (dictMonadAff) => {
+var findM = (dictMonad) => {
+  const $0 = dictMonad.Bind1().Apply0();
+  return (dictFoldable) => (xs) => (f) => (base) => dictFoldable.foldr((x) => (acc) => $0.apply($0.Functor0().map(altMaybe.alt)(acc))(f(x)))(dictMonad.Applicative0().pure(base))(xs);
+};
+var loadFile = (folders) => (v) => (dictMonadAff) => {
   const Monad0 = dictMonadAff.MonadEffect0().Monad0();
-  return (dictMonadError) => Monad0.Bind1().bind(dictMonadAff.liftAff(toAff2(readTextFile)(UTF8)(v + "/" + v1 + ".fld")))((buffer) => Monad0.Applicative0().pure(buffer));
+  const $0 = Monad0.Bind1();
+  const findM1 = findM(Monad0)(foldableArray);
+  return (dictMonadError) => $0.bind(findM1(arrayMap((() => {
+    const $1 = v + ".fld";
+    return (a) => a + "/" + $1;
+  })())(folders))((v1) => $0.bind(dictMonadAff.liftAff(toAff1(stat2)(v1)))((stats) => Monad0.Applicative0().pure(isFileImpl(stats) ? $Maybe("Just", v1) : Nothing)))(Nothing))((url) => {
+    if (url.tag === "Nothing") {
+      return throwException(error("File " + v + " not found."))();
+    }
+    if (url.tag === "Just") {
+      return dictMonadAff.liftAff(toAff2(readTextFile)(ASCII)(url._1));
+    }
+    fail();
+  });
 };
 var loadProgCxt2 = (dictMonadAff) => {
   const loadProgCxt1 = loadProgCxt(dictMonadAff);
   return (dictMonadError) => {
     const loadProgCxt22 = loadProgCxt1(dictMonadError);
-    return (fluidSrcPath) => loadProgCxt22({ loadFile, fluidSrcPath });
+    return (fluidSrcPaths) => loadProgCxt22({ loadFile, fluidSrcPaths });
   };
 };
 var prepConfig2 = (dictMonadAff) => {
   const prepConfig1 = prepConfig(dictMonadAff);
   return (dictMonadError) => {
     const prepConfig22 = prepConfig1(dictMonadError);
-    return (fluidSrcPath) => prepConfig22({ loadFile, fluidSrcPath });
+    return (fluidSrcPaths) => prepConfig22({ loadFile, fluidSrcPaths });
   };
 };
 
@@ -28399,7 +28444,8 @@ var parseImports = /* @__PURE__ */ $Parser(
 );
 var evaluate = (v) => {
   const $0 = v._1.fileName;
-  return _bind(loadProgCxt3("fluid")(v._1.imports)(v._1.datasets))((progCxt) => _bind(prepConfig3("fluid")($0)(progCxt))((v1) => _bind(graphEval2(v1.gconfig)(v1.e))((v2) => _pure($Val(
+  const fluidSrcPaths = ["fluid"];
+  return _bind(loadProgCxt3(fluidSrcPaths)(v._1.imports)(v._1.datasets))((progCxt) => _bind(prepConfig3(fluidSrcPaths)($0)(progCxt))((v1) => _bind(graphEval2(v1.gconfig)(v1.e))((v2) => _pure($Val(
     void 0,
     functorBaseVal.map((v$1) => {
     })(v2["out\u03B1"]._2)
@@ -28437,8 +28483,8 @@ var dispatchCommand = (v) => {
     return _bind(evaluate(v._1))((v1) => _liftEffect(log(intercalate4("\n")(removeDocWS(prettyVal(highlightableUnit).pretty(v1)).lines))));
   }
   if (v.tag === "Publish") {
-    return _bind(_map((v$1) => {
-    })(_liftEffect(publish(v._1)(v._2))))(() => _liftEffect(log("Published")));
+    return _map((v$1) => {
+    })(_liftEffect(publish(v._1)(v._2)));
   }
   fail();
 };
@@ -28447,7 +28493,8 @@ var callback = (v) => {
     return log(showErrorImpl(v._1));
   }
   if (v.tag === "Right") {
-    return log("Success");
+    return () => {
+    };
   }
   fail();
 };
