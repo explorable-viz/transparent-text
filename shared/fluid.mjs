@@ -28444,7 +28444,7 @@ var parseImports = /* @__PURE__ */ $Parser(
 );
 var evaluate = (v) => {
   const $0 = v._1.fileName;
-  const fluidSrcPaths = ["fluid"];
+  const fluidSrcPaths = ["fluid", ...v._1.library ? ["node_modules/@explorable-viz/fluid"] : []];
   return _bind(loadProgCxt3(fluidSrcPaths)(v._1.imports)(v._1.datasets))((progCxt) => _bind(prepConfig3(fluidSrcPaths)($0)(progCxt))((v1) => _bind(graphEval2(v1.gconfig)(v1.e))((v2) => _pure($Val(
     void 0,
     functorBaseVal.map((v$1) => {
@@ -28462,22 +28462,19 @@ var copyOptions = {
   encoding: Nothing,
   shell: Nothing
 };
-var publish = (website) => ($$package) => {
-  const cmd$p = "/script/bundle-website.sh -w " + website;
-  return exec2($$package ? "./node_modules/@explorable-viz/fluid" + cmd$p + " -r true" : "." + cmd$p)(copyOptions)((v) => {
-    if (v.error.tag === "Just") {
-      return log(showErrorImpl(v.error._1));
-    }
-    if (v.error.tag === "Nothing") {
-      const $0 = toString2(monadEffect)(ASCII)(v.stdout);
-      return () => {
-        const $1 = $0();
-        return log($1)();
-      };
-    }
-    fail();
-  });
-};
+var publish = (website) => (library) => exec2((library ? "./node_modules/@explorable-viz/fluid/script/bundle-website.sh -w " : "./script/bundle-website.sh -w ") + (library ? website + " -r" : website + ""))(copyOptions)((v) => {
+  if (v.error.tag === "Just") {
+    return log(showErrorImpl(v.error._1));
+  }
+  if (v.error.tag === "Nothing") {
+    const $0 = toString2(monadEffect)(ASCII)(v.stdout);
+    return () => {
+      const $1 = $0();
+      return log($1)();
+    };
+  }
+  fail();
+});
 var dispatchCommand = (v) => {
   if (v.tag === "Evaluate") {
     return _bind(evaluate(v._1))((v1) => _liftEffect(log(intercalate4("\n")(removeDocWS(prettyVal(highlightableUnit).pretty(v1)).lines))));
@@ -28547,7 +28544,29 @@ var program = /* @__PURE__ */ (() => $Parser(
     $Parser(
       "MultP",
       $MultPE(
-        parserFunctor.map((v) => (v1) => (v2) => $Program({ imports: v, datasets: v1, fileName: v2 }))(parserFunctor.map(fromFoldable29)(parseImports)),
+        $Parser(
+          "MultP",
+          $MultPE(
+            parserFunctor.map((v) => (v1) => (v2) => (v3) => $Program({ library: v, imports: v1, datasets: v2, fileName: v3 }))($Parser(
+              "AltP",
+              flag$p(true)((() => {
+                const $0 = help("Are you running fluid as a library?");
+                const $1 = $0._2._1.tag === "Nothing" ? Nothing : $0._2._1;
+                const $2 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
+                return $Mod(
+                  (x) => $0._1({
+                    flagNames: [$OptName("OptShort", "l"), $OptName("OptLong", "library"), ...x.flagNames],
+                    flagActive: x.flagActive
+                  }),
+                  $DefaultProp($1.tag === "Nothing" ? Nothing : $1, $2.tag === "Nothing" ? Nothing : $2),
+                  (x) => $0._3(x)
+                );
+              })()),
+              $Parser("NilP", false)
+            )),
+            parserFunctor.map(fromFoldable29)(parseImports)
+          )
+        ),
         parserFunctor.map(fromFoldable29)(parseDatasets)
       )
     ),
