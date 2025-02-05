@@ -29,8 +29,7 @@ public class TestQueryContext extends QueryContext {
         for (int i = 0; i < number; i++) {
             Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
             QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getParagraph(), replacedVariables.getSecond());
-            queryContext.setResponse(queryContext.getExpected());
-            if (queryContext.validate().isEmpty()) {
+            if (queryContext.validate(queryContext.getExpected()).isEmpty()) {
                 queryContexts.add(queryContext);
             } else {
                 throw new RuntimeException("Invalid test exception");
@@ -55,7 +54,7 @@ public class TestQueryContext extends QueryContext {
                     paragraph.add(new Literal(paragraph_element.getString("value")));
                     break;
                 case "expression":
-                    paragraph.add(new Expression(json_paragraph.getJSONObject(i).getString("expression")));
+                    paragraph.add(new Expression(json_paragraph.getJSONObject(i).getString("expression"), json_paragraph.getJSONObject(i).getString("value")));
                     break;
                 default:
                     throw new RuntimeException((STR."\{paragraph_element.getString("type")} type is invalid"));

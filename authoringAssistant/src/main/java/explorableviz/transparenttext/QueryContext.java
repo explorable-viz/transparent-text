@@ -29,6 +29,7 @@ public class QueryContext {
     private ArrayList<String> imports;
     private final ArrayList<String> _loadedImports;
 
+    private static final String valueReplaceRegex = "\\[REPLACE value=\\\"(.*?)\\\"]";
     public String getCode() {
         return code;
     }
@@ -42,8 +43,6 @@ public class QueryContext {
 
     private String expected;
 
-    private String response;
-
     public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph) throws IOException {
         this.dataset = dataset;
         this.imports = imports;
@@ -55,7 +54,7 @@ public class QueryContext {
     }
 
     public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph, String expected) throws IOException {
-        this(dataset,imports,code, paragraph);
+        this(dataset, imports, code, paragraph);
         this.expected = expected;
     }
 
@@ -84,32 +83,49 @@ public class QueryContext {
     }
 
     public void loadFiles() throws IOException {
-        for(Map.Entry<String, String> dataset : this.dataset.entrySet()) {
+        for (Map.Entry<String, String> dataset : this.dataset.entrySet()) {
             String path = "fluid/" + dataset.getValue();
             this._loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
-        for(String path : imports)  {
+        for (String path : imports) {
             path = "fluid/" + path;
             this._loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
     }
-    @Override
-    public String toString() {
+
+    public String toLLMQueryText() {
         JSONObject object = new JSONObject();
-        object.put("loadedDatasets", this._loadedDatasets);
-        object.put("loadedImports", this._loadedImports);
+        object.put("datasets", this._loadedDatasets);
+        object.put("imports", this._loadedImports);
         object.put("code", this.code);
         object.put("paragraph", paragraphToString());
         return object.toString();
     }
 
     public String paragraphToString() {
-        return paragraph.stream().map(e -> {
-            if(e instanceof Literal) return e.getValue();
-            if(e instanceof Expression) return ((Expression) e).getExpr();
+        return STR."Paragraph([\{paragraph.stream().map(e -> {
+            if (e instanceof Literal) return STR."\"\{e.getValue()}\"";
+            if (e instanceof Expression) return ((Expression) e).getExpr();
             throw new RuntimeException("Error, it is possible to have only String or Expression element");
-        }).collect(Collectors.joining());
+        }).collect(Collectors.joining(","))}])";
     }
+
+    public void addExpressionToParagraph(String expression) throws Exception {
+        String expectedValue = getExpectedValue();
+        for(int i = 0; i < paragraph.size(); i++) {
+            TextFragment textFragment = paragraph.get(i);
+            if (textFragment instanceof Literal) {
+                String[] parts = textFragment.getValue().split(valueReplaceRegex);
+                if(parts.length == 2) {
+                    paragraph.remove(textFragment);
+                    paragraph.add(i, new Literal(parts[0]));
+                    paragraph.add(i+1, new Expression(expression, expectedValue));
+                    paragraph.add(i+2, new Literal(parts[1]));
+                }
+            }
+        }
+    }
+
     public String getExpected() {
         return expected;
     }
@@ -118,23 +134,16 @@ public class QueryContext {
         this.expected = expected;
     }
 
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
-
     /**
      * Executes the validation task, generating a fluid program
      * and compiling it.
+     *
      * @return null
      */
-    public Optional<String> validate() {
+    public Optional<String> validate(String response) {
 
         try {
-            writeFluidFile(this.response);
+            writeFluidFile(response);
 
             //Generate the fluid program that will be processed and evaluated by the compiler
             String tempFile = Settings.getInstance().get(Settings.FLUID_TEMP_FILE);
@@ -184,20 +193,7 @@ public class QueryContext {
         logger.info("Validating output: " + output);
 
         //Extract value from input query.text
-        //The scenario [REPLACE value="SSP5-8.5"] framework foresees a considerable escalation in temperatures
-        //Return: SSP5-8.5
-        String regex = "value=\\\"(.*?)\\\"";
-        Pattern pattern = Pattern.compile(regex);
-        String text = paragraphToString();
-
-        Matcher matcher = pattern.matcher(text);
-
-        if (!matcher.find()) {
-            throw new Exception("No matching value found in text");
-        }
-
-        //expectedValue: SSP5-8.5
-        String expectedValue = matcher.group(1);
+        String expectedValue = getExpectedValue();
 
         // Extract and clean the generated expression
         String[] outputLines = output.split("\n");
@@ -205,7 +201,7 @@ public class QueryContext {
             throw new Exception("Output format is invalid");
         }
 
-        String value = outputLines[1].replaceAll("^\"|\"$", "");
+        String value = outputLines[2].replaceAll("^\"|\"$", "");
 
         if (value.equals(expectedValue)) {
             logger.info("Validation passed");
@@ -214,6 +210,18 @@ public class QueryContext {
             logger.info("Validation failed: generated=" + value + ", expected=" + expectedValue);
             return Optional.of(value);
         }
+    }
+
+    private String getExpectedValue() throws Exception {
+        //The scenario [REPLACE value="SSP5-8.5"] framework foresees a considerable escalation in temperatures
+        //Return: SSP5-8.5
+        Pattern valueReplacePattern = Pattern.compile(valueReplaceRegex);
+        Matcher valueReplaceMatcher = valueReplacePattern.matcher(paragraphToString());
+        if (!valueReplaceMatcher.find()) {
+            throw new Exception("No matching value found in text");
+        }
+        //expectedValue: SSP5-8.5
+        return valueReplaceMatcher.group(1);
     }
 
     /**

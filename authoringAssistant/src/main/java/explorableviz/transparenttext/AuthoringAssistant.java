@@ -1,5 +1,6 @@
 package explorableviz.transparenttext;
 
+import explorableviz.transparenttext.textfragment.Expression;
 import it.unisa.cluelab.lllm.llm.LLMEvaluatorAgent;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
@@ -36,17 +37,16 @@ public class AuthoringAssistant {
         int limit = Integer.parseInt(Settings.getInstance().get(Settings.LIMIT));
         // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
-        prompts.addPrompt(PromptList.USER, query.toString());
+        prompts.addPrompt(PromptList.USER, query.toLLMQueryText());
         for (int attempts = 0; response.get() == null && attempts <= limit; attempts++) {
             logger.info("Attempt #" + attempts);
             // Send the query to the LLM to be processed
             String candidateResponse = llm.evaluate(prompts, "");
             logger.info("Received response: " + candidateResponse);
 
-            prompts.addPrompt(PromptList.SYSTEM, candidateResponse);
-            query.setResponse(candidateResponse);
+            prompts.addPrompt(PromptList.ASSISTANT, candidateResponse);
             // Validate the response
-            query.validate().ifPresentOrElse(value -> {
+            query.validate(candidateResponse).ifPresentOrElse(value -> {
                 try {
                     prompts.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, value));
                 } catch (Exception e) {
@@ -56,7 +56,11 @@ public class AuthoringAssistant {
         }
         if (response.get() == null) {
             logger.warning("Validation failed after " + limit + " attempts");
+        } else {
+            query.addExpressionToParagraph(response.get());
+            logger.info(query.paragraphToString());
         }
+
         return response.get();
     }
 
