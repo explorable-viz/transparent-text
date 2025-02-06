@@ -32,5 +32,5 @@ install_java() {
 
 # Check if Java is installed
 if ! command -v java &> /dev/null; then
-    echo "pippo"
+    echo install_java
 fi
