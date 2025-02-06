@@ -12,16 +12,16 @@ import java.util.Random;
 
 public class LearningQueryContext  {
     private static final String LEARNING_CASE_PATH = "learningCases";
-    private String systemPrompt;
+    private final String systemPrompt;
 
-    private ArrayList<QueryContext> learningCasePaths;
+    private final ArrayList<QueryContext> learningCasePaths;
 
     public LearningQueryContext(String systemPrompt, ArrayList<QueryContext> learningCasePaths) {
         this.systemPrompt = systemPrompt;
         this.learningCasePaths = learningCasePaths;
     }
 
-    public static LearningQueryContext importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws IOException {
+    public static LearningQueryContext importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
         JSONObject jsonLearningCase = new JSONObject(new String(Files.readAllBytes(Path.of(jsonLearningCasePath))));
         String systemPrompt = jsonLearningCase.getString("system_prompt");
         ArrayList<QueryContext> learningCases = new ArrayList<>();
@@ -29,9 +29,7 @@ public class LearningQueryContext  {
 
         DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Path.of(LEARNING_CASE_PATH), Files::isRegularFile);
         for (Path filePath : directoryStream) {
-            String content = new String(Files.readAllBytes(filePath));
-            JSONObject jsonTestCase = new JSONObject(content);
-            TestQueryContext testQueryContext = TestQueryContext.importFromJson(jsonTestCase, random);
+            TestQueryContext testQueryContext = TestQueryContext.importFromJson(filePath, random);
             learningCases.addAll(testQueryContext.instantiate(numCasesToGenerate));
         }
 

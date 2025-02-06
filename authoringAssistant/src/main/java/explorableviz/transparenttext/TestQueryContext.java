@@ -8,37 +8,41 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
 public class TestQueryContext extends QueryContext {
     private final HashMap<String, String> variables;
     private final Random random;
+    private final String testCaseFileName;
 
-    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, ArrayList<TextFragment> file, Random random, String expected) throws IOException {
+    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, ArrayList<TextFragment> file, Random random, String expected, String testCaseFileName) throws IOException {
         super(dataset, imports, code, file);
         this.random = random;
         this.variables = variables;
         this.setExpected(expected);
+        this.testCaseFileName = testCaseFileName;
     }
 
-    public ArrayList<QueryContext> instantiate(int number) throws IOException {
+    public ArrayList<QueryContext> instantiate(int number) throws Exception {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         for (int i = 0; i < number; i++) {
             Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
             QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getParagraph(), replacedVariables.getSecond());
-            if (queryContext.validate(queryContext.getExpected()).isEmpty()) {
+            Optional<String> result = queryContext.validate(queryContext.evaluate(queryContext.getExpected()));
+            if (result.isEmpty()) {
                 queryContexts.add(queryContext);
             } else {
-                throw new RuntimeException("Invalid test exception");
+                throw new RuntimeException(STR."[testCaseFile=\{this.testCaseFileName}] Invalid test exception\{result}");
             }
         }
         return queryContexts;
     }
 
-    public static TestQueryContext importFromJson(JSONObject testCase, Random random) throws IOException {
+    public static TestQueryContext importFromJson(Path filePath, Random random) throws IOException {
+        String content = new String(Files.readAllBytes(filePath));
+        JSONObject testCase = new JSONObject(content);
         JSONArray json_datasets = testCase.getJSONArray("datasets");
         JSONObject json_variables = testCase.getJSONObject("variables");
         JSONArray json_imports = testCase.getJSONArray("imports");
@@ -76,7 +80,7 @@ public class TestQueryContext extends QueryContext {
             imports.add(json_imports.getString(i));
         }
 
-        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected);
+        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected, filePath.toAbsolutePath().toString());
     }
 
     private static String getRandomString(int length, Random generator) {
@@ -94,7 +98,7 @@ public class TestQueryContext extends QueryContext {
         for (Map.Entry<String, String> entry : variables.entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
-            String variablePlaceholder = "$" + key + "$";
+            String variablePlaceholder = STR."$\{key}$";
             String replacement = switch (value) {
                 case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
                 case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
