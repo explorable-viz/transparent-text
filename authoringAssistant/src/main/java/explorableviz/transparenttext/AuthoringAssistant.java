@@ -26,7 +26,7 @@ public class AuthoringAssistant {
         // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
         PromptList sessionPrompt = (PromptList) prompts.clone();
-        sessionPrompt.addPrompt(PromptList.USER, query.toLLMQueryText());
+        sessionPrompt.addPrompt(PromptList.USER, query.toUserPrompt());
         for (int attempts = 0; response.get() == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed

@@ -88,7 +88,7 @@ public class QueryContext {
         }
     }
 
-    public String toLLMQueryText() {
+    public String toUserPrompt() {
         JSONObject object = new JSONObject();
         object.put("datasets", this._loadedDatasets);
         object.put("imports", this._loadedImports);
