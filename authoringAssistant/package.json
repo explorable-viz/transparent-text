@@ -11,7 +11,7 @@
     "url": "https://github.com/explorable-viz/fluid/issues"
   },
   "scripts": {
-    "build-executor": "./script/build-executor.sh",
+    "build": "./script/build.sh",
     "pull-llama3": "./script/model-pull.sh llama3",
     "pull-llama3-1": "./script/ollama-model-pull.sh llama3.1",
     "ollama-install": "./script/ollama-install.sh",
