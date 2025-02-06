@@ -1,5 +1,5 @@
 {
-  "name": "@explorable-viz/prompt-executor",
+  "name": "@explorable-viz/authoring-assistant",
   "version": "0.1",
   "repository": {
     "type": "git",
@@ -11,7 +11,7 @@
     "url": "https://github.com/explorable-viz/fluid/issues"
   },
   "scripts": {
-    "build-executor": "./script/build-executor.sh",
+    "build": "./script/build.sh",
     "bundle": "yarn fluid publish -w Ar6Wg1SPM -l",
     "pull-llama3": "./script/model-pull.sh llama3",
     "pull-llama3-1": "./script/ollama-model-pull.sh llama3.1",
@@ -19,9 +19,9 @@
     "ollama-serve": "./script/ollama-serve.sh",
     "ollama-run": "./script/ollama-steps.sh",
     "serve": "npx http-serve dist/ar6-wg1-spm",
-    "test": "./script/authoring-assistant.sh it.unisa.cluelab.lllm.llm.agents.Llama31EvaluatorAgent input/system-prompt.json input/settings.json testCases 0 1 1",
-    "test-gpt4o": "./script/authoring-assistant.sh it.unisa.cluelab.lllm.llm.agents.Gpt4oEvaluationAgent input/system-prompt.json input/settings.json testCases 0 1 1",
-    "test-mock": "./script/authoring-assistant.sh explorableviz.transparenttext.llm.LLMDummyAgent input/system-prompt.json input/settings.json testCases 0 1 1"
+    "test": "./script/authoring-assistant.sh it.unisa.cluelab.lllm.llm.agents.Llama31EvaluatorAgent",
+    "test-gpt4o": "./script/authoring-assistant.sh it.unisa.cluelab.lllm.llm.agents.Gpt4oEvaluationAgent",
+    "test-mock": "./script/authoring-assistant.sh explorableviz.transparenttext.llm.LLMDummyAgent"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
   "dependencies": {
