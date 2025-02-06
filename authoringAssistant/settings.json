@@ -12,5 +12,5 @@
   "log-path": "logs/",
   "fluid-compiler-path": "./",
   "fluid-temp-file": "example/llmTest",
-  "agent-limit": "2"
+  "agent-limit": "10"
 }
