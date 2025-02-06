@@ -12,6 +12,6 @@
   "paragraph": [
     {
       "type": "literal",
-      "value" :"The scenario [REPLACE value=\"SSP3-7.0\"] outlines a more substantial risk, rendering the chance of exceeding the 2°C mark [REPLACE value=\"more likely than not\"]. Meanwhile, [SCEN_REPLACE value=\"SSP1-1.9\"] charts a different course, with a restrained [NUM_REPLACE value=\"1.4\"] rise, making such an exceedance [STAT_REPLACE value=\"very unlikely\"]."
+      "value" :"The scenario [REPLACE value=\"SSP3-7.0\"] outlines a more substantial risk, rendering the chance of exceeding the 2°C mark more likely than not. Meanwhile, SSP1-1.9 charts a different course, with a restrained 1.4 rise, making such an exceedance very unlikely."
     }]
 }
