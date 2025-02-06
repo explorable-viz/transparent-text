@@ -106,14 +106,14 @@ public class QueryContext {
     }
 
     public void addExpressionToParagraph(String expression) throws Exception {
-        HashMap<String,String> expectedValue = getSplitParagraph();
         for (int i = 0; i < paragraph.size(); i++) {
             TextFragment textFragment = paragraph.get(i);
             if (textFragment instanceof Literal && textFragment.getValue().contains("[REPLACE")) {
+                LiteralParts expectedValue = splitLiteral((Literal) textFragment);
                 paragraph.remove(textFragment);
-                paragraph.add(i, new Literal(expectedValue.get("prev_literal")));
-                paragraph.add(i + 1, new Expression(expression, expectedValue.get("tag_value")));
-                paragraph.add(i + 2, new Literal("next_literal"));
+                paragraph.add(i, expectedValue.beforeTag());
+                paragraph.add(i + 1, new Expression(expression, expectedValue.tag().getValue()));
+                paragraph.add(i + 2, expectedValue.afterTag());
             }
         }
     }
@@ -167,18 +167,18 @@ public class QueryContext {
 
     public Optional<String> validate(String output) throws Exception {
         logger.info(STR."Validating output: \{output}");
-
         //Extract value from input query.text
-        String expectedValue = getSplitParagraph().get("tag_value");
-
+        Optional<TextFragment> textFragment = paragraph.stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
+        if(textFragment.isEmpty()) {
+            throw new RuntimeException("REPLACE tag missing");
+        }
+        String expectedValue = splitLiteral((Literal) textFragment.get()).tag().getValue();
         // Extract and clean the generated expression
         String[] outputLines = output.split("\n");
         if (outputLines.length < 2) {
-            throw new Exception("Output format is invalid");
+            throw new RuntimeException("Output format is invalid");
         }
-
         String value = outputLines[1].replaceAll("^\"|\"$", "");
-
         if (value.equals(expectedValue)) {
             logger.info("Validation passed");
             return Optional.empty();
@@ -188,23 +188,14 @@ public class QueryContext {
         }
     }
 
-    private HashMap<String,String> getSplitParagraph() throws Exception {
-        //The scenario [REPLACE value="SSP5-8.5"] framework foresees a considerable escalation in temperatures
-        //Return: SSP5-8.5
-        final String valueReplaceRegex = "(.*)\\[REPLACE value=\"(.*?)\"](.*)";
-
-        HashMap<String,String> splitParagraph = new HashMap<>();
-        Pattern valueReplacePattern = Pattern.compile(valueReplaceRegex);
-        Matcher valueReplaceMatcher = valueReplacePattern.matcher(paragraphToString());
+    private LiteralParts splitLiteral(Literal literal) {
+        final String replaceRegex = "(.*)\\[REPLACE value=\"(.*?)\"](.*)";
+        Pattern valueReplacePattern = Pattern.compile(replaceRegex);
+        Matcher valueReplaceMatcher = valueReplacePattern.matcher(literal.getValue());
         if (!valueReplaceMatcher.find()) {
-            throw new Exception("No matching value found in text");
+            throw new RuntimeException("No matching value found in text");
         }
-        splitParagraph.put("prev_literal", valueReplaceMatcher.group(1));
-        splitParagraph.put("tag_value", valueReplaceMatcher.group(2));
-        splitParagraph.put("next_literal", valueReplaceMatcher.group(2));
-
-        //expectedValue: SSP5-8.5
-        return splitParagraph;
+        return new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3)));
     }
 
     private void writeFluidFile(String response, String path) throws FileNotFoundException {
