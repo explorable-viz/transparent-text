@@ -25,18 +25,19 @@ public class AuthoringAssistant {
         int limit = Settings.getInstance().getLimit();
         // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
-        prompts.addPrompt(PromptList.USER, query.toLLMQueryText());
+        PromptList sessionPrompt = (PromptList) prompts.clone();
+        sessionPrompt.addPrompt(PromptList.USER, query.toLLMQueryText());
         for (int attempts = 0; response.get() == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
             String candidateResponse = llm.evaluate(prompts, "");
             logger.info(STR."Received response: \{candidateResponse}");
 
-            prompts.addPrompt(PromptList.ASSISTANT, candidateResponse);
+            sessionPrompt.addPrompt(PromptList.ASSISTANT, candidateResponse);
             // Validate the response
             query.validate(query.evaluate(candidateResponse)).ifPresentOrElse(value -> {
                 try {
-                    prompts.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, value));
+                    sessionPrompt.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, value));
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
