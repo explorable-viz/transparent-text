@@ -24,9 +24,9 @@ jobs:
         with:
           distribution: 'temurin' # See 'Supported distributions' for available options
           java-version: '22'
-      - name: Install Java
+      - name: Install dependencies
         run: |
-          yarn install-java
+          yarn install-dependencies
       - name: Deploy LLM Tool
         run: |
           yarn build
