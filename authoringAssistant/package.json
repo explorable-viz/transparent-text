@@ -12,6 +12,7 @@
   },
   "scripts": {
     "build": "./script/build.sh",
+    "install-java": "./script/install-java.sh",
     "bundle": "yarn fluid publish -w Ar6Wg1SPM -l",
     "pull-llama3": "./script/model-pull.sh llama3",
     "pull-llama3-1": "./script/ollama-model-pull.sh llama3.1",

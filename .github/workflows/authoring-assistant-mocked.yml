@@ -6,7 +6,7 @@ on:
     paths:
       - authoringAssistant/**
 jobs:
-  prompt-test-mock:
+  test:
     strategy:
       matrix:
         os: [ ubuntu-22.04, macos-14 ]
@@ -19,10 +19,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '22'
+#      - uses: actions/setup-java@v4
+#        with:
+#          distribution: 'temurin' # See 'Supported distributions' for available options
+#          java-version: '22'
+      - name: Install Java
+        run: |
+          yarn install-java
       - name: Deploy LLM Tool
         run: |
           yarn build
