@@ -1,14 +1,32 @@
 #!/bin/bash
 set -xe
 
-# Function to install Java
-install_java() {
-    echo "Java is not installed. Installation attempt..."
+install_dependencies() {
+
     if [[ $OSTYPE == 'darwin'* ]]; then
+        JAVA_URL="https://download.java.net/java/GA/jdk22.0.2/c9ecb94cd31b495da20a27d4581645e8/9/GPL/openjdk-22.0.2_macos-aarch64_bin.tar.gz"
+        JAVA_TAR="openjdk-22.0.2_macos-aarch64_bin.tar.gz"
+        INSTALL_DIR="/Library/Java/JavaVirtualMachines"
+
+        # Download OpenJDK
+        curl -L -o "$JAVA_TAR" "$JAVA_URL"
+
+        # Extract and move to system location
+        mkdir -p "$INSTALL_DIR"
+        tar -xzf "$JAVA_TAR" -C "$INSTALL_DIR"
+        mv "$INSTALL_DIR"/jdk-22.0.2.jdk "$INSTALL_DIR"/openjdk.jdk
+
+        # Cleanup tar file
+        rm "$JAVA_TAR"
+
+        # Ensure JAVA_HOME is set correctly
+        export JAVA_HOME="$INSTALL_DIR/openjdk.jdk/Contents/Home"
+        echo "export JAVA_HOME=$JAVA_HOME" | tee -a /etc/profile
+        echo "export PATH=\$JAVA_HOME/bin:\$PATH" | tee -a /etc/profile
+        source /etc/profile
+
         brew update
-        brew install openjdk maven
-        # Symbolic link for macos.
-        sudo ln -sfn "$(brew --prefix openjdk)/libexec/openjdk.jdk" /Library/Java/JavaVirtualMachines/openjdk.jdk
+        brew install maven
     elif command -v apt &> /dev/null; then
         # Debian/Ubuntu based
         sudo apt update
@@ -27,4 +45,4 @@ install_java() {
     java --version
 }
 
-install_java
+install_dependencies
