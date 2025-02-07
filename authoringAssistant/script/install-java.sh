@@ -7,7 +7,7 @@ install_java() {
     if command -v apt &> /dev/null; then
         # Debian/Ubuntu based
         sudo apt update
-        sudo apt install -y default-jre
+        sudo apt install -y default-jre default-jdk
     elif command -v yum &> /dev/null; then
         # CentOS/RHEL based
         sudo yum install -y java-11-openjdk
