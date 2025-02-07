@@ -12,17 +12,17 @@ install_dependencies() {
         curl -L -o "$JAVA_TAR" "$JAVA_URL"
 
         # Extract and move to system location
-        mkdir -p "$INSTALL_DIR"
-        tar -xzf "$JAVA_TAR" -C "$INSTALL_DIR"
-        mv "$INSTALL_DIR"/jdk-22.0.2.jdk "$INSTALL_DIR"/openjdk.jdk
+        sudo mkdir -p "$INSTALL_DIR"
+        sudo tar -xzf "$JAVA_TAR" -C "$INSTALL_DIR"
+        sudo mv "$INSTALL_DIR"/jdk-22.0.2.jdk "$INSTALL_DIR"/openjdk.jdk
 
         # Cleanup tar file
         rm "$JAVA_TAR"
 
         # Ensure JAVA_HOME is set correctly
         export JAVA_HOME="$INSTALL_DIR/openjdk.jdk/Contents/Home"
-        echo "export JAVA_HOME=$JAVA_HOME" | tee -a /etc/profile
-        echo "export PATH=\$JAVA_HOME/bin:\$PATH" | tee -a /etc/profile
+        echo "export JAVA_HOME=$JAVA_HOME" | sudo tee -a /etc/profile
+        echo "export PATH=\$JAVA_HOME/bin:\$PATH" | sudo tee -a /etc/profile
         source /etc/profile
 
         brew update
