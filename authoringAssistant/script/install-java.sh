@@ -6,16 +6,13 @@ install_java() {
     echo "Java is not installed. Installation attempt..."
     if [[ $OSTYPE == 'darwin'* ]]; then
         brew update
-        brew install openjdk
+        brew install openjdk maven
         # Symbolic link for macos.
         sudo ln -sfn "$(brew --prefix openjdk)/libexec/openjdk.jdk" /Library/Java/JavaVirtualMachines/openjdk.jdk
     elif command -v apt &> /dev/null; then
         # Debian/Ubuntu based
         sudo apt update
-        sudo apt install -y default-jre default-jdk
-    elif command -v yum &> /dev/null; then
-        # CentOS/RHEL based
-        sudo yum install -y java-11-openjdk
+        sudo apt install -y default-jre default-jdk maven
     else
         echo "Error: neither apt nor yum found. Java installation failed."
         exit 1
