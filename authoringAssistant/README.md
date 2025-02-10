@@ -12,6 +12,7 @@ Before setting up the project, ensure you have the following dependencies instal
 - **Java Development Kit (JDK) 22** (or a more recent version)
 - **Apache Maven** (latest stable version recommended)
 
+**Note**: Ensure that either Java and Maven are not installed before running this script, or have them preinstalled with Java set to version 22 and `JAVA_HOME` properly configured.
 ####  Automated Installation
 
 To simplify the installation process, you can run the provided script:
