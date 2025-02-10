@@ -5,7 +5,7 @@
   "datasets": [
     {
       "var": "tableData",
-      "file": "dataset/test-dataset"
+      "file": "datasets/test-dataset"
     }
   ],
   "imports": [],
