@@ -14,6 +14,7 @@ install_dependencies() {
         # Extract and move to system location
         sudo mkdir -p "$INSTALL_DIR"
         sudo tar -xzf "$JAVA_TAR" -C "$INSTALL_DIR"
+        sudo rm -rf "$INSTALL_DIR"/openjdk.jdk
         sudo mv "$INSTALL_DIR"/jdk-22.0.2.jdk "$INSTALL_DIR"/openjdk.jdk
 
         # Cleanup tar file
@@ -21,12 +22,20 @@ install_dependencies() {
 
         # Ensure JAVA_HOME is set correctly
         export JAVA_HOME="$INSTALL_DIR/openjdk.jdk/Contents/Home"
-        echo "export JAVA_HOME=$JAVA_HOME" | sudo tee -a /etc/profile
-        echo "export PATH=\$JAVA_HOME/bin:\$PATH" | sudo tee -a /etc/profile
+        echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> "$HOME/.bashrc"
+        echo 'export JAVA_HOME=$INSTALL_DIR/openjdk.jdk/Contents/Home' >> "$HOME/.bashrc"
+
         source /etc/profile
 
         brew update
         brew install maven
+
+        # Apply changes
+        source "$HOME/.bashrc"
+
+        # Verify installation
+        mvn --version
+
     elif command -v apt &> /dev/null; then
         # Debian/Ubuntu based
         sudo apt update
