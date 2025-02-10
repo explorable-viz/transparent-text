@@ -169,9 +169,7 @@ public class QueryContext {
         logger.info(STR."Validating output: \{output}");
         //Extract value from input query.text
         Optional<TextFragment> textFragment = paragraph.stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
-        if(textFragment.isEmpty()) {
-            throw new RuntimeException("REPLACE tag missing");
-        }
+
         String expectedValue = splitLiteral((Literal) textFragment.get()).tag().getValue();
         // Extract and clean the generated expression
         String[] outputLines = output.split("\n");
