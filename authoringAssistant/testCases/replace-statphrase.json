@@ -3,7 +3,7 @@
   "datasets": [
     {
       "var": "tableData",
-      "file": "datasets/test-dataset"
+      "file": "text-viz/datasets/test-dataset"
     }
   ],
   "imports": [],
