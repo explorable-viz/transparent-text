@@ -22,16 +22,25 @@ install_dependencies() {
 
         # Ensure JAVA_HOME is set correctly
         export JAVA_HOME="$INSTALL_DIR/openjdk.jdk/Contents/Home"
-        echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> "$HOME/.bashrc"
-        echo 'export JAVA_HOME=$INSTALL_DIR/openjdk.jdk/Contents/Home' >> "$HOME/.bashrc"
+
+        PROFILE_FILE=""
+        if [[ -n "$BASH_VERSION" ]]; then
+          PROFILE_FILE="$HOME/.bashrc"
+        elif [[ -n "$ZSH_VERSION" ]]; then
+          PROFILE_FILE="$HOME/.zshrc"
+        else
+          echo "Error: Terminal not supported."
+          exit 1
+        fi
+
+        echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> "$PROFILE_FILE"
+        echo "export JAVA_HOME=$INSTALL_DIR/openjdk.jdk/Contents/Home" >> "$PROFILE_FILE"
+        source "$PROFILE_FILE"
 
         source /etc/profile
 
         brew update
         brew install maven
-
-        # Apply changes
-        source "$HOME/.bashrc"
 
         # Verify installation
         mvn --version
