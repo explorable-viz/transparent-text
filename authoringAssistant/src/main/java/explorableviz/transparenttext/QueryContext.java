@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -159,6 +160,7 @@ public class QueryContext {
             if(!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
+            Files.delete(Path.of(new File(STR."fluid/\{tempFile}.fld").getPath()));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
