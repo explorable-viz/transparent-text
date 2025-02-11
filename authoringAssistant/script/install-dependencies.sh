@@ -33,7 +33,7 @@ install_dependencies() {
         rm "$JAVA_TAR"
 
         # Ensure JAVA_HOME is set correctly
-        export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-22.0.2.jdk/Contents/Home"
+        export JAVA_HOME="$INSTALL_DIR/jdk-22.0.2.jdk/Contents/Home"
 
         brew update
         brew install maven

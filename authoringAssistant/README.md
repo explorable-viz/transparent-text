@@ -76,12 +76,6 @@ where:
 | Llama3EvaluatorAgent       | llama3:8b              | no           |
 | Llama31EvaluatorAgent      | llama3.1:8b            | no           |
 
-### Scripts
-There are four main bash scripts, placed in the script folder, for the installation and the execution of the Prompt Executor
-1. **ollama-install.sh**. This script provides the installation of the ollama platform.
-2. **model-pull.sh** This script allows us to pull the models into ollama. Require 1 parameter, which is the model name. For example: ./model-pull.sh llama3
-3. **ollama-serve.sh** This script starts the ollama platform (generally on port 11434).
-4. **prompt-executor.sh**. This script executes the Java application. It requires the parameters described in the section "The Java Application"
 
 ### Yarn integration
 
@@ -91,15 +85,7 @@ All the scripts are integrated with yarn scripts.
 - `yarn pull-llama3` to pull llama3 model
 - `yarn ollama-serve` to start ollama server
 - `yarn test` to launch test with file in input folder
-
-### Webtools
-
-There are two web-based tools which allow to edit the prompt base-knowledge and the input queries. These tools are in the folder `./webapp`
-
-| Tool          | Description                           | Link                                                           |
-|---------------|---------------------------------------|----------------------------------------------------------------|
-| Prompt Editor | Tool for the editing of the prompt    | [./webapp/prompt-editor.html](./webapp/prompt-editor.html)     |
-| Query Editor  | Tool for the editing of the queries | [./webapp/queries-editor.html](./webapp/queries-editor.html) |
+- `yarn test-mock` to launch test with a mocked agent.
 
 ## Websites
 
