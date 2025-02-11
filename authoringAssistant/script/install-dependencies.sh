@@ -4,7 +4,19 @@ set -xe
 install_dependencies() {
 
     if [[ $OSTYPE == 'darwin'* ]]; then
-        JAVA_URL="https://download.java.net/java/GA/jdk22.0.2/c9ecb94cd31b495da20a27d4581645e8/9/GPL/openjdk-22.0.2_macos-aarch64_bin.tar.gz"
+
+        # Check system architecture
+        ARCH=$(uname -m)
+        JAVA_URL=""
+        if [[ "$ARCH" == "x86_64" ]]; then
+            JAVA_URL="https://download.oracle.com/java/22/archive/jdk-22.0.2_macos-x64_bin.tar.gz"
+        elif [[ "$ARCH" == "aarch64" ]]; then
+            JAVA_URL="https://download.java.net/java/GA/jdk22.0.2/c9ecb94cd31b495da20a27d4581645e8/9/GPL/openjdk-22.0.2_macos-aarch64_bin.tar.gz"
+        else
+            echo "Error: Unsupported architecture ($ARCH)."
+            exit 1
+        fi
+
         JAVA_TAR="openjdk-22.0.2_macos-aarch64_bin.tar.gz"
         INSTALL_DIR="/Library/Java/JavaVirtualMachines"
 
@@ -15,29 +27,13 @@ install_dependencies() {
         sudo mkdir -p "$INSTALL_DIR"
         sudo tar -xzf "$JAVA_TAR" -C "$INSTALL_DIR"
         sudo rm -rf "$INSTALL_DIR"/openjdk.jdk
-        sudo mv "$INSTALL_DIR"/jdk-22.0.2.jdk "$INSTALL_DIR"/openjdk.jdk
+#        sudo mv "$INSTALL_DIR"/jdk-22.0.2.jdk "$INSTALL_DIR"/openjdk.jdk
 
         # Cleanup tar file
         rm "$JAVA_TAR"
 
         # Ensure JAVA_HOME is set correctly
-        export JAVA_HOME="$INSTALL_DIR/openjdk.jdk/Contents/Home"
-
-        PROFILE_FILE=""
-        if [[ -n "$BASH_VERSION" ]]; then
-          PROFILE_FILE="$HOME/.bashrc"
-        elif [[ -n "$ZSH_VERSION" ]]; then
-          PROFILE_FILE="$HOME/.zshrc"
-        else
-          echo "Error: Terminal not supported."
-          exit 1
-        fi
-
-        echo "export PATH=\$JAVA_HOME/bin:\$PATH" >> "$PROFILE_FILE"
-        echo "export JAVA_HOME=$INSTALL_DIR/openjdk.jdk/Contents/Home" >> "$PROFILE_FILE"
-        source "$PROFILE_FILE"
-
-        source /etc/profile
+        export JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-22.0.2.jdk/Contents/Home"
 
         brew update
         brew install maven
