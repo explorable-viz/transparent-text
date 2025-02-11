@@ -27,7 +27,6 @@ install_dependencies() {
         sudo mkdir -p "$INSTALL_DIR"
         sudo tar -xzf "$JAVA_TAR" -C "$INSTALL_DIR"
         sudo rm -rf "$INSTALL_DIR"/openjdk.jdk
-#        sudo mv "$INSTALL_DIR"/jdk-22.0.2.jdk "$INSTALL_DIR"/openjdk.jdk
 
         # Cleanup tar file
         rm "$JAVA_TAR"
@@ -50,7 +49,6 @@ install_dependencies() {
         exit 1
     fi
 
-    # Verifica se l'installazione ha avuto successo
     if ! command -v java &> /dev/null; then
         echo "Error: Java installation failed."
         exit 1
