@@ -1,1 +1,1 @@
-![PromptExecutorMocked](https://github.com/explorable-viz/transparent-text/actions/workflows/prompt-executor-mocked.yml/badge.svg)
+![AuthoringAssistantMocked](https://github.com/explorable-viz/transparent-text/actions/workflows/authoring-assistant-mocked.yml/badge.svg)
