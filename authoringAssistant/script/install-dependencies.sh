@@ -44,7 +44,7 @@ install_dependencies() {
     elif command -v apt &> /dev/null; then
         # Debian/Ubuntu based
         sudo apt update
-        sudo apt install -y jdk-22 maven
+        sudo apt install -y default-jre default-jdk maven
     else
         echo "Error: neither apt nor yum found. Java installation failed."
         exit 1
