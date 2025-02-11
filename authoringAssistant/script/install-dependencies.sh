@@ -10,7 +10,7 @@ install_dependencies() {
         JAVA_URL=""
         if [[ "$ARCH" == "x86_64" ]]; then
             JAVA_URL="https://download.oracle.com/java/22/archive/jdk-22.0.2_macos-x64_bin.tar.gz"
-        elif [[ "$ARCH" == "aarch64" ]]; then
+        elif [[ "$ARCH" == "arm64" ]]; then
             JAVA_URL="https://download.java.net/java/GA/jdk22.0.2/c9ecb94cd31b495da20a27d4581645e8/9/GPL/openjdk-22.0.2_macos-aarch64_bin.tar.gz"
         else
             echo "Error: Unsupported architecture ($ARCH)."
