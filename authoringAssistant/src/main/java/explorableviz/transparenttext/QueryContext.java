@@ -167,7 +167,7 @@ public class QueryContext {
         }
     }
 
-    public Optional<String> validate(String output) throws Exception {
+    public Optional<String> validate(String output)  {
         logger.info(STR."Validating output: \{output}");
         //Extract value from input query.text
         Optional<TextFragment> textFragment = paragraph.stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
