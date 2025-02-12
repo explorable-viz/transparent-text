@@ -7,8 +7,10 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 
 public class LearningQueryContext  {
     private static final String LEARNING_CASE_PATH = "learningCases";
@@ -26,13 +28,18 @@ public class LearningQueryContext  {
         String systemPrompt = jsonLearningCase.getString("system_prompt");
         ArrayList<QueryContext> learningCases = new ArrayList<>();
         Random random = new Random(0);
-
-        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Path.of(LEARNING_CASE_PATH), Files::isRegularFile);
-        for (Path filePath : directoryStream) {
-            TestQueryContext testQueryContext = TestQueryContext.importFromJson(filePath, random);
-            learningCases.addAll(testQueryContext.instantiate(numCasesToGenerate));
-        }
-
+        Files.list(Paths.get(LEARNING_CASE_PATH))
+                .filter(Files::isRegularFile)
+                .map(path -> path.toAbsolutePath().toString())
+                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
+                .forEach(filePath -> {
+            try {
+                TestQueryContext testQueryContext = TestQueryContext.importFromJson(filePath, random);
+                learningCases.addAll(testQueryContext.instantiate(numCasesToGenerate));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
         return new LearningQueryContext(systemPrompt, learningCases);
     }
 

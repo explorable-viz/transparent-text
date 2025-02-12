@@ -25,7 +25,7 @@ public class TestQueryContext extends QueryContext {
         this.testCaseFileName = testCaseFileName;
     }
 
-    public ArrayList<QueryContext> instantiate(int number) throws Exception {
+    public ArrayList<QueryContext> instantiate(int number) throws RuntimeException, IOException {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         for (int i = 0; i < number; i++) {
             Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
@@ -40,13 +40,13 @@ public class TestQueryContext extends QueryContext {
         return queryContexts;
     }
 
-    public static TestQueryContext importFromJson(Path filePath, Random random) throws IOException {
-        String content = new String(Files.readAllBytes(filePath));
+    public static TestQueryContext importFromJson(String filePath, Random random) throws IOException {
+        String content = new String(Files.readAllBytes(Path.of(STR."\{filePath}.json")));
         JSONObject testCase = new JSONObject(content);
         JSONArray json_datasets = testCase.getJSONArray("datasets");
         JSONObject json_variables = testCase.getJSONObject("variables");
         JSONArray json_imports = testCase.getJSONArray("imports");
-        String code = testCase.getString("code");
+        String code = new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld")));
         JSONArray json_paragraph = testCase.getJSONArray("paragraph");
         ArrayList<TextFragment> paragraph = new ArrayList<>();
 
@@ -80,7 +80,7 @@ public class TestQueryContext extends QueryContext {
             imports.add(json_imports.getString(i));
         }
 
-        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected, filePath.toAbsolutePath().toString());
+        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected, filePath);
     }
 
     private static String getRandomString(int length, Random generator) {

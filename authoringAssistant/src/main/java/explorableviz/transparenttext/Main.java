@@ -1,14 +1,13 @@
 package explorableviz.transparenttext;
 
+import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Main {
@@ -55,7 +54,7 @@ public class Main {
 
             float rate = (float) correct / queryLimit;
             System.out.println(STR."Accuracy: \{rate}");
-            if(rate < threshold) {
+            if (rate < threshold) {
                 System.out.println("FAILED: Accuracy too low");
                 System.exit(1);
             } else {
@@ -75,13 +74,22 @@ public class Main {
         if (!Files.exists(folder) || !Files.isDirectory(folder)) {
             throw new RuntimeException(STR."Invalid folder path: \{testCasesFolder}");
         }
-        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(folder, Files::isRegularFile);
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         Random random = new Random(0);
-        for (Path filePath : directoryStream) {
-            TestQueryContext testQueryContext = TestQueryContext.importFromJson(filePath, random);
-            queryContexts.addAll(testQueryContext.instantiate(numInstances));
-        }
+        Files.list(Paths.get(testCasesFolder))
+                .filter(Files::isRegularFile)
+                .map(path -> path.toAbsolutePath().toString())
+                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
+                .forEach(filePath -> {
+                    TestQueryContext testQueryContext = null;
+                    try {
+                        testQueryContext = TestQueryContext.importFromJson(filePath, random);
+                        queryContexts.addAll(testQueryContext.instantiate(numInstances));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+
         return queryContexts;
     }
 
