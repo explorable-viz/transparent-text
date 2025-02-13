@@ -34,8 +34,6 @@ public class LearningQueryContext {
         });
         return new LearningQueryContext(systemPrompt, learningCases);
     }
-
-
     public PromptList generateInContextLearningJSON() throws Exception {
         PromptList inContextLearning = new PromptList();
         inContextLearning.addPrompt(PromptList.SYSTEM, this.systemPrompt);
@@ -45,5 +43,4 @@ public class LearningQueryContext {
         }
         return inContextLearning;
     }
-
 }
