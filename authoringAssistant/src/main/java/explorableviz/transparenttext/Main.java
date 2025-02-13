@@ -84,7 +84,7 @@ public class Main {
         Set<String> uniqueNames = new HashSet<>();
         uniqueNames = Files.list(Paths.get(folderPath))
                 .filter(Files::isRegularFile) // Only process files, not directories
-                .map(path -> path.getFileName().toString()) // Get file name
+                .map(path -> path.toAbsolutePath().toString()) // Get file name
                 .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name) // Remove extension
                 .collect(Collectors.toSet()); // Collect as a unique set
         return uniqueNames;
