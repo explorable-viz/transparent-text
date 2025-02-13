@@ -1,13 +1,9 @@
 package explorableviz.transparenttext;
 
-import java.nio.file.DirectoryStream;
+import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 
@@ -33,7 +29,7 @@ public class Main {
         try {
             Settings.getInstance().loadSettings(settingsPath);
             learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(inContextLearningPath, numLearningCaseToGenerate);
-            queryContexts = loadTestCases(testPath, numTestToGenerate);
+            queryContexts = QueryContext.loadCases(testPath, numTestToGenerate);
             final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
             final ArrayList<String> results = new ArrayList<>();
 
@@ -55,7 +51,7 @@ public class Main {
 
             float rate = (float) correct / queryLimit;
             System.out.println(STR."Accuracy: \{rate}");
-            if(rate < threshold) {
+            if (rate < threshold) {
                 System.out.println("FAILED: Accuracy too low");
                 System.exit(1);
             } else {
@@ -66,23 +62,6 @@ public class Main {
             e.printStackTrace();
             System.exit(1);
         }
-    }
-
-    public static ArrayList<QueryContext> loadTestCases(String testCasesFolder, int numInstances) throws Exception {
-        Path folder = Paths.get(testCasesFolder);
-
-        // Check if the folder exists and is a directory
-        if (!Files.exists(folder) || !Files.isDirectory(folder)) {
-            throw new RuntimeException(STR."Invalid folder path: \{testCasesFolder}");
-        }
-        DirectoryStream<Path> directoryStream = Files.newDirectoryStream(folder, Files::isRegularFile);
-        ArrayList<QueryContext> queryContexts = new ArrayList<>();
-        Random random = new Random(0);
-        for (Path filePath : directoryStream) {
-            TestQueryContext testQueryContext = TestQueryContext.importFromJson(filePath, random);
-            queryContexts.addAll(testQueryContext.instantiate(numInstances));
-        }
-        return queryContexts;
     }
 
     public static HashMap<String, String> parseArguments(String[] args) {
