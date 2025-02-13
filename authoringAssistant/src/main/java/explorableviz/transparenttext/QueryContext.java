@@ -12,10 +12,7 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -206,5 +203,23 @@ public class QueryContext {
         out.println(STR."in \{response}");
         out.flush();
         out.close();
+    }
+
+    public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws Exception {
+        ArrayList<QueryContext> queryContexts = new ArrayList<>();
+        Random random = new Random(0);
+        Files.list(Paths.get(casesFolder))
+                .filter(Files::isRegularFile) // Only process files, not directories
+                .map(path -> path.toAbsolutePath().toString()) // Get file name
+                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name).forEach(filePath -> {
+                    TestQueryContext queryContext;
+                    try {
+                        queryContext = TestQueryContext.importFromJson(filePath, random);
+                        queryContexts.addAll(queryContext.instantiate(numInstances));
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        return queryContexts;
     }
 }

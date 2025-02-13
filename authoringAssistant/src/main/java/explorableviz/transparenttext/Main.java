@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Main {
@@ -30,7 +29,7 @@ public class Main {
         try {
             Settings.getInstance().loadSettings(settingsPath);
             learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(inContextLearningPath, numLearningCaseToGenerate);
-            queryContexts = loadTestCases(testPath, numTestToGenerate);
+            queryContexts = QueryContext.loadCases(testPath, numTestToGenerate);
             final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
             final ArrayList<String> results = new ArrayList<>();
 
@@ -63,31 +62,6 @@ public class Main {
             e.printStackTrace();
             System.exit(1);
         }
-    }
-
-    public static ArrayList<QueryContext> loadTestCases(String testCasesFolder, int numInstances) throws Exception {
-        ArrayList<QueryContext> queryContexts = new ArrayList<>();
-        Random random = new Random(0);
-        loadUniqueCaseFileNames(testCasesFolder).forEach(filePath -> {
-            TestQueryContext testQueryContext = null;
-            try {
-                testQueryContext = TestQueryContext.importFromJson(filePath, random);
-                queryContexts.addAll(testQueryContext.instantiate(numInstances));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        return queryContexts;
-    }
-
-    public static Set<String> loadUniqueCaseFileNames(String folderPath) throws IOException {
-        Set<String> uniqueNames = new HashSet<>();
-        uniqueNames = Files.list(Paths.get(folderPath))
-                .filter(Files::isRegularFile) // Only process files, not directories
-                .map(path -> path.toAbsolutePath().toString()) // Get file name
-                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name) // Remove extension
-                .collect(Collectors.toSet()); // Collect as a unique set
-        return uniqueNames;
     }
 
     public static HashMap<String, String> parseArguments(String[] args) {
