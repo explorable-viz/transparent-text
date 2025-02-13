@@ -24,7 +24,7 @@ public class LearningQueryContext {
         String systemPrompt = jsonLearningCase.getString("system_prompt");
         ArrayList<QueryContext> learningCases = new ArrayList<>();
         Random random = new Random(0);
-        Main.loadUniqueCaseFileNames(jsonLearningCasePath).forEach(filePath -> {
+        Main.loadUniqueCaseFileNames(LEARNING_CASE_PATH).forEach(filePath -> {
             try {
                 TestQueryContext testQueryContext = TestQueryContext.importFromJson(filePath, random);
                 learningCases.addAll(testQueryContext.instantiate(numCasesToGenerate));
