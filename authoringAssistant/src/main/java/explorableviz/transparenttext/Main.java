@@ -1,9 +1,7 @@
 package explorableviz.transparenttext;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
@@ -68,29 +66,28 @@ public class Main {
     }
 
     public static ArrayList<QueryContext> loadTestCases(String testCasesFolder, int numInstances) throws Exception {
-        Path folder = Paths.get(testCasesFolder);
-
-        // Check if the folder exists and is a directory
-        if (!Files.exists(folder) || !Files.isDirectory(folder)) {
-            throw new RuntimeException(STR."Invalid folder path: \{testCasesFolder}");
-        }
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         Random random = new Random(0);
-        Files.list(Paths.get(testCasesFolder))
-                .filter(Files::isRegularFile)
-                .map(path -> path.toAbsolutePath().toString())
-                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
-                .forEach(filePath -> {
-                    TestQueryContext testQueryContext = null;
-                    try {
-                        testQueryContext = TestQueryContext.importFromJson(filePath, random);
-                        queryContexts.addAll(testQueryContext.instantiate(numInstances));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-
+        loadUniqueCaseFileNames(testCasesFolder).forEach(filePath -> {
+            TestQueryContext testQueryContext = null;
+            try {
+                testQueryContext = TestQueryContext.importFromJson(filePath, random);
+                queryContexts.addAll(testQueryContext.instantiate(numInstances));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         return queryContexts;
+    }
+
+    public static Set<String> loadUniqueCaseFileNames(String folderPath) throws IOException {
+        Set<String> uniqueNames = new HashSet<>();
+        uniqueNames = Files.list(Paths.get(folderPath))
+                .filter(Files::isRegularFile) // Only process files, not directories
+                .map(path -> path.getFileName().toString()) // Get file name
+                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name) // Remove extension
+                .collect(Collectors.toSet()); // Collect as a unique set
+        return uniqueNames;
     }
 
     public static HashMap<String, String> parseArguments(String[] args) {
