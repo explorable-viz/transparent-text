@@ -19,7 +19,8 @@ let likelihoods = [
     { prob: 0.1, msg: "unlikely"},
     { prob: 0.01, msg: "very unlikely"},
     { prob: 0.0, msg: "exceptionally unlikely"}
-];let likelihoodMap prob =
+];
+let likelihoodMap prob =
     let go (x:xs) =
         if x.prob < prob
         then x.msg
