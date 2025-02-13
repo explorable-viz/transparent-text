@@ -27879,17 +27879,21 @@ var showEdgeList = (es) => joinWith("\n")([
   "digraph G {",
   ...arrayMap((v) => "   " + v)([
     "rankdir = RL",
-    ...arrayMap((v) => v._1 + " -> {" + joinWith(", ")(fromFoldable4(map2(ordString)(unsafeCoerce)(v._2))) + "}")(fromFoldable13(reverse2(es)))
+    ...arrayMap((v) => v._1 + " -> {" + joinWith(", ")(fromFoldable4(map2(ordString)(unsafeCoerce)(v._2._1))) + "}")(fromFoldable13(reverse2(es)))
   ]),
   "}"
 ]);
+var pack1 = (x2) => (k) => k(showString)(x2);
 var toEdgeList = (dictGraph) => (g) => {
   const $0 = (v) => {
     if (v._1.tag === "Nil") {
       return $Step("Done", v._2);
     }
     if (v._1.tag === "Cons") {
-      return $Step("Loop", $Tuple(v._1._2, $List("Cons", $Tuple(v._1._1, dictGraph.outN(g)(v._1._1)), v._2)));
+      return $Step(
+        "Loop",
+        $Tuple(v._1._2, $List("Cons", $Tuple(v._1._1, $Tuple(dictGraph.outN(g)(v._1._1), pack1(""))), v._2))
+      );
     }
     fail();
   };
@@ -28161,14 +28165,15 @@ var $GraphImpl = (_1) => ({ tag: "GraphImpl", _1 });
 var eqSet = { eq: (v) => (v1) => eqMap(eqVertex)(eqUnit).eq(v)(v1) };
 var eq = /* @__PURE__ */ (() => eqObject(eqSet).eq)();
 var fromFoldable6 = /* @__PURE__ */ foldlArray((m) => (a) => insert3(ordVertex)(a)()(m))(Leaf2);
+var pack = (x2) => (k) => k(showString)(x2);
 var toUnfoldable6 = /* @__PURE__ */ toUnfoldable4(unfoldableList);
 var fromFoldable15 = /* @__PURE__ */ (() => foldableSet.foldr(Cons)(Nil))();
 var fromFoldable23 = /* @__PURE__ */ (() => foldableSet.foldl((m) => (a) => insert3(ordVertex)(a)()(m))(Leaf2))();
 var toUnfoldable12 = /* @__PURE__ */ toAscUnfoldable(unfoldableArray);
 var fromFoldable32 = /* @__PURE__ */ fromFoldable2(ordVertex)(foldableArray);
 var verticesGraphImpl = { vertices: (v) => v._1.vertices };
-var eqGraphImpl = { eq: (v) => (v1) => eq(v._1.out)(v1._1.out) };
-var sinks$p = (m) => fromFoldable6(arrayMap((x2) => x2._1)(filter((x2) => x2._2.tag === "Leaf")(toArrayWithKey(Tuple)(m))));
+var eqGraphImpl = { eq: (v) => (v1) => eq(_fmapObject(v._1.out, fst))(_fmapObject(v1._1.out, fst)) };
+var sinks$p = (m) => fromFoldable6(arrayMap((x2) => x2._1)(filter((x2) => x2._2._1.tag === "Leaf")(toArrayWithKey(Tuple)(m))));
 var init5 = (\u03B1s) => () => {
   const obj = {};
   return monadRecST.tailRecM((v) => {
@@ -28180,7 +28185,7 @@ var init5 = (\u03B1s) => () => {
       const $1 = v._1._2;
       const $2 = v._2;
       return () => {
-        $2[$0] = Leaf2;
+        $2[$0] = $Tuple(Leaf2, pack("uninit: init"));
         return $Step("Loop", $Tuple($1, $2));
       };
     }
@@ -28216,7 +28221,7 @@ var addIfMissing = (acc) => (v) => {
   return () => {
     const v1 = $0();
     if (v1.tag === "Nothing") {
-      acc[v] = Leaf2;
+      acc[v] = $Tuple(Leaf2, pack("uninit: missing"));
       return acc;
     }
     if (v1.tag === "Just") {
@@ -28250,27 +28255,28 @@ var outMap = (\u03B1s) => (es) => {
       if (v._1.tag === "Cons") {
         const $1 = v._2;
         const $2 = v._1._2;
-        const $3 = v._1._1._1;
-        const $4 = v._1._1._2;
-        const $5 = peek($3)($1);
+        const $3 = v._1._1._2._2;
+        const $4 = v._1._1._1;
+        const $5 = v._1._1._2._1;
+        const $6 = peek($4)($1);
         return () => {
-          const $6 = $5();
+          const $7 = $6();
           if ((() => {
-            if ($6.tag === "Nothing") {
+            if ($7.tag === "Nothing") {
               return true;
             }
-            if ($6.tag === "Just") {
-              return eqMap(eqVertex)(eqUnit).eq($6._1)(Leaf2);
+            if ($7.tag === "Just") {
+              return eqMap(eqVertex)(eqUnit).eq($7._1._1)(Leaf2);
             }
             fail();
           })()) {
-            const \u03B2s$p = toUnfoldable6($4);
+            const \u03B2s$p = toUnfoldable6($5);
             monadRecST.tailRecM(assertPresent($1))(\u03B2s$p)();
-            $1[$3] = $4;
+            $1[$4] = $Tuple($5, $3);
             const acc$p = addIfMissing$p(\u03B2s$p)($1)();
             return $Step("Loop", $Tuple($2, acc$p));
           }
-          return throwException(error("Duplicate edge list entry for " + showStringImpl($3)))()();
+          return throwException(error("Duplicate edge list entry for " + showStringImpl($4)))()();
         };
       }
       fail();
@@ -28287,37 +28293,38 @@ var inMap = (\u03B1s) => (es) => {
       }
       if (v._1.tag === "Cons") {
         const $1 = v._1._2;
-        const $2 = v._1._1._1;
-        const $3 = monadRecST.tailRecM((v1) => {
-          if (v1._1.tag === "Nil") {
-            return () => $Step("Done", v1._2);
+        const $2 = v._1._1._2._2;
+        const $3 = v._1._1._1;
+        const $4 = monadRecST.tailRecM((v2) => {
+          if (v2._1.tag === "Nil") {
+            return () => $Step("Done", v2._2);
           }
-          if (v1._1.tag === "Cons") {
-            const $32 = v1._2;
-            const $4 = v1._1._1;
-            const $5 = v1._1._2;
-            const $6 = peek($4)($32);
+          if (v2._1.tag === "Cons") {
+            const $42 = v2._2;
+            const $5 = v2._1._1;
+            const $6 = v2._1._2;
+            const $7 = peek($5)($42);
             return () => {
-              const v1$1 = $6();
+              const v1 = $7();
               const acc$p = (() => {
-                if (v1$1.tag === "Nothing") {
-                  $32[$4] = $$$Map("Two", Leaf2, $2, void 0, Leaf2);
-                  return $32;
+                if (v1.tag === "Nothing") {
+                  $42[$5] = $Tuple($$$Map("Two", Leaf2, $3, void 0, Leaf2), $2);
+                  return $42;
                 }
-                if (v1$1.tag === "Just") {
-                  $32[$4] = insert3(ordVertex)($2)()(v1$1._1);
-                  return $32;
+                if (v1.tag === "Just") {
+                  $42[$5] = $Tuple(insert3(ordVertex)($3)()(v1._1._1), $2);
+                  return $42;
                 }
                 fail();
               })();
-              return $Step("Loop", $Tuple($5, acc$p));
+              return $Step("Loop", $Tuple($6, acc$p));
             };
           }
           fail();
-        })($Tuple(toUnfoldable6(v._1._1._2), v._2));
+        })($Tuple(toUnfoldable6(v._1._1._2._1), v._2));
         return () => {
-          const a = $3();
-          const acc$p = addIfMissing(a)($2)();
+          const a = $4();
+          const acc$p = addIfMissing(a)($3)();
           return $Step("Loop", $Tuple($1, acc$p));
         };
       }
@@ -28326,7 +28333,8 @@ var inMap = (\u03B1s) => (es) => {
   };
 };
 var graphGraphImpl = {
-  outN: (v) => (\u03B1) => definitely("in graph")(_lookup(Nothing, Just, \u03B1, v._1.out)),
+  outN: (v) => (\u03B1) => definitely("in graph")(_lookup(Nothing, Just, \u03B1, v._1.out))._1,
+  vertexData: (v) => (\u03B1) => definitely("in graph")(_lookup(Nothing, Just, \u03B1, v._1.out))._2,
   inN: (g) => graphGraphImpl.outN(graphGraphImpl.op(g)),
   elem: (\u03B1) => (v) => {
     const $0 = _lookup(Nothing, Just, \u03B1, v._1.out);
@@ -28365,7 +28373,7 @@ var graphGraphImpl = {
   topologicalSort: (v) => reverse2(topologicalSort(ordVertex)(fromFoldable32(arrayMap((x2) => $Tuple(
     x2._1,
     $Tuple(void 0, x2._2)
-  ))(toUnfoldable12(_fmapObject(v._1.out, toUnfoldable6)))))),
+  ))(toUnfoldable12(_fmapObject(_fmapObject(v._1.out, fst), toUnfoldable6)))))),
   Eq0: () => eqGraphImpl,
   Vertices1: () => verticesGraphImpl
 };
@@ -34054,6 +34062,32 @@ var Dictionary3 = (value0) => $BaseVal("Dictionary", value0);
 var DictRep = (x2) => x2;
 var MatrixRep = (x2) => x2;
 var Env = (x2) => x2;
+var showBaseVal = {
+  show: (v) => {
+    if (v.tag === "Int") {
+      return showIntImpl(v._1);
+    }
+    if (v.tag === "Float") {
+      return showNumberImpl(v._1);
+    }
+    if (v.tag === "Str") {
+      return showStringImpl(v._1);
+    }
+    if (v.tag === "Constr") {
+      return showStringImpl(v._1);
+    }
+    if (v.tag === "Dictionary") {
+      return "Dictionary";
+    }
+    if (v.tag === "Matrix") {
+      return "Matrix";
+    }
+    if (v.tag === "Fun") {
+      return "Function";
+    }
+    fail();
+  }
+};
 var isEmptyEnv = { isEmpty: (v) => isEmpty(v) };
 var setEnvString = {
   empty,
@@ -34864,7 +34898,7 @@ var string2 = {
     return typeError(v)("Str");
   }
 };
-var unary = (dictBoundedJoinSemilattice) => {
+var unary = (dictShow) => (dictBoundedJoinSemilattice) => {
   const bot2 = dictBoundedJoinSemilattice.bot;
   return (id3) => (f) => $Tuple(
     id3,
@@ -34882,17 +34916,17 @@ var unary = (dictBoundedJoinSemilattice) => {
                 const $0 = dictMonadError.MonadThrow0().Monad0().Bind1().Apply0().Functor0();
                 return (v) => {
                   if (v.tag === "Cons" && v._2.tag === "Nil") {
-                    const $1 = v._1._2;
+                    const v$p = f.fwd(f.i.unpack(v._1._2));
                     return $0.map((() => {
-                      const $2 = f.o;
-                      return (v$1) => $Val(v$1._2, $2.pack(v$1._1));
-                    })())($0.map((v2) => $Tuple(f.fwd(f.i.unpack($1)), v2))(dictMonadWithGraphAlloc.new($$$Map(
+                      const $1 = f.o;
+                      return (v$1) => $Val(v$1._2, $1.pack(v$1._1));
+                    })())($0.map((v2) => $Tuple(v$p, v2))(dictMonadWithGraphAlloc.new($$$Map(
                       "Two",
                       Leaf2,
                       v._1._1,
                       void 0,
                       Leaf2
-                    ))));
+                    ))((k) => k(dictShow)(v$p))));
                   }
                   fail();
                 };
@@ -35021,7 +35055,7 @@ var $$boolean = {
     return typeError(v)("Boolean");
   }
 };
-var binaryZero = (dictBoundedJoinSemilattice) => {
+var binaryZero = (dictShow) => (dictBoundedJoinSemilattice) => {
   const bot2 = dictBoundedJoinSemilattice.bot;
   return (dictIsZero) => (id3) => (f) => $Tuple(
     id3,
@@ -35041,10 +35075,11 @@ var binaryZero = (dictBoundedJoinSemilattice) => {
                   if (v.tag === "Cons" && v._2.tag === "Cons" && v._2._2.tag === "Nil") {
                     const $1 = f.i.unpack(v._1._2);
                     const $2 = f.i.unpack(v._2._1._2);
+                    const v$p = f.fwd($1)($2);
                     return $0.map((() => {
                       const $3 = f.o;
                       return (v$1) => $Val(v$1._2, $3.pack(v$1._1));
-                    })())($0.map((v4) => $Tuple(f.fwd($1)($2), v4))(dictMonadWithGraphAlloc.new((() => {
+                    })())($0.map((v4) => $Tuple(v$p, v4))(dictMonadWithGraphAlloc.new((() => {
                       if (dictIsZero.isZero($1)) {
                         return $$$Map("Two", Leaf2, v._1._1, void 0, Leaf2);
                       }
@@ -35058,7 +35093,7 @@ var binaryZero = (dictBoundedJoinSemilattice) => {
                         void 0,
                         Leaf2
                       ));
-                    })())));
+                    })())((k) => k(dictShow)(v$p))));
                   }
                   fail();
                 };
@@ -35109,7 +35144,7 @@ var binaryZero = (dictBoundedJoinSemilattice) => {
     )
   );
 };
-var binary = (dictBoundedJoinSemilattice) => {
+var binary = (dictShow) => (dictBoundedJoinSemilattice) => {
   const bot2 = dictBoundedJoinSemilattice.bot;
   return (id3) => (f) => $Tuple(
     id3,
@@ -35127,18 +35162,17 @@ var binary = (dictBoundedJoinSemilattice) => {
                 const $0 = dictMonadError.MonadThrow0().Monad0().Bind1().Apply0().Functor0();
                 return (v) => {
                   if (v.tag === "Cons" && v._2.tag === "Cons" && v._2._2.tag === "Nil") {
-                    const $1 = v._1._2;
-                    const $2 = v._2._1._2;
+                    const v$p = f.fwd(f.i1.unpack(v._1._2))(f.i2.unpack(v._2._1._2));
                     return $0.map((() => {
-                      const $3 = f.o;
-                      return (v$1) => $Val(v$1._2, $3.pack(v$1._1));
-                    })())($0.map((v3) => $Tuple(f.fwd(f.i1.unpack($1))(f.i2.unpack($2)), v3))(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v._2._1._1)()($$$Map(
+                      const $1 = f.o;
+                      return (v$1) => $Val(v$1._2, $1.pack(v$1._1));
+                    })())($0.map((v3) => $Tuple(v$p, v3))(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v._2._1._1)()($$$Map(
                       "Two",
                       Leaf2,
                       v._1._1,
                       void 0,
                       Leaf2
-                    )))));
+                    )))((k) => k(dictShow)(v$p))));
                   }
                   fail();
                 };
@@ -37685,9 +37719,9 @@ var drawableTableView = {
 var arrayDictToArray2 = (x2) => arrayMap((a) => arrayMap((a$1) => $$get2(showString)(mapDictString)(a$1)(a))(x2));
 
 // output-es/App.View/index.js
-var pack = (x2) => (k) => k(drawableBarChart)(x2);
-var pack1 = (x2) => (k) => k(drawableLineChart)(x2);
-var pack2 = (x2) => (k) => k(drawableScatterPlot)(x2);
+var pack2 = (x2) => (k) => k(drawableBarChart)(x2);
+var pack12 = (x2) => (k) => k(drawableLineChart)(x2);
+var pack22 = (x2) => (k) => k(drawableScatterPlot)(x2);
 var pack3 = (x2) => (k) => k(drawableParagraphSelState)(x2);
 var pack4 = (x2) => (k) => k(drawableMultiView)(x2);
 var identity28 = (x2) => x2;
@@ -37697,13 +37731,13 @@ var view = () => (v) => (v1) => (v2) => {
   if (v1._2.tag === "Constr") {
     if (v1._2._2.tag === "Cons" && v1._2._2._2.tag === "Nil") {
       if (v1._2._1 === "BarChart") {
-        return pack(dict(reflectDictSelState\u{1D54A}$x215ValS22.from())(v1._2._2._1));
+        return pack2(dict(reflectDictSelState\u{1D54A}$x215ValS22.from())(v1._2._2._1));
       }
       if (v1._2._1 === "LineChart") {
-        return pack1(dict(reflectDictSelState\u{1D54A}$x215ValS13.from())(v1._2._2._1));
+        return pack12(dict(reflectDictSelState\u{1D54A}$x215ValS13.from())(v1._2._2._1));
       }
       if (v1._2._1 === "ScatterPlot") {
-        return pack2(dict(reflectDictSelState\u{1D54A}$x215ValS5.from())(v1._2._2._1));
+        return pack22(dict(reflectDictSelState\u{1D54A}$x215ValS5.from())(v1._2._2._1));
       }
       if (v1._2._1 === "Paragraph") {
         return pack3(reflectValSelState\u{1D54A}Paragr.from()(v1._2._2._1));
@@ -37819,8 +37853,8 @@ var monadWithGraphWithGraphT = (dictMonad) => {
   const $1 = monadStateStateT(dictMonad);
   const monadStateT = { Applicative0: () => applicativeStateT(dictMonad), Bind1: () => bindStateT(dictMonad) };
   return {
-    extend: (\u03B1) => (\u03B1s) => {
-      const $2 = Cons($Tuple(\u03B1, \u03B1s));
+    extend: (\u03B1) => (\u03B1s) => (vd) => {
+      const $2 = Cons($Tuple(\u03B1, $Tuple(\u03B1s, vd)));
       const $3 = $1.state((s) => $Tuple(void 0, $2(s)));
       return (s) => $0.map((v1) => $Tuple(void 0, v1._2))($3(s));
     },
@@ -37882,10 +37916,10 @@ var runWithGraphT = (dictMonad) => {
   };
 };
 var runWithGraphT_spy = (dictMonad) => {
-  const runWithGraphT2 = runWithGraphT(dictMonad);
+  const runWithGraphT1 = runWithGraphT(dictMonad);
   const spyFunWhenM2 = spyFunWhenM(dictMonad.Bind1().Apply0().Functor0());
   return (dictGraph) => {
-    const $0 = runWithGraphT2(dictGraph);
+    const $0 = runWithGraphT1(dictGraph);
     const $1 = spyFunWhenM2(false)("runWithGraphT")(showVertices)((x2) => showEdgeList(toEdgeList(dictGraph)(x2._1)));
     return (x2) => $1($0(x2));
   };
@@ -37900,7 +37934,7 @@ var monadWithGraphAllocWithGr = (dictMonadError) => {
   const monadWithGraphWithGraphT1 = monadWithGraphWithGraphT(monadStateT);
   const monadErrorStateT2 = monadErrorStateT(monadErrorStateT(dictMonadError));
   return {
-    new: (\u03B1s) => bindStateT2.bind(fresh1)((\u03B1) => bindStateT2.bind(monadWithGraphWithGraphT1.extend(\u03B1)(\u03B1s))(() => applicativeStateT(monadStateT).pure(\u03B1))),
+    new: (\u03B1s) => (vd) => bindStateT2.bind(fresh1)((\u03B1) => bindStateT2.bind(monadWithGraphWithGraphT1.extend(\u03B1)(\u03B1s)(vd))(() => applicativeStateT(monadStateT).pure(\u03B1))),
     MonadAlloc0: () => monadAllocWithGraphAllocT1,
     MonadError1: () => monadErrorStateT2,
     MonadWithGraph2: () => monadWithGraphWithGraphT1
@@ -37910,6 +37944,7 @@ var monadWithGraphAllocWithGr = (dictMonadError) => {
 // output-es/Graph.Slice/index.js
 var pure2 = /* @__PURE__ */ (() => applicativeStateT(monadIdentity).pure)();
 var extend3 = /* @__PURE__ */ (() => monadWithGraphWithGraphT(monadIdentity).extend)();
+var pack7 = (x2) => (k) => k(showString)(x2);
 var tailRecM = /* @__PURE__ */ (() => monadRecStateT(monadRecIdentity).tailRecM)();
 var member4 = /* @__PURE__ */ (() => setSet(ordVertex).member)();
 var fromFoldable19 = /* @__PURE__ */ (() => foldableSet.foldr(Cons)(Nil))();
@@ -37935,7 +37970,7 @@ var fwdSlice = (dictGraph) => {
           fail();
         })();
         if (eqMap(eqVertex)(eqUnit).eq(\u03B2s)(dictGraph.outN($0)(v1.es._1._1))) {
-          return bindStateT(monadIdentity).bind(extend3(v1.es._1._1)(\u03B2s))(() => pure2($Step(
+          return bindStateT(monadIdentity).bind(extend3(v1.es._1._1)(\u03B2s)(pack7("uninit: fwd")))(() => pure2($Step(
             "Loop",
             {
               pending: $$delete3(ordVertex)(v1.es._1._1)(v1.pending),
@@ -37960,10 +37995,12 @@ var bwdSlice = (dictGraph) => {
           return pure2($Step("Done", void 0));
         }
         if (v1.pending.tag === "Cons") {
+          const $2 = v1.pending._1._2._2;
+          const $3 = v1.pending._1._2._1;
           if (member4(v1.pending._1._1)(v1.visited)) {
             return pure2($Step("Loop", { visited: v1.visited, "\u03B1s": Nil, pending: v1.pending._2 }));
           }
-          return bindStateT(monadIdentity).bind(extend3(v1.pending._1._1)(v1.pending._1._2))(() => pure2($Step(
+          return bindStateT(monadIdentity).bind(extend3(v1.pending._1._1)($3)(spyWhen(true)("Value found at " + showStringImpl(v1.pending._1._1))((v$1) => v$1((dictShow) => dictShow.show))($2)))(() => pure2($Step(
             "Loop",
             { visited: insert3(ordVertex)(v1.pending._1._1)()(v1.visited), "\u03B1s": Nil, pending: v1.pending._2 }
           )));
@@ -37977,7 +38014,7 @@ var bwdSlice = (dictGraph) => {
           {
             visited: v1.visited,
             "\u03B1s": foldableList.foldr(Cons)(v1["\u03B1s"]._2)(fromFoldable19(\u03B2s)),
-            pending: $List("Cons", $Tuple(v1["\u03B1s"]._1, \u03B2s), v1.pending)
+            pending: $List("Cons", $Tuple(v1["\u03B1s"]._1, $Tuple(\u03B2s, dictGraph.vertexData($0)(v1["\u03B1s"]._1))), v1.pending)
           }
         ));
       }
@@ -37998,6 +38035,7 @@ var show22 = /* @__PURE__ */ (() => showSet(showString).show)();
 var toUnfoldable10 = /* @__PURE__ */ toUnfoldable4(unfoldableList);
 var union1 = /* @__PURE__ */ (() => setSet(ordString).union)();
 var fv = /* @__PURE__ */ (() => fVDict(fVElim).fv)();
+var pack8 = (x2) => (k) => k(showBaseVal)(x2);
 var fromFoldable110 = /* @__PURE__ */ fromFoldable(foldableList);
 var greaterThanOrEq = /* @__PURE__ */ (() => {
   const $0 = ordTuple(ordInt)(ordInt);
@@ -38147,22 +38185,22 @@ var closeDefs = (dictMonadWithGraphAlloc) => {
   const traverse2 = traversableDict.traverse(Monad0.Applicative0());
   return (\u03B3) => (\u03C1) => (\u03B1s) => Functor0.map(Env)(traverse2((\u03C3) => {
     const \u03C1$p = forDefs(\u03C1)(\u03C3);
-    const $0 = $BaseVal(
+    const v = $BaseVal(
       "Fun",
       $Fun(
         "Closure",
         (() => {
-          const $02 = union1(fv(\u03C1$p))(fVElim.fv(\u03C3));
+          const $0 = union1(fv(\u03C1$p))(fVElim.fv(\u03C3));
           return filterWithKey((x2) => {
-            const $1 = setSet(ordString).member(x2)($02);
-            return (v) => $1;
+            const $1 = setSet(ordString).member(x2)($0);
+            return (v2) => $1;
           })(\u03B3);
         })(),
         \u03C1$p,
         \u03C3
       )
     );
-    return Functor0.map((f) => f($0))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(\u03B1s)));
+    return Functor0.map((f) => f(v))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(\u03B1s)(pack8(v))));
   })(\u03C1));
 };
 var $$eval = (dictMonadWithGraphAlloc) => {
@@ -38187,13 +38225,22 @@ var $$eval = (dictMonadWithGraphAlloc) => {
       return withMsg2("Variable lookup")(lookup$p(MonadThrow0)(showString)(mapEnvStringVal)(v1._1)(v));
     }
     if (v1.tag === "Int") {
-      return Functor0.map((f) => f($BaseVal("Int", v1._2)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))));
+      return Functor0.map((f) => f($BaseVal("Int", v1._2)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))(pack8($BaseVal(
+        "Int",
+        v1._2
+      )))));
     }
     if (v1.tag === "Float") {
-      return Functor0.map((f) => f($BaseVal("Float", v1._2)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))));
+      return Functor0.map((f) => f($BaseVal("Float", v1._2)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))(pack8($BaseVal(
+        "Float",
+        v1._2
+      )))));
     }
     if (v1.tag === "Str") {
-      return Functor0.map((f) => f($BaseVal("Str", v1._2)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))));
+      return Functor0.map((f) => f($BaseVal("Str", v1._2)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))(pack8($BaseVal(
+        "Str",
+        v1._2
+      )))));
     }
     if (v1.tag === "Dictionary") {
       const $0 = v1._1;
@@ -38202,8 +38249,8 @@ var $$eval = (dictMonadWithGraphAlloc) => {
         return (a) => $1(a)(v2);
       })()))(v1._2)))((v3) => {
         const v4 = unzip(listMap((v$1) => $Tuple(v$1._2.tag === "Str" ? v$1._2._1 : typeError(v$1._2)("Str"), v$1._1))(v3._1));
-        const $1 = $BaseVal("Dictionary", fromFoldable110(zipWith2(Tuple)(v4._1)(zipWith2(Tuple)(v4._2)(v3._2))));
-        return Functor0.map((f) => f($1))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)($0)()(v2))));
+        const v5 = $BaseVal("Dictionary", fromFoldable110(zipWith2(Tuple)(v4._1)(zipWith2(Tuple)(v4._2)(v3._2))));
+        return Functor0.map((f) => f(v5))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)($0)()(v2))(pack8(v5))));
       });
     }
     if (v1.tag === "Constr") {
@@ -38233,7 +38280,11 @@ var $$eval = (dictMonadWithGraphAlloc) => {
       })()))(() => Bind1.bind(traverse2((() => {
         const $3 = $$eval(dictMonadWithGraphAlloc)(v);
         return (a) => $3(a)(v2);
-      })())($1))((vs) => Functor0.map((f) => f($BaseVal("Constr", $0, vs)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)($2)()(v2))))));
+      })())($1))((vs) => Functor0.map((f) => f($BaseVal("Constr", $0, vs)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)($2)()(v2))(pack8($BaseVal(
+        "Constr",
+        $0,
+        vs
+      )))))));
     }
     if (v1.tag === "Matrix") {
       const $0 = v1._2;
@@ -38261,18 +38312,21 @@ var $$eval = (dictMonadWithGraphAlloc) => {
               return $8;
             })())))($0)(v2)
           ]))
-        ])))((vss) => Functor0.map((f) => f($BaseVal("Matrix", $Tuple(vss, $Tuple($Tuple($4, $6), $Tuple($5, $7))))))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)($3)()(v2))))));
+        ])))((vss) => Functor0.map((f) => f($BaseVal("Matrix", $Tuple(vss, $Tuple($Tuple($4, $6), $Tuple($5, $7))))))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)($3)()(v2))(pack8($BaseVal(
+          "Matrix",
+          $Tuple(vss, $Tuple($Tuple($4, $6), $Tuple($5, $7)))
+        )))))));
       });
     }
     if (v1.tag === "Lambda") {
-      const $0 = $BaseVal(
+      const v3 = $BaseVal(
         "Fun",
         $Fun(
           "Closure",
           (() => {
-            const $02 = fVElim.fv(v1._2);
+            const $0 = fVElim.fv(v1._2);
             return filterWithKey((x2) => {
-              const $1 = setSet(ordString).member(x2)($02);
+              const $1 = setSet(ordString).member(x2)($0);
               return (v$1) => $1;
             })(v);
           })(),
@@ -38280,7 +38334,7 @@ var $$eval = (dictMonadWithGraphAlloc) => {
           v1._2
         )
       );
-      return Functor0.map((f) => f($0))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))));
+      return Functor0.map((f) => f(v3))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v1._1)()(v2))(pack8(v3))));
     }
     if (v1.tag === "Project") {
       const $0 = v1._2;
@@ -38379,7 +38433,7 @@ var apply2 = (dictMonadWithGraphAlloc) => {
             v._1,
             void 0,
             Leaf2
-          ))));
+          ))(pack8($BaseVal("Fun", $Fun("Foreign", $Tuple($1, $2), vs$p))))));
         }
         return $2._1["op'"](dictMonadWithGraphAlloc)(MonadError1)(vs$p);
       }
@@ -38430,26 +38484,26 @@ var apply2 = (dictMonadWithGraphAlloc) => {
             };
             return go(0)($2) < (n - 1 | 0);
           })()) {
-            const $42 = $BaseVal(
+            const v$p2 = $BaseVal(
               "Fun",
               $Fun("PartialConstr", $1, foldableList.foldr(Cons)($List("Cons", v1, Nil))($2))
             );
-            return Functor0.map((f) => f($42))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
+            return Functor0.map((f) => f(v$p2))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
               "Two",
               Leaf2,
               $3,
               void 0,
               Leaf2
-            ))));
+            ))(pack8(v$p2))));
           }
-          const $4 = $BaseVal("Constr", $1, foldableList.foldr(Cons)($List("Cons", v1, Nil))($2));
-          return Functor0.map((f) => f($4))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
+          const v$p = $BaseVal("Constr", $1, foldableList.foldr(Cons)($List("Cons", v1, Nil))($2));
+          return Functor0.map((f) => f(v$p))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
             "Two",
             Leaf2,
             $3,
             void 0,
             Leaf2
-          ))));
+          ))(pack8(v$p))));
         });
       }
     }
@@ -42864,6 +42918,7 @@ var apply2Bwd = (dictAnn) => {
 };
 
 // output-es/Primitive.Defs/index.js
+var pack9 = (x2) => (k) => k(showBaseVal)(x2);
 var erase = /* @__PURE__ */ (() => functorVal.map((v) => {
 }))();
 var unzip6 = /* @__PURE__ */ unzip3(functorDict);
@@ -42873,11 +42928,24 @@ var foldWithIndexM = (dictMonad) => (f) => (a0) => foldableWithIndexStringDi.fol
   return (a) => $0(a)(b);
 })()))(dictMonad.Applicative0().pure(a0));
 var disjointUnion5 = /* @__PURE__ */ disjointUnion(mapDictString);
-var unary2 = /* @__PURE__ */ unary(boundedJoinSemilatticeUni);
-var binary2 = /* @__PURE__ */ binary(boundedJoinSemilatticeUni);
-var binaryZero2 = /* @__PURE__ */ binaryZero(boundedJoinSemilatticeUni);
-var binaryZero1 = /* @__PURE__ */ (() => binaryZero2({ isZero: fanin2(isZeroInt.isZero)(isZeroNumber.isZero) }))();
-var binaryZero22 = /* @__PURE__ */ binaryZero2(isZeroInt);
+var unary2 = /* @__PURE__ */ unary(showInt)(boundedJoinSemilatticeUni);
+var showEither = {
+  show: (v) => {
+    if (v.tag === "Left") {
+      return "(Left " + showIntImpl(v._1) + ")";
+    }
+    if (v.tag === "Right") {
+      return "(Right " + showNumberImpl(v._1) + ")";
+    }
+    fail();
+  }
+};
+var binary2 = /* @__PURE__ */ binary(showEither)(boundedJoinSemilatticeUni);
+var binaryZero2 = /* @__PURE__ */ (() => binaryZero(showEither)(boundedJoinSemilatticeUni)({
+  isZero: fanin2(isZeroInt.isZero)(isZeroNumber.isZero)
+}))();
+var binary1 = /* @__PURE__ */ binary(showBoolean)(boundedJoinSemilatticeUni);
+var binaryZero1 = /* @__PURE__ */ binaryZero(showInt)(boundedJoinSemilatticeUni)(isZeroInt);
 var pow3 = /* @__PURE__ */ union5(asNumberIntOrNumber)(asNumberIntOrNumber)(asIntNumber)(asIntNumber)((x2) => (y2) => pow(toNumber(x2))(toNumber(y2)))(pow);
 var numToStr = (v2) => {
   if (v2.tag === "Left") {
@@ -42899,14 +42967,14 @@ var matrixUpdate = /* @__PURE__ */ $Tuple(
       return (v) => {
         if (v.tag === "Cons" && v._1._2.tag === "Matrix" && v._2.tag === "Cons" && v._2._1._2.tag === "Constr" && v._2._1._2._2.tag === "Cons" && v._2._1._2._2._1._2.tag === "Int" && v._2._1._2._2._2.tag === "Cons" && v._2._1._2._2._2._1._2.tag === "Int" && v._2._1._2._2._2._2.tag === "Nil" && v._2._2.tag === "Cons" && v._2._2._2.tag === "Nil" && v._2._1._2._1 === "Pair") {
           const $0 = v._2._2._1;
-          const $1 = $BaseVal("Matrix", matrixPut(v._2._1._2._2._1._2._1)(v._2._1._2._2._2._1._2._1)((v$1) => $0)(v._1._2._1));
-          return Functor0.map((f) => f($1))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
+          const v$p = $BaseVal("Matrix", matrixPut(v._2._1._2._2._1._2._1)(v._2._1._2._2._2._1._2._1)((v$1) => $0)(v._1._2._1));
+          return Functor0.map((f) => f(v$p))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
             "Two",
             Leaf2,
             v._1._1,
             void 0,
             Leaf2
-          ))));
+          ))(pack9(v$p))));
         }
         return MonadThrow0.throwError(error("Matrix, pair of integers and value expected"));
       };
@@ -43088,28 +43156,31 @@ var dims = /* @__PURE__ */ $Tuple(
       const Functor0 = Bind1.Apply0().Functor0();
       return (v) => {
         if (v.tag === "Cons" && v._1._2.tag === "Matrix" && v._2.tag === "Nil") {
-          const $0 = v._1._2._1._2._2._1;
-          const $1 = v._1._1;
-          const $2 = v._1._2._1._2._2._2;
-          return Bind1.bind(Functor0.map((f) => f($BaseVal("Int", v._1._2._1._2._1._1)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
+          const $0 = v._1._2._1._2._1._1;
+          const $1 = v._1._2._1._2._2._1;
+          const $2 = v._1._1;
+          const $3 = v._1._2._1._2._2._2;
+          return Bind1.bind(Functor0.map((f) => f($BaseVal("Int", $0)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
             "Two",
             Leaf2,
             v._1._2._1._2._1._2,
             void 0,
             Leaf2
-          )))))((v1) => Bind1.bind(Functor0.map((f) => f($BaseVal("Int", $0)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
+          ))(pack9($BaseVal("Int", $0))))))((v1) => Bind1.bind(Functor0.map((f) => f($BaseVal("Int", $1)))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
             "Two",
             Leaf2,
-            $2,
+            $3,
             void 0,
             Leaf2
-          )))))((v2) => Functor0.map((f) => f($BaseVal("Constr", "Pair", $List("Cons", v1, $List("Cons", v2, Nil)))))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map(
-            "Two",
-            Leaf2,
-            $1,
-            void 0,
-            Leaf2
-          ))))));
+          ))(pack9($BaseVal("Int", $1))))))((v2) => Functor0.map((f) => f($BaseVal(
+            "Constr",
+            "Pair",
+            $List("Cons", v1, $List("Cons", v2, Nil))
+          )))(Functor0.map(Val)(dictMonadWithGraphAlloc.new($$$Map("Two", Leaf2, $2, void 0, Leaf2))(pack9($BaseVal(
+            "Constr",
+            "Pair",
+            $List("Cons", v1, $List("Cons", v2, Nil))
+          )))))));
         }
         return MonadThrow0.throwError(error("Matrix expected"));
       };
@@ -43189,7 +43260,7 @@ var dict_map = /* @__PURE__ */ $Tuple(
               $1,
               void 0,
               Leaf2
-            )))));
+            ))(pack9($BaseVal("Dictionary", d$p))))));
           }
           return MonadThrow0.throwError(error("Function and dictionary expected"));
         };
@@ -43254,27 +43325,31 @@ var dict_intersectionWith = /* @__PURE__ */ $Tuple(
         const Bind1 = Monad0.Bind1();
         const Apply0 = Bind1.Apply0();
         const $0 = Apply0.Functor0();
-        const sequence1 = traversableDict.sequence(Monad0.Applicative0());
+        const Applicative0 = Monad0.Applicative0();
         return (v) => {
           if (v.tag === "Cons" && v._2.tag === "Cons" && v._2._1._2.tag === "Dictionary" && v._2._2.tag === "Cons" && v._2._2._1._2.tag === "Dictionary" && v._2._2._2.tag === "Nil") {
             const $1 = v._1;
-            return Apply0.apply($0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v._2._2._1._1)()($$$Map(
-              "Two",
-              Leaf2,
-              v._2._1._1,
-              void 0,
-              Leaf2
-            )))))($0.map(Dictionary3)($0.map(DictRep)(sequence1(intersectionWith_Object((v2) => (v3) => {
-              const $2 = v2._2;
-              const $3 = v3._2;
-              return Bind1.bind(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v3._1)()($$$Map(
+            const $2 = v._2._1._1;
+            const $3 = v._2._2._1._1;
+            const v$p = $0.map(Dictionary3)($0.map(DictRep)(traversableDict.traverse(Applicative0)(identity19)(intersectionWith_Object((v2) => (v3) => {
+              const $4 = v3._2;
+              const $5 = v2._1;
+              const $6 = v3._1;
+              return Bind1.bind(Bind1.bind(apply4($1)(v2._2))((a) => apply4(a)($4)))((v4) => Bind1.bind(dictMonadWithGraphAlloc.new(insert3(ordVertex)($6)()($$$Map(
                 "Two",
                 Leaf2,
-                v2._1,
+                $5,
                 void 0,
                 Leaf2
-              ))))((\u03B2$p$p) => $0.map(Tuple(\u03B2$p$p))(Bind1.bind(apply4($1)($2))((a) => apply4(a)($3))));
-            })(v._2._1._2._1)(v._2._2._1._2._1)))));
+              )))(pack9(v4._2)))((\u03B2$p$p) => $0.map(Tuple(\u03B2$p$p))(Applicative0.pure(v4))));
+            })(v._2._1._2._1)(v._2._2._1._2._1))));
+            return Bind1.bind(v$p)((packable) => Apply0.apply($0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)($3)()($$$Map(
+              "Two",
+              Leaf2,
+              $2,
+              void 0,
+              Leaf2
+            )))(pack9(packable))))(v$p));
           }
           return MonadThrow0.throwError(error("Function and two dictionaries expected"));
         };
@@ -43507,14 +43582,14 @@ var dict_disjointUnion = /* @__PURE__ */ $Tuple(
       const Functor0 = MonadThrow0.Monad0().Bind1().Apply0().Functor0();
       return (v) => {
         if (v.tag === "Cons" && v._1._2.tag === "Dictionary" && v._2.tag === "Cons" && v._2._1._2.tag === "Dictionary" && v._2._2.tag === "Nil") {
-          const $0 = $BaseVal("Dictionary", disjointUnion5(v._1._2._1)(v._2._1._2._1));
-          return Functor0.map((f) => f($0))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v._2._1._1)()($$$Map(
+          const v1 = $BaseVal("Dictionary", disjointUnion5(v._1._2._1)(v._2._1._2._1));
+          return Functor0.map((f) => f(v1))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v._2._1._1)()($$$Map(
             "Two",
             Leaf2,
             v._1._1,
             void 0,
             Leaf2
-          )))));
+          )))(pack9(v1))));
         }
         return MonadThrow0.throwError(error("Dictionaries expected"));
       };
@@ -43555,14 +43630,14 @@ var dict_difference = /* @__PURE__ */ $Tuple(
       const Functor0 = MonadThrow0.Monad0().Bind1().Apply0().Functor0();
       return (v) => {
         if (v.tag === "Cons" && v._1._2.tag === "Dictionary" && v._2.tag === "Cons" && v._2._1._2.tag === "Dictionary" && v._2._2.tag === "Nil") {
-          const $0 = $BaseVal("Dictionary", mapFObjectString.difference(v._1._2._1)(v._2._1._2._1));
-          return Functor0.map((f) => f($0))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v._2._1._1)()($$$Map(
+          const v1 = $BaseVal("Dictionary", mapFObjectString.difference(v._1._2._1)(v._2._1._2._1));
+          return Functor0.map((f) => f(v1))(Functor0.map(Val)(dictMonadWithGraphAlloc.new(insert3(ordVertex)(v._2._1._1)()($$$Map(
             "Two",
             Leaf2,
             v._1._1,
             void 0,
             Leaf2
-          )))));
+          )))(pack9(v1))));
         }
         return MonadThrow0.throwError(error("Dictionaries expected."));
       };
@@ -43631,8 +43706,8 @@ var primitives = /* @__PURE__ */ fromFoldable(foldableArray)([
   /* @__PURE__ */ extern1(dims),
   /* @__PURE__ */ extern1(error_),
   /* @__PURE__ */ unary2("floor")({ i: number5, o: $$int, fwd: floor2 }),
-  /* @__PURE__ */ unary2("log")({ i: intOrNumber, o: number5, fwd: log3 }),
-  /* @__PURE__ */ unary2("numToStr")({ i: intOrNumber, o: string2, fwd: numToStr }),
+  /* @__PURE__ */ unary(showNumber)(boundedJoinSemilatticeUni)("log")({ i: intOrNumber, o: number5, fwd: log3 }),
+  /* @__PURE__ */ unary(showString)(boundedJoinSemilatticeUni)("numToStr")({ i: intOrNumber, o: string2, fwd: numToStr }),
   /* @__PURE__ */ binary2("+")({
     i1: intOrNumber,
     i2: intOrNumber,
@@ -43645,25 +43720,30 @@ var primitives = /* @__PURE__ */ fromFoldable(foldableArray)([
     o: intOrNumber,
     fwd: /* @__PURE__ */ union5(asIntIntOrNumber)(asNumberIntOrNumber)(asIntNumber)(asIntNumber)(intSub)(numSub)
   }),
-  /* @__PURE__ */ binaryZero1("*")({
+  /* @__PURE__ */ binaryZero2("*")({
     i: intOrNumber,
     o: intOrNumber,
     fwd: /* @__PURE__ */ union5(asIntIntOrNumber)(asNumberIntOrNumber)(asIntNumber)(asIntNumber)(intMul)(numMul)
   }),
-  /* @__PURE__ */ binaryZero1("**")({ i: intOrNumber, o: intOrNumber, fwd: pow3 }),
-  /* @__PURE__ */ binaryZero1("/")({ i: intOrNumber, o: intOrNumber, fwd: divide }),
-  /* @__PURE__ */ binary2("==")({
+  /* @__PURE__ */ binaryZero2("**")({ i: intOrNumber, o: intOrNumber, fwd: pow3 }),
+  /* @__PURE__ */ binaryZero2("/")({ i: intOrNumber, o: intOrNumber, fwd: divide }),
+  /* @__PURE__ */ binary1("==")({
     i1: intOrNumberOrString,
     i2: intOrNumberOrString,
     o: $$boolean,
     fwd: /* @__PURE__ */ union5(asBooleanBoolean)(asBooleanBoolean)(asIntNumberOrString)(asIntNumberOrString)(eqIntImpl)(/* @__PURE__ */ unionStr(asBooleanBoolean)(asNumberString)(eqNumberImpl)(eqStringImpl))
   }),
-  /* @__PURE__ */ binary2("/=")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: notEquals }),
-  /* @__PURE__ */ binary2("<")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: lessThan }),
-  /* @__PURE__ */ binary2(">")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: greaterThan }),
-  /* @__PURE__ */ binary2("<=")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: lessThanEquals }),
-  /* @__PURE__ */ binary2(">=")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: greaterThanEquals }),
-  /* @__PURE__ */ binary2("++")({ i1: string2, i2: string2, o: string2, fwd: concatString }),
+  /* @__PURE__ */ binary1("/=")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: notEquals }),
+  /* @__PURE__ */ binary1("<")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: lessThan }),
+  /* @__PURE__ */ binary1(">")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: greaterThan }),
+  /* @__PURE__ */ binary1("<=")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: lessThanEquals }),
+  /* @__PURE__ */ binary1(">=")({ i1: intOrNumberOrString, i2: intOrNumberOrString, o: $$boolean, fwd: greaterThanEquals }),
+  /* @__PURE__ */ binary(showString)(boundedJoinSemilatticeUni)("++")({
+    i1: string2,
+    i2: string2,
+    o: string2,
+    fwd: concatString
+  }),
   /* @__PURE__ */ extern1(matrixLookup),
   /* @__PURE__ */ extern1(dict_difference),
   /* @__PURE__ */ extern1(dict_disjointUnion),
@@ -43672,10 +43752,10 @@ var primitives = /* @__PURE__ */ fromFoldable(foldableArray)([
   /* @__PURE__ */ extern1(dict_intersectionWith),
   /* @__PURE__ */ extern1(dict_map),
   /* @__PURE__ */ extern1(matrixUpdate),
-  /* @__PURE__ */ binaryZero22("div")({ i: $$int, o: $$int, fwd: intDiv2 }),
-  /* @__PURE__ */ binaryZero22("mod")({ i: $$int, o: $$int, fwd: intMod }),
-  /* @__PURE__ */ binaryZero22("quot")({ i: $$int, o: $$int, fwd: quot }),
-  /* @__PURE__ */ binaryZero22("rem")({ i: $$int, o: $$int, fwd: rem })
+  /* @__PURE__ */ binaryZero1("div")({ i: $$int, o: $$int, fwd: intDiv2 }),
+  /* @__PURE__ */ binaryZero1("mod")({ i: $$int, o: $$int, fwd: intMod }),
+  /* @__PURE__ */ binaryZero1("quot")({ i: $$int, o: $$int, fwd: quot }),
+  /* @__PURE__ */ binaryZero1("rem")({ i: $$int, o: $$int, fwd: rem })
 ]);
 
 // output-es/ProgCxt/index.js
