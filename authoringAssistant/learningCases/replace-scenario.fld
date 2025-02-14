@@ -36,5 +36,5 @@ let findLikelihood (min, max) target =
     else (target - min)/(max - min);
 let envDataTable = newDataTable 13;
     probMetric = newModel 0.35;
-    earlyScenario = getByScenario "SSP3-7.0" envDataTable;
+    earlyScenario = getByScenario "$random_var_1$" envDataTable;
     lateScenario = getByScenario "SSP1-1.9" envDataTable
