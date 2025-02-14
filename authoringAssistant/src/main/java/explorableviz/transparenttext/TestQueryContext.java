@@ -29,8 +29,8 @@ public class TestQueryContext extends QueryContext {
     public ArrayList<QueryContext> instantiate(int number) throws RuntimeException, IOException {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         for (int i = 0; i < number; i++) {
-            Pair<String, String> replacedVariables = replaceVariables(this.getCode(), this.getExpected());
-            QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), replacedVariables.getFirst(), getParagraph(), replacedVariables.getSecond());
+            QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), this.getCode(), getParagraph(), this.getExpected());
+            queryContext.replaceVariables(variables, random);
             Optional<String> result = queryContext.validate(queryContext.evaluate(queryContext.getExpected()));
             if (result.isEmpty()) {
                 queryContexts.add(queryContext);
@@ -84,33 +84,6 @@ public class TestQueryContext extends QueryContext {
         return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected, filePath);
     }
 
-    private static String getRandomString(int length, Random generator) {
-        StringBuilder sb = new StringBuilder(length);
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        for (int i = 0; i < length; i++) {
-            int randomIndex = generator.nextInt(characters.length());
-            sb.append(characters.charAt(randomIndex));
-        }
-        return sb.toString();
-    }
 
-    private Pair<String, String> replaceVariables(String code, String expected) {
 
-        for (Map.Entry<String, String> entry : variables.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            String variablePlaceholder = STR."$\{key}$";
-            String replacement = switch (value) {
-                case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
-                case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
-                case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
-                default -> value;
-            };
-
-            code = code.replace(variablePlaceholder, replacement);
-            expected = expected.replace(variablePlaceholder, replacement);
-
-        }
-        return new Pair<>(code, expected);
-    }
 }
