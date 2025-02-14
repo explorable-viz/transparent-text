@@ -138,7 +138,7 @@ public class QueryContext {
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -f \{tempFile}");
+            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -f \{tempFile}");
             this.getDataset().forEach((key, path) -> {
                 command.append(" -d \"(").append(key).append(", ").append("temp/").append(path).append(")\"");
             });
