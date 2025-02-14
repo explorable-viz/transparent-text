@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class QueryContext {
 
@@ -86,6 +87,10 @@ public class QueryContext {
         }
     }
 
+    public HashMap<String, String> get_loadedDatasets() {
+        return _loadedDatasets;
+    }
+
     public String toUserPrompt() {
         JSONObject object = new JSONObject();
         object.put("datasets", this._loadedDatasets);
@@ -128,14 +133,14 @@ public class QueryContext {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
             String tempFile = Settings.getInstance().getFluidTempFile();
-            writeFluidFile(response, tempFile);
+            writeFluidFiles(response, tempFile);
             String os = System.getProperty("os.name").toLowerCase();
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
             StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempFile}");
             this.getDataset().forEach((key, path) -> {
-                command.append(" -d \"(").append(key).append(", ").append(path).append(")\"");
+                command.append(" -d \"(").append(key).append(", ").append("temp/").append(path).append(")\"");
             });
             this.getImports().forEach(path -> {
                 command.append(" -i ").append(path);
@@ -154,17 +159,17 @@ public class QueryContext {
             String errorOutput = new String(process.getErrorStream().readAllBytes());
 
             logger.info(STR."Command output: \{output}");
-            if(!errorOutput.isEmpty()) {
+            if (!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
-            Files.delete(Path.of(new File(STR."fluid/\{tempFile}.fld").getPath()));
+            deleteDirectory(Path.of("fluid/temp"));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
         }
     }
 
-    public Optional<String> validate(String output)  {
+    public Optional<String> validate(String output) {
         logger.info(STR."Validating output: \{output}");
         //Extract value from input query.text
         Optional<TextFragment> textFragment = paragraph.stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
@@ -195,12 +200,36 @@ public class QueryContext {
         return new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3)));
     }
 
-    private void writeFluidFile(String response, String path) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(STR."\{path}.fld");
-        out.println(this.getCode());
-        out.println(STR."in \{response}");
-        out.flush();
-        out.close();
+    private void writeFluidFiles(String response, String path) throws IOException {
+        Files.createDirectories(Paths.get("fluid/temp/dataset"));
+        Files.createDirectories(Paths.get("fluid/temp/example"));
+
+        try (PrintWriter out = new PrintWriter(STR."fluid/\{path}.fld")) {
+            out.println(this.getCode());
+            out.println(STR."in \{response}");
+        }
+
+        this.dataset.forEach((v, p) -> {
+            try (PrintWriter outData = new PrintWriter(STR."fluid/temp/\{p}.fld")) {
+                outData.println(this._loadedDatasets.get(v));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException("Error during the generation of dataset files");
+            }
+        });
+    }
+
+    public static void deleteDirectory(Path directory) throws IOException {
+        if (Files.exists(directory)) {
+            try (Stream<Path> paths = Files.walk(directory)) {
+                paths.sorted(Comparator.reverseOrder()).forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (IOException e) {
+                        throw new RuntimeException("Error during delete of: " + path, e);
+                    }
+                });
+            }
+        }
     }
 
     public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws Exception {
@@ -209,7 +238,9 @@ public class QueryContext {
         Files.list(Paths.get(casesFolder))
                 .filter(Files::isRegularFile) // Only process files, not directories
                 .map(path -> path.toAbsolutePath().toString()) // Get file name
-                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name).forEach(filePath -> {
+                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
+                .collect(Collectors.toSet())
+                .forEach(filePath -> {
                     TestQueryContext queryContext;
                     try {
                         queryContext = TestQueryContext.importFromJson(filePath, random);
@@ -219,5 +250,40 @@ public class QueryContext {
                     }
                 });
         return queryContexts;
+    }
+
+    public void replaceVariables(Map<String, String> variables, Random random) {
+        String code = this.getCode();
+        String expected = this.getExpected();
+
+        for (Map.Entry<String, String> entry : variables.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            String variablePlaceholder = STR."$\{key}$";
+            String replacement = switch (value) {
+                case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
+                case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
+                case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
+                default -> value;
+            };
+            code = code.replace(variablePlaceholder, replacement);
+            expected = expected.replace(variablePlaceholder, replacement);
+            this.getParagraph().forEach(t -> {
+                t.setValue(t.getValue().replace(variablePlaceholder, replacement));
+            });
+            this.get_loadedDatasets().replaceAll((k, v) -> v.replace(variablePlaceholder, replacement));
+        }
+        this.setCode(code);
+        this.setExpected(expected);
+    }
+
+    private static String getRandomString(int length, Random generator) {
+        StringBuilder sb = new StringBuilder(length);
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        for (int i = 0; i < length; i++) {
+            int randomIndex = generator.nextInt(characters.length());
+            sb.append(characters.charAt(randomIndex));
+        }
+        return sb.toString();
     }
 }
