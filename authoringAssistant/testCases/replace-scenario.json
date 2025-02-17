@@ -4,7 +4,7 @@
   },
   "datasets": [{
     "var": "tableData",
-    "file": "../website/Ar6Wg1SPM/fluid/text-viz/datasets/test-dataset"
+    "file": "website/Ar6Wg1SPM/fluid/datasets/test-dataset"
   }],
   "imports": [],
   "expected": "earlyScenario.scenario",
