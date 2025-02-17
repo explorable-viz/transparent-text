@@ -77,11 +77,11 @@ public class QueryContext {
 
     public void loadFiles() throws IOException {
         for (Map.Entry<String, String> dataset : this.dataset.entrySet()) {
-            String path = STR."fluid/\{dataset.getValue()}";
+            String path = STR."\{dataset.getValue()}";
             this._loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
         for (String path : imports) {
-            path = STR."fluid/\{path}";
+            path = STR."\{path}";
             this._loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
     }
@@ -133,7 +133,7 @@ public class QueryContext {
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -f \{tempFile}");
+            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempFile}");
             this.getDataset().forEach((key, path) -> {
                 command.append(" -d \"(").append(key).append(", ").append(path).append(")\"");
             });
@@ -168,9 +168,7 @@ public class QueryContext {
         logger.info(STR."Validating output: \{output}");
         //Extract value from input query.text
         Optional<TextFragment> textFragment = paragraph.stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
-        if(textFragment.isEmpty()) {
-            throw new RuntimeException("REPLACE tag missing");
-        }
+
         String expectedValue = splitLiteral((Literal) textFragment.get()).tag().getValue();
         // Extract and clean the generated expression
         String[] outputLines = output.split("\n");
@@ -198,7 +196,7 @@ public class QueryContext {
     }
 
     private void writeFluidFile(String response, String path) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(STR."fluid/\{path}.fld");
+        PrintWriter out = new PrintWriter(STR."\{path}.fld");
         out.println(this.getCode());
         out.println(STR."in \{response}");
         out.flush();
