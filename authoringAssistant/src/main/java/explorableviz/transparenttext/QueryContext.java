@@ -79,11 +79,11 @@ public class QueryContext {
 
     public void loadFiles() throws IOException {
         for (Map.Entry<String, String> dataset : this.dataset.entrySet()) {
-            String path = STR."fluid/\{dataset.getValue()}";
+            String path = STR."\{dataset.getValue()}";
             this._loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
         for (String path : imports) {
-            path = STR."fluid/\{path}";
+            path = STR."\{path}";
             this._loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
     }
@@ -135,7 +135,7 @@ public class QueryContext {
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -f \{tempFile}");
+            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempFile}");
             this.getDataset().forEach((key, path) -> {
                 command.append(" -d \"(").append(key).append(", ").append(path).append(")\"");
             });
@@ -197,7 +197,7 @@ public class QueryContext {
     }
 
     private void writeFluidFile(String response, String path) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(STR."fluid/\{path}.fld");
+        PrintWriter out = new PrintWriter(STR."\{path}.fld");
         out.println(this.getCode());
         out.println(STR."in \{response}");
         out.flush();
