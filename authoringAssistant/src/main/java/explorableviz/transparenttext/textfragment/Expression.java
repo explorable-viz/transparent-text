@@ -15,4 +15,9 @@ public class Expression extends TextFragment {
     public void setExpr(String expr) {
         this.expr = expr;
     }
+
+    @Override
+    public Expression clone() {
+        return new Expression(expr, getValue());
+    }
 }

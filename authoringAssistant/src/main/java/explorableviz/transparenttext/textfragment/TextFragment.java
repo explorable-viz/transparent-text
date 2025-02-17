@@ -11,4 +11,6 @@ public abstract class TextFragment {
         this.value = value;
     }
 
+    @Override
+    public abstract Object clone();
 }
