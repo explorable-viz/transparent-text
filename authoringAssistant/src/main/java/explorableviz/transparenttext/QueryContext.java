@@ -44,7 +44,10 @@ public class QueryContext {
     public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph) throws IOException {
         this.dataset = dataset;
         this.imports = imports;
-        this.paragraph = paragraph;
+        this.paragraph = new ArrayList<>();
+        paragraph.forEach(t -> {
+            this.paragraph.add((TextFragment) t.clone());
+        });
         this.code = code;
         this._loadedImports = new ArrayList<>();
         this._loadedDatasets = new HashMap<>();
