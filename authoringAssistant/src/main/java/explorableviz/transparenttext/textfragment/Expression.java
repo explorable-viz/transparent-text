@@ -2,7 +2,7 @@ package explorableviz.transparenttext.textfragment;
 
 public class Expression extends TextFragment {
 
-    private String expr;
+    private final String expr;
     public Expression(String expr, String value) {
         this.expr = expr;
         this.setValue(value);
@@ -10,10 +10,6 @@ public class Expression extends TextFragment {
 
     public String getExpr() {
         return expr;
-    }
-
-    public void setExpr(String expr) {
-        this.expr = expr;
     }
 
     @Override
