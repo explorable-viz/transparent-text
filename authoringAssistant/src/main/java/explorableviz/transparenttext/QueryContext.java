@@ -1,8 +1,8 @@
 package explorableviz.transparenttext;
 
 import explorableviz.transparenttext.textfragment.Expression;
-import explorableviz.transparenttext.textfragment.TextFragment;
 import explorableviz.transparenttext.textfragment.Literal;
+import explorableviz.transparenttext.textfragment.TextFragment;
 import org.codehaus.plexus.util.FileUtils;
 import org.json.JSONObject;
 
@@ -10,14 +10,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QueryContext {
 
@@ -47,13 +45,13 @@ public class QueryContext {
         loadFiles();
     }
 
-    public QueryContext(HashMap<String, String> datasets, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph, String expected, HashMap<String, String> variables, Random random) throws IOException {
-        this(datasets, imports, code, paragraph);
-        this.expected = expected;
-        this.replaceVariables(variables, random);
+    public QueryContext(TestQueryContext queryContext, Random random) throws IOException {
+        this(queryContext.getDatasets(), queryContext.getImports(), queryContext.getCode(), queryContext.getParagraph());
+        this.expected = queryContext.getExpected();
+        this.replaceVariables(queryContext.getVariables(), random);
         Optional<String> result = validate(evaluate(getExpected()));
         if(result.isPresent()) {
-            throw new RuntimeException(STR."[testCaseFile=\{}] Invalid test exception\{result}");
+            throw new RuntimeException(STR."[testCaseFile=\{queryContext.getTestCaseFileName()}] Invalid test exception\{result}");
         }
     }
 
@@ -209,25 +207,7 @@ public class QueryContext {
         });
     }
 
-    public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws IOException {
-        ArrayList<QueryContext> queryContexts = new ArrayList<>();
-        Random random = new Random(0);
-        Files.list(Paths.get(casesFolder))
-                .filter(Files::isRegularFile) // Only process files, not directories
-                .map(path -> path.toAbsolutePath().toString()) // Get file name
-                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
-                .collect(Collectors.toSet())
-                .forEach(filePath -> {
-                    TestQueryContext queryContext;
-                    try {
-                        queryContext = TestQueryContext.importFromJson(filePath, random);
-                        queryContexts.addAll(queryContext.instantiate(numInstances));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-        return queryContexts;
-    }
+
 
     public void replaceVariables(Map<String, String> variables, Random random) {
         String code = this.getCode();

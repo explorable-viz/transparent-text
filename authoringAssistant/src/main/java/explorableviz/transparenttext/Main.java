@@ -29,7 +29,7 @@ public class Main {
         try {
             Settings.getInstance().loadSettings(settingsPath);
             learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(inContextLearningPath, numLearningCaseToGenerate);
-            queryContexts = QueryContext.loadCases(testPath, numTestToGenerate);
+            queryContexts = TestQueryContext.loadCases(testPath, numTestToGenerate);
             final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
             final ArrayList<String> results = new ArrayList<>();
 

@@ -1,14 +1,10 @@
 package explorableviz.transparenttext;
-
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Random;
-
-import static explorableviz.transparenttext.QueryContext.loadCases;
+import static explorableviz.transparenttext.TestQueryContext.loadCases;
 
 public class LearningQueryContext {
     private static final String LEARNING_CASE_PATH = "learningCases";

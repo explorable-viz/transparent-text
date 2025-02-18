@@ -9,30 +9,44 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TestQueryContext extends QueryContext {
     private final HashMap<String, String> variables;
-    private final Random random;
     private final String testCaseFileName;
 
-    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, ArrayList<TextFragment> file, Random random, String expected, String testCaseFileName) throws IOException {
+    public TestQueryContext(HashMap<String, String> dataset, ArrayList<String> imports, HashMap<String, String> variables, String code, ArrayList<TextFragment> file, String expected, String testCaseFileName) throws IOException {
         super(dataset, imports, code, file);
-        this.random = random;
         this.variables = variables;
         this.setExpected(expected);
         this.testCaseFileName = testCaseFileName;
     }
 
-    public ArrayList<QueryContext> instantiate(int number) throws RuntimeException, IOException {
+    public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws IOException {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
-        for (int i = 0; i < number; i++) {
-            queryContexts.add(new QueryContext(this.getDatasets(), this.getImports(), this.getCode(), getParagraph(), this.getExpected(), variables, random));
-        }
+        Random random = new Random(0);
+        Files.list(Paths.get(casesFolder))
+                .filter(Files::isRegularFile) // Only process files, not directories
+                .map(path -> path.toAbsolutePath().toString()) // Get file name
+                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
+                .collect(Collectors.toSet())
+                .forEach(filePath -> {
+                    TestQueryContext testQueryContext;
+                    try {
+                        testQueryContext = TestQueryContext.importFromJson(filePath);
+                        for(int i = 0 ; i < numInstances; i++) {
+                            queryContexts.add(new QueryContext(testQueryContext, random));
+                        }
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
         return queryContexts;
     }
 
-    public static TestQueryContext importFromJson(String filePath, Random random) throws IOException {
+    public static TestQueryContext importFromJson(String filePath) throws IOException {
         String content = new String(Files.readAllBytes(Path.of(STR."\{filePath}.json")));
         JSONObject testCase = new JSONObject(content);
         JSONArray json_datasets = testCase.getJSONArray("datasets");
@@ -72,8 +86,14 @@ public class TestQueryContext extends QueryContext {
             imports.add(json_imports.getString(i));
         }
 
-        return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected, filePath);
+        return new TestQueryContext(datasets, imports, variables, code, paragraph, expected, filePath);
     }
 
+    public HashMap<String, String> getVariables() {
+        return variables;
+    }
 
+    public String getTestCaseFileName() {
+        return testCaseFileName;
+    }
 }
