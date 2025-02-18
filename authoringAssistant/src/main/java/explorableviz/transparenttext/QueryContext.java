@@ -24,9 +24,9 @@ public class QueryContext {
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private HashMap<String, String> dataset;
     private final HashMap<String, String> _loadedDatasets;
-
     private ArrayList<String> imports;
     private final ArrayList<String> _loadedImports;
+    private final String fluidFileName = "llmTest";
 
     public String getCode() {
         return code;
@@ -135,18 +135,18 @@ public class QueryContext {
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
-            String tempFile = Settings.getInstance().getFluidTempFile();
-            writeFluidFiles(response, tempFile);
+            String tempWorkingPath = Settings.getInstance().getTempWorkingPath();
+            writeFluidFiles(response, tempWorkingPath);
             String os = System.getProperty("os.name").toLowerCase();
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempFile}");
+            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempWorkingPath}/\{this.fluidFileName}");
             this.getDataset().forEach((key, path) -> {
-                command.append(" -d \"(").append(key).append(", ").append("temp/").append(path).append(")\"");
+                command.append(STR." -d \"(\{key}, \{tempWorkingPath}/\{path})\"");
             });
             this.getImports().forEach(path -> {
-                command.append(" -i ").append(path);
+                command.append(STR." -i \{path}");
             });
             logger.info(STR."Running command: \{command}");
             Process process;
@@ -165,7 +165,7 @@ public class QueryContext {
             if (!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
-            deleteDirectory(Path.of("fluid/temp"));
+            deleteDirectory(Path.of(tempWorkingPath));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
@@ -203,20 +203,22 @@ public class QueryContext {
         return new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3)));
     }
 
-    private void writeFluidFiles(String response, String path) throws IOException {
-        Files.createDirectories(Paths.get("fluid/temp/dataset"));
-        Files.createDirectories(Paths.get("fluid/temp/example"));
-
-        try (PrintWriter out = new PrintWriter(STR."fluid/\{path}.fld")) {
+    private void writeFluidFiles(String response, String tempWorkingPath) throws IOException {
+        Files.createDirectories(Paths.get(tempWorkingPath));
+        //Write temp fluid file
+        try (PrintWriter out = new PrintWriter(STR."\{tempWorkingPath}/\{this.fluidFileName}.fld")) {
             out.println(this.getCode());
             out.println(STR."in \{response}");
         }
-
+        //Write temp datasets
         this.dataset.forEach((v, p) -> {
-            try (PrintWriter outData = new PrintWriter(STR."fluid/temp/\{p}.fld")) {
-                outData.println(this._loadedDatasets.get(v));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException("Error during the generation of dataset files");
+            try {
+                Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{p}.fld").getParent());
+                try (PrintWriter outData = new PrintWriter(STR."temp/\{p}.fld")) {
+                    outData.println(this._loadedDatasets.get(v));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
     }
