@@ -28,6 +28,7 @@ public class QueryContext {
     private String code;
     private final ArrayList<TextFragment> paragraph;
     private String expected;
+
     public String getCode() {
         return code;
     }
@@ -42,15 +43,15 @@ public class QueryContext {
         this.code = code;
         this._loadedImports = new ArrayList<>();
         this._loadedDatasets = new HashMap<>();
-        loadFiles();
+        this.loadFiles();
     }
 
     public QueryContext(TestQueryContext queryContext, Random random) throws IOException {
         this(queryContext.getDatasets(), queryContext.getImports(), queryContext.getCode(), queryContext.getParagraph());
         this.expected = queryContext.getExpected();
         this.replaceVariables(queryContext.getVariables(), random);
-        Optional<String> result = validate(evaluate(getExpected()));
-        if(result.isPresent()) {
+        Optional<String> result = this.validate(this.evaluate(this.getExpected()));
+        if (result.isPresent()) {
             throw new RuntimeException(STR."[testCaseFile=\{queryContext.getTestCaseFileName()}] Invalid test exception\{result}");
         }
     }
@@ -70,12 +71,16 @@ public class QueryContext {
     public void loadFiles() throws IOException {
         for (Map.Entry<String, String> dataset : this.datasets.entrySet()) {
             String path = STR."\{dataset.getValue()}";
-            this._loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            this.get_loadedDatasets().put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
-        for (String path : imports) {
+        for (String path : this.getImports()) {
             path = STR."\{path}";
-            this._loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            this.get_loadedImports().add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
+    }
+
+    private ArrayList<String> get_loadedImports() {
+        return _loadedImports;
     }
 
     public HashMap<String, String> get_loadedDatasets() {
@@ -84,36 +89,40 @@ public class QueryContext {
 
     public String toUserPrompt() {
         JSONObject object = new JSONObject();
-        object.put("datasets", this._loadedDatasets);
-        object.put("imports", this._loadedImports);
-        object.put("code", this.code);
-        object.put("paragraph", paragraphToString());
+        object.put("datasets", this.get_loadedDatasets());
+        object.put("imports", this.get_loadedImports());
+        object.put("code", this.getCode());
+        object.put("paragraph", this.paragraphToString());
         return object.toString();
     }
 
     public String paragraphToString() {
-        return STR."Paragraph([\{paragraph.stream().map(e -> {
+        return STR."Paragraph([\{this.getParagraph().stream().map(e -> {
             if (e instanceof Literal) return STR."\"\{e.getValue()}\"";
             if (e instanceof Expression) return ((Expression) e).getExpr();
             throw new RuntimeException("Error, it is possible to have only String or Expression element");
         }).collect(Collectors.joining(","))}])";
     }
 
-    public void addExpressionToParagraph(String expression) throws Exception {
-        for (int i = 0; i < paragraph.size(); i++) {
-            TextFragment textFragment = paragraph.get(i);
+    public void addExpressionToParagraph(String expression) {
+        for (int i = 0; i < this.getParagraph().size(); i++) {
+            TextFragment textFragment = this.getParagraph().get(i);
             if (textFragment instanceof Literal && textFragment.getValue().contains("[REPLACE")) {
                 LiteralParts expectedValue = splitLiteral((Literal) textFragment);
-                paragraph.remove(textFragment);
-                paragraph.add(i, expectedValue.beforeTag());
-                paragraph.add(i + 1, new Expression(expression, expectedValue.tag().getValue()));
-                paragraph.add(i + 2, expectedValue.afterTag());
+                this.getParagraph().remove(textFragment);
+                this.getParagraph().add(i, expectedValue.beforeTag());
+                this.getParagraph().add(i + 1, new Expression(expression, expectedValue.tag().getValue()));
+                this.getParagraph().add(i + 2, expectedValue.afterTag());
             }
         }
     }
 
     public String getExpected() {
         return expected;
+    }
+
+    private String getFluidFileName() {
+        return fluidFileName;
     }
 
     public String evaluate(String response) {
@@ -125,7 +134,7 @@ public class QueryContext {
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempWorkingPath}/\{this.fluidFileName}");
+            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempWorkingPath}/\{this.getFluidFileName()}");
             this.getDatasets().forEach((key, path) -> {
                 command.append(STR." -d \"(\{key}, \{tempWorkingPath}/\{path})\"");
             });
@@ -159,7 +168,7 @@ public class QueryContext {
     public Optional<String> validate(String output) {
         logger.info(STR."Validating output: \{output}");
         //Extract value from input query.text
-        Optional<TextFragment> textFragment = paragraph.stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
+        Optional<TextFragment> textFragment = this.getParagraph().stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
 
         String expectedValue = splitLiteral((Literal) textFragment.get()).tag().getValue();
         // Extract and clean the generated expression
@@ -195,19 +204,17 @@ public class QueryContext {
             out.println(STR."in \{response}");
         }
         //Write temp datasets
-        this.datasets.forEach((v, p) -> {
+        this.getDatasets().forEach((v, p) -> {
             try {
                 Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{p}.fld").getParent());
                 try (PrintWriter outData = new PrintWriter(STR."temp/\{p}.fld")) {
-                    outData.println(this._loadedDatasets.get(v));
+                    outData.println(this.get_loadedDatasets().get(v));
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
     }
-
-
 
     public void replaceVariables(Map<String, String> variables, Random random) {
         String code = this.getCode();
