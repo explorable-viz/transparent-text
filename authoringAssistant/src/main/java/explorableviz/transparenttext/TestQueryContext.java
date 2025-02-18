@@ -3,14 +3,12 @@ package explorableviz.transparenttext;
 import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.TextFragment;
 import explorableviz.transparenttext.textfragment.Literal;
-import kotlin.Pair;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class TestQueryContext extends QueryContext {
@@ -29,14 +27,7 @@ public class TestQueryContext extends QueryContext {
     public ArrayList<QueryContext> instantiate(int number) throws RuntimeException, IOException {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         for (int i = 0; i < number; i++) {
-            QueryContext queryContext = new QueryContext(this.getDataset(), this.getImports(), this.getCode(), getParagraph(), this.getExpected());
-            queryContext.replaceVariables(variables, random);
-            Optional<String> result = queryContext.validate(queryContext.evaluate(queryContext.getExpected()));
-            if (result.isEmpty()) {
-                queryContexts.add(queryContext);
-            } else {
-                throw new RuntimeException(STR."[testCaseFile=\{this.testCaseFileName}] Invalid test exception\{result}");
-            }
+            queryContexts.add(new QueryContext(this.getDatasets(), this.getImports(), this.getCode(), getParagraph(), this.getExpected(), variables, random));
         }
         return queryContexts;
     }
@@ -83,7 +74,6 @@ public class TestQueryContext extends QueryContext {
 
         return new TestQueryContext(datasets, imports, variables, code, paragraph, random, expected, filePath);
     }
-
 
 
 }

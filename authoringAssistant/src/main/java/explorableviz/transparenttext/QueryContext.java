@@ -3,10 +3,10 @@ package explorableviz.transparenttext;
 import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.TextFragment;
 import explorableviz.transparenttext.textfragment.Literal;
+import org.codehaus.plexus.util.FileUtils;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -22,27 +22,20 @@ import java.util.stream.Stream;
 public class QueryContext {
 
     public final Logger logger = Logger.getLogger(this.getClass().getName());
-    private HashMap<String, String> dataset;
+    private final HashMap<String, String> datasets;
     private final HashMap<String, String> _loadedDatasets;
-    private ArrayList<String> imports;
+    private final ArrayList<String> imports;
     private final ArrayList<String> _loadedImports;
     private final String fluidFileName = "llmTest";
-
+    private String code;
+    private final ArrayList<TextFragment> paragraph;
+    private String expected;
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    private String code;
-    private final ArrayList<TextFragment> paragraph;
-
-    private String expected;
-
-    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph) throws IOException {
-        this.dataset = dataset;
+    public QueryContext(HashMap<String, String> datasets, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph) throws IOException {
+        this.datasets = datasets;
         this.imports = imports;
         this.paragraph = new ArrayList<>();
         paragraph.forEach(t -> {
@@ -54,25 +47,22 @@ public class QueryContext {
         loadFiles();
     }
 
-    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph, String expected) throws IOException {
-        this(dataset, imports, code, paragraph);
+    public QueryContext(HashMap<String, String> datasets, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph, String expected, HashMap<String, String> variables, Random random) throws IOException {
+        this(datasets, imports, code, paragraph);
         this.expected = expected;
+        this.replaceVariables(variables, random);
+        Optional<String> result = validate(evaluate(getExpected()));
+        if(result.isPresent()) {
+            throw new RuntimeException(STR."[testCaseFile=\{}] Invalid test exception\{result}");
+        }
     }
 
-    public HashMap<String, String> getDataset() {
-        return dataset;
-    }
-
-    public void setDataset(HashMap<String, String> dataset) {
-        this.dataset = dataset;
+    public HashMap<String, String> getDatasets() {
+        return datasets;
     }
 
     public ArrayList<String> getImports() {
         return imports;
-    }
-
-    public void setImports(ArrayList<String> imports) {
-        this.imports = imports;
     }
 
     public ArrayList<TextFragment> getParagraph() {
@@ -80,7 +70,7 @@ public class QueryContext {
     }
 
     public void loadFiles() throws IOException {
-        for (Map.Entry<String, String> dataset : this.dataset.entrySet()) {
+        for (Map.Entry<String, String> dataset : this.datasets.entrySet()) {
             String path = STR."\{dataset.getValue()}";
             this._loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
@@ -128,10 +118,6 @@ public class QueryContext {
         return expected;
     }
 
-    public void setExpected(String expected) {
-        this.expected = expected;
-    }
-
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
@@ -142,7 +128,7 @@ public class QueryContext {
 
             //Command construction
             StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempWorkingPath}/\{this.fluidFileName}");
-            this.getDataset().forEach((key, path) -> {
+            this.getDatasets().forEach((key, path) -> {
                 command.append(STR." -d \"(\{key}, \{tempWorkingPath}/\{path})\"");
             });
             this.getImports().forEach(path -> {
@@ -165,7 +151,7 @@ public class QueryContext {
             if (!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
-            deleteDirectory(Path.of(tempWorkingPath));
+            FileUtils.deleteDirectory(new File(tempWorkingPath));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
@@ -211,7 +197,7 @@ public class QueryContext {
             out.println(STR."in \{response}");
         }
         //Write temp datasets
-        this.dataset.forEach((v, p) -> {
+        this.datasets.forEach((v, p) -> {
             try {
                 Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{p}.fld").getParent());
                 try (PrintWriter outData = new PrintWriter(STR."temp/\{p}.fld")) {
@@ -223,21 +209,7 @@ public class QueryContext {
         });
     }
 
-    public static void deleteDirectory(Path directory) throws IOException {
-        if (Files.exists(directory)) {
-            try (Stream<Path> paths = Files.walk(directory)) {
-                paths.sorted(Comparator.reverseOrder()).forEach(path -> {
-                    try {
-                        Files.delete(path);
-                    } catch (IOException e) {
-                        throw new RuntimeException("Error during delete of: " + path, e);
-                    }
-                });
-            }
-        }
-    }
-
-    public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws Exception {
+    public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws IOException {
         ArrayList<QueryContext> queryContexts = new ArrayList<>();
         Random random = new Random(0);
         Files.list(Paths.get(casesFolder))
@@ -278,8 +250,8 @@ public class QueryContext {
             });
             this.get_loadedDatasets().replaceAll((k, v) -> v.replace(variablePlaceholder, replacement));
         }
-        this.setCode(code);
-        this.setExpected(expected);
+        this.code = code;
+        this.expected = expected;
     }
 
     private static String getRandomString(int length, Random generator) {
@@ -290,5 +262,9 @@ public class QueryContext {
             sb.append(characters.charAt(randomIndex));
         }
         return sb.toString();
+    }
+
+    protected void setExpected(String expected) {
+        this.expected = expected;
     }
 }
