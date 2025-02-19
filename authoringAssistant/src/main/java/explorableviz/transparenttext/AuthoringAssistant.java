@@ -5,6 +5,7 @@ import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
@@ -20,41 +21,38 @@ public class AuthoringAssistant {
     }
 
     public String execute(QueryContext query) throws Exception {
-        AtomicReference<String> response = new AtomicReference<>();
-
+        String response = null;
         int limit = Settings.getInstance().getLimit();
-        // Initialize the agent
         // Add the input query to the KB that will be sent to the LLM
         PromptList sessionPrompt = (PromptList) prompts.clone();
         sessionPrompt.addPrompt(PromptList.USER, query.toUserPrompt());
-        for (int attempts = 0; response.get() == null && attempts <= limit; attempts++) {
+        for (int attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
-            String candidateResponse = llm.evaluate(prompts, "");
-            logger.info(STR."Received response: \{candidateResponse}");
+            String candidateExpr = llm.evaluate(prompts, "");
+            logger.info(STR."Received response: \{candidateExpr}");
 
-            sessionPrompt.addPrompt(PromptList.ASSISTANT, candidateResponse);
-            // Validate the response
-            query.validate(query.evaluate(candidateResponse)).ifPresentOrElse(value -> {
-                try {
-                    sessionPrompt.addPrompt(PromptList.USER, generateLoopBackMessage(candidateResponse, value));
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }, () -> response.set(candidateResponse));
+            Optional<String> result = query.validate(query.evaluate(candidateExpr));
+            if(result.isPresent()) {
+                //Add the prev. expression to the SessionPrompt to say to the LLM that the response is wrong.
+                sessionPrompt.addPrompt(PromptList.ASSISTANT, candidateExpr);
+                sessionPrompt.addPrompt(PromptList.USER, generateLoopBackMessage(candidateExpr, result.get()));
+            } else {
+                response = (candidateExpr);
+            }
         }
-        if (response.get() == null) {
+        if (response == null) {
             logger.warning(STR."Expression validation failed after \{limit} attempts");
         } else {
-            query.addExpressionToParagraph(response.get());
+            query.addExpressionToParagraph(response);
             logger.info(query.paragraphToString());
         }
 
-        return response.get();
+        return response;
     }
 
    private LLMEvaluatorAgent initialiseAgent(String agentClassName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        logger.info("Initializing agent: " + agentClassName);
+        logger.info(STR."Initializing agent: \{agentClassName}");
         LLMEvaluatorAgent llmAgent;
         Class<?> agentClass = Class.forName(agentClassName);
         llmAgent = (LLMEvaluatorAgent) agentClass
