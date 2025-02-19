@@ -19,9 +19,8 @@ public class LearningQueryContext {
 
     public static LearningQueryContext importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
         JSONObject jsonLearningCase = new JSONObject(new String(Files.readAllBytes(Path.of(jsonLearningCasePath))));
-        String systemPrompt = jsonLearningCase.getString("system_prompt");
         ArrayList<QueryContext> learningCases = loadCases(LEARNING_CASE_PATH, numCasesToGenerate);
-        return new LearningQueryContext(systemPrompt, learningCases);
+        return new LearningQueryContext(jsonLearningCase.getString("system_prompt"), learningCases);
     }
 
     public PromptList generateInContextLearningJSON() throws Exception {
