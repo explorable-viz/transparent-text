@@ -3,7 +3,6 @@ package explorableviz.transparenttext;
 import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.Literal;
 import explorableviz.transparenttext.textfragment.TextFragment;
-import org.codehaus.plexus.util.FileUtils;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -20,71 +19,63 @@ import java.util.stream.Collectors;
 public class QueryContext {
 
     public final Logger logger = Logger.getLogger(this.getClass().getName());
-    private final HashMap<String, String> datasets;
-    private final HashMap<String, String> _loadedDatasets;
-    private final ArrayList<String> imports;
+    private final Map<String, String> datasets;
+    private final List<String> imports;
     private final ArrayList<String> _loadedImports;
     private final String fluidFileName = "llmTest";
-    private String code;
-    private final ArrayList<TextFragment> paragraph;
-    private String expected;
+    private final String code;
+    private final List<TextFragment> paragraph;
+    private final String expected;
+    private final String testCaseFileName;
+    private final HashMap<String, String> _loadedDatasets;
+    private final Map<String, String> variables;
 
-    public String getCode() {
-        return code;
-    }
-
-    public QueryContext(HashMap<String, String> datasets, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph) throws IOException {
+    public QueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, String> variables, String expected, String testCaseFileName) throws IOException {
+        HashMap<String, String> computedVariables = computeVariableValue(variables, new Random(0));
+        this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
-        this.paragraph = new ArrayList<>();
-        paragraph.forEach(t -> {
-            this.paragraph.add((TextFragment) t.clone());
-        });
-        this.code = code;
-        this._loadedImports = new ArrayList<>();
-        this._loadedDatasets = new HashMap<>();
-        this.loadFiles();
-    }
-
-    public QueryContext(TestQueryContext queryContext, Random random) throws IOException {
-        this(queryContext.getDatasets(), queryContext.getImports(), queryContext.getCode(), queryContext.getParagraph());
-        this.expected = queryContext.getExpected();
-        this.replaceVariables(queryContext.getVariables(), random);
+        this.testCaseFileName = testCaseFileName;
+        this._loadedDatasets = new HashMap<>(this.loadDatasets()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> replaceVariables(entry.getValue(), computedVariables)
+                )));
+        this._loadedImports = this.loadImports();
+        this.code = replaceVariables(code, computedVariables);
+        this.expected = replaceVariables(expected, computedVariables);
+        this.paragraph = (ArrayList<TextFragment>) paragraph.stream()
+                .map(t -> {
+                    TextFragment cloned = (TextFragment) t.clone();
+                    cloned.setValue(replaceVariables(cloned.getValue(), computedVariables));
+                    return cloned;
+                })
+                .collect(Collectors.toList());
+        //Validation of the created object
         Optional<String> result = this.validate(this.evaluate(this.getExpected()));
         if (result.isPresent()) {
-            throw new RuntimeException(STR."[testCaseFile=\{queryContext.getTestCaseFileName()}] Invalid test exception\{result}");
+            throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
         }
     }
 
-    public HashMap<String, String> getDatasets() {
-        return datasets;
-    }
-
-    public ArrayList<String> getImports() {
-        return imports;
-    }
-
-    public ArrayList<TextFragment> getParagraph() {
-        return paragraph;
-    }
-
-    public void loadFiles() throws IOException {
+    public HashMap<String, String> loadDatasets() throws IOException {
+        HashMap<String, String> loadedDatasets = new HashMap<>();
         for (Map.Entry<String, String> dataset : this.datasets.entrySet()) {
             String path = STR."\{dataset.getValue()}";
-            this.get_loadedDatasets().put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
+        return loadedDatasets;
+    }
+
+    private ArrayList<String> loadImports() throws IOException {
+        ArrayList<String> loadedImports = new ArrayList<>();
         for (String path : this.getImports()) {
             path = STR."\{path}";
-            this.get_loadedImports().add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
-    }
-
-    private ArrayList<String> get_loadedImports() {
-        return _loadedImports;
-    }
-
-    public HashMap<String, String> get_loadedDatasets() {
-        return _loadedDatasets;
+        return loadedImports;
     }
 
     public String toUserPrompt() {
@@ -116,15 +107,6 @@ public class QueryContext {
             }
         }
     }
-
-    public String getExpected() {
-        return expected;
-    }
-
-    private String getFluidFileName() {
-        return fluidFileName;
-    }
-
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
@@ -158,7 +140,7 @@ public class QueryContext {
             if (!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
-            FileUtils.deleteDirectory(new File(tempWorkingPath));
+            // FileUtils.deleteDirectory(new File(tempWorkingPath));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
@@ -187,10 +169,9 @@ public class QueryContext {
     }
 
     private LiteralParts splitLiteral(Literal literal) {
-        final String replaceRegex = "(.*)\\[REPLACE value=\"(.*?)\"](.*)";
-        Pattern valueReplacePattern = Pattern.compile(replaceRegex);
-        Matcher valueReplaceMatcher = valueReplacePattern.matcher(literal.getValue());
+        Matcher valueReplaceMatcher = Pattern.compile("(.*)\\[REPLACE value=\"(.*?)\"](.*)").matcher(literal.getValue());
         if (!valueReplaceMatcher.find()) {
+            //@todo return Optional.empty();
             throw new RuntimeException("No matching value found in text");
         }
         return new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3)));
@@ -203,42 +184,36 @@ public class QueryContext {
             out.println(this.getCode());
             out.println(STR."in \{response}");
         }
-        //Write temp datasets
-        this.getDatasets().forEach((v, p) -> {
-            try {
-                Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{p}.fld").getParent());
-                try (PrintWriter outData = new PrintWriter(STR."temp/\{p}.fld")) {
-                    outData.println(this.get_loadedDatasets().get(v));
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        for (Map.Entry<String, String> dataset : this.getDatasets().entrySet()) {
+            Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{dataset.getValue()}.fld").getParent());
+            try (PrintWriter outData = new PrintWriter(STR."temp/\{dataset.getValue()}.fld")) {
+                outData.println(this.get_loadedDatasets().get(dataset.getKey()));
             }
-        });
+        }
     }
 
-    public void replaceVariables(Map<String, String> variables, Random random) {
-        String code = this.getCode();
-        String expected = this.getExpected();
-
-        for (Map.Entry<String, String> entry : variables.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            String variablePlaceholder = STR."$\{key}$";
-            String replacement = switch (value) {
-                case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
-                case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
-                case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
-                default -> value;
-            };
-            code = code.replace(variablePlaceholder, replacement);
-            expected = expected.replace(variablePlaceholder, replacement);
-            this.getParagraph().forEach(t -> {
-                t.setValue(t.getValue().replace(variablePlaceholder, replacement));
-            });
-            this.get_loadedDatasets().replaceAll((k, v) -> v.replace(variablePlaceholder, replacement));
+    private String replaceVariables(String textToReplace, HashMap<String, String> variables) {
+        for (Map.Entry<String, String> var : variables.entrySet()) {
+            String variablePlaceholder = STR."$\{var.getKey()}$";
+            textToReplace = textToReplace.replace(variablePlaceholder, var.getValue());
         }
-        this.code = code;
-        this.expected = expected;
+        return textToReplace;
+    }
+
+    private HashMap<String, String> computeVariableValue(Map<String, String> variables, Random random) {
+        return new HashMap<>(variables.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> generateVariableValue(random, entry))));
+    }
+
+    private static String generateVariableValue(Random random, Map.Entry<String, String> entry) {
+        return switch (entry.getValue()) {
+            case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
+            case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
+            case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
+            default -> entry.getValue();
+        };
     }
 
     private static String getRandomString(int length, Random generator) {
@@ -251,7 +226,43 @@ public class QueryContext {
         return sb.toString();
     }
 
-    protected void setExpected(String expected) {
-        this.expected = expected;
+    private ArrayList<String> get_loadedImports() {
+        return _loadedImports;
+    }
+
+    public HashMap<String, String> get_loadedDatasets() {
+        return _loadedDatasets;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public Map<String, String> getDatasets() {
+        return datasets;
+    }
+
+    public List<String> getImports() {
+        return imports;
+    }
+
+    public List<TextFragment> getParagraph() {
+        return paragraph;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public String getTestCaseFileName() {
+        return testCaseFileName;
+    }
+
+    public String getExpected() {
+        return expected;
+    }
+
+    private String getFluidFileName() {
+        return fluidFileName;
     }
 }
