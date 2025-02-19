@@ -31,7 +31,7 @@ public class QueryContext {
     private final Map<String, String> variables;
 
     public QueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, String> variables, String expected, String testCaseFileName) throws IOException {
-        HashMap<String, String> computedVariables = computeVariableValue(variables, new Random(0));
+        Map<String, String> computedVariables = computeVariableValue(variables, new Random(0));
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
@@ -46,12 +46,8 @@ public class QueryContext {
         this._loadedImports = this.loadImports();
         this.code = replaceVariables(code, computedVariables);
         this.expected = replaceVariables(expected, computedVariables);
-        this.paragraph = (ArrayList<TextFragment>) paragraph.stream()
-                .map(t -> {
-                    TextFragment cloned = (TextFragment) t.clone();
-                    cloned.setValue(replaceVariables(cloned.getValue(), computedVariables));
-                    return cloned;
-                })
+        this.paragraph = paragraph.stream()
+                .map(t -> t.replace(computedVariables))
                 .collect(Collectors.toList());
         //Validation of the created object
         Optional<String> result = this.validate(this.evaluate(this.getExpected()));
@@ -96,14 +92,20 @@ public class QueryContext {
     }
 
     public void addExpressionToParagraph(String expression) {
-        for (int i = 0; i < this.getParagraph().size(); i++) {
-            TextFragment textFragment = this.getParagraph().get(i);
+        List<TextFragment> paragraph = this.getParagraph();
+        ListIterator<TextFragment> iterator = paragraph.listIterator();
+
+        while (iterator.hasNext()) {
+            TextFragment textFragment = iterator.next();
             if (textFragment instanceof Literal && textFragment.getValue().contains("[REPLACE")) {
-                LiteralParts expectedValue = splitLiteral((Literal) textFragment);
-                this.getParagraph().remove(textFragment);
-                this.getParagraph().add(i, expectedValue.beforeTag());
-                this.getParagraph().add(i + 1, new Expression(expression, expectedValue.tag().getValue()));
-                this.getParagraph().add(i + 2, expectedValue.afterTag());
+                splitLiteral(textFragment).ifPresentOrElse(expectedValue -> {
+                    iterator.remove();
+                    iterator.add(expectedValue.beforeTag());
+                    iterator.add(new Expression(expression, expectedValue.tag().getValue()));
+                    iterator.add(expectedValue.afterTag());
+                }, () -> {
+                    throw new RuntimeException("REPLACE tag not found");
+                });
             }
         }
     }
@@ -149,10 +151,12 @@ public class QueryContext {
 
     public Optional<String> validate(String output) {
         logger.info(STR."Validating output: \{output}");
-        //Extract value from input query.text
-        Optional<TextFragment> textFragment = this.getParagraph().stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
 
-        String expectedValue = splitLiteral((Literal) textFragment.get()).tag().getValue();
+        Optional<LiteralParts> parts = this.getParagraph().stream().map(this::splitLiteral).flatMap(Optional::stream).findFirst();
+        if(parts.isEmpty()) {
+            throw new RuntimeException("No REPLACE tag found");
+        }
+        String expectedValue = parts.get().tag().getValue();
         // Extract and clean the generated expression
         String[] outputLines = output.split("\n");
         if (outputLines.length < 2) {
@@ -168,13 +172,12 @@ public class QueryContext {
         }
     }
 
-    private LiteralParts splitLiteral(Literal literal) {
+    private Optional<LiteralParts> splitLiteral(TextFragment literal) {
         Matcher valueReplaceMatcher = Pattern.compile("(.*)\\[REPLACE value=\"(.*?)\"](.*)").matcher(literal.getValue());
         if (!valueReplaceMatcher.find()) {
-            //@todo return Optional.empty();
-            throw new RuntimeException("No matching value found in text");
+            return Optional.empty();
         }
-        return new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3)));
+        return Optional.of(new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3))));
     }
 
     private void writeFluidFiles(String response, String tempWorkingPath) throws IOException {
@@ -192,7 +195,7 @@ public class QueryContext {
         }
     }
 
-    private String replaceVariables(String textToReplace, HashMap<String, String> variables) {
+    public static String replaceVariables(String textToReplace, Map<String, String> variables) {
         for (Map.Entry<String, String> var : variables.entrySet()) {
             String variablePlaceholder = STR."$\{var.getKey()}$";
             textToReplace = textToReplace.replace(variablePlaceholder, var.getValue());
