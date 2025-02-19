@@ -7,13 +7,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Main {
     public static Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String... args) {
-        HashMap<String, String> arguments = parseArguments(args);
+        Map<String, String> arguments = parseArguments(args);
         logger.info("Arguments passed from command line");
         logger.info(arguments.toString().replace(",", "\n"));
         final ArrayList<QueryContext> queryContexts;
@@ -63,20 +64,15 @@ public class Main {
         return results;
     }
 
-    public static HashMap<String, String> parseArguments(String[] args) {
-        HashMap<String, String> arguments = new HashMap<>();
-        for (String arg : args) {
-            if (arg.contains("=")) {
-                String[] keyValue = arg.split("=", 2); // Split into key and value
-                if (keyValue.length == 2) {
-                    arguments.put(keyValue[0], keyValue[1]);
-                } else {
-                    System.err.println(STR."Invalid argument format: \{arg}");
-                }
-            } else {
-                System.err.println(STR."Skipping argument without '=': \{arg}");
-            }
-        }
-        return arguments;
+    public static Map<String, String> parseArguments(String[] args) {
+        return Arrays.stream(args)
+                .filter(arg -> arg.contains("="))
+                .map(arg -> arg.split("=", 2))
+                .filter(keyValue -> keyValue.length == 2)
+                .collect(Collectors.toMap(
+                        keyValue -> keyValue[0],
+                        keyValue -> keyValue[1],
+                        (_, replacement) -> replacement
+                ));
     }
 }
