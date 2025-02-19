@@ -3,6 +3,7 @@ package explorableviz.transparenttext;
 import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.Literal;
 import explorableviz.transparenttext.textfragment.TextFragment;
+import org.codehaus.plexus.util.FileUtils;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -142,7 +143,7 @@ public class QueryContext {
             if (!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
-            // FileUtils.deleteDirectory(new File(tempWorkingPath));
+            FileUtils.deleteDirectory(new File(tempWorkingPath));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
