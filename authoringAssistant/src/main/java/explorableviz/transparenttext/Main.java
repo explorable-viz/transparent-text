@@ -13,29 +13,19 @@ public class Main {
     public static Logger logger = Logger.getLogger(Main.class.getName());
 
     public static void main(String... args) {
-
         HashMap<String, String> arguments = parseArguments(args);
         logger.info("Arguments passed from command line");
         logger.info(arguments.toString().replace(",", "\n"));
-        final String agent = arguments.get("agent");
-        final String inContextLearningPath = arguments.get("inContextLearningPath");
-        final String settingsPath = arguments.get("settings");
-        final String testPath = arguments.get("testPath");
-        final int numTestToGenerate = Integer.parseInt(arguments.get("numTestToGenerate"));
-        final int numLearningCaseToGenerate = Integer.parseInt(arguments.get("numLearningCaseToGenerate"));
-        final float threshold = Integer.parseInt(arguments.get("threshold"));
         final ArrayList<QueryContext> queryContexts;
         final LearningQueryContext learningQueryContext;
         final Optional<Integer> numQueryToExecute = arguments.containsKey("numQueryToExecute") ? Optional.of(Integer.parseInt(arguments.get("numQueryToExecute"))) : Optional.empty();
-
         try {
-            Settings.getInstance().loadSettings(settingsPath);
-            learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(inContextLearningPath, numLearningCaseToGenerate);
-            queryContexts = TestQueryContext.loadCases(testPath, numTestToGenerate);
+            Settings.getInstance().loadSettings(arguments.get("settings"));
+            learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(arguments.get("inContextLearningPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
+            queryContexts = TestQueryContext.loadCases(arguments.get("testPath"), Integer.parseInt(arguments.get("numTestToGenerate")));
             final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
-            final ArrayList<String> results = execute(learningQueryContext, agent, queryLimit, queryContexts);
-
-            if (computeAccuracy(results, queryContexts, queryLimit, threshold)) {
+            final ArrayList<String> results = execute(learningQueryContext, arguments.get("agent"), queryLimit, queryContexts);
+            if (computeAccuracy(results, queryContexts, queryLimit, Integer.parseInt(arguments.get("threshold")))) {
                 System.exit(0);
             } else {
                 System.exit(1);
