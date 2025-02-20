@@ -1,14 +1,10 @@
 package explorableviz.transparenttext;
-
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
 import org.json.JSONObject;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Random;
-
-import static explorableviz.transparenttext.QueryContext.loadCases;
+import static explorableviz.transparenttext.TestQueryContext.loadCases;
 
 public class LearningQueryContext {
     private static final String LEARNING_CASE_PATH = "learningCases";
@@ -23,9 +19,8 @@ public class LearningQueryContext {
 
     public static LearningQueryContext importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
         JSONObject jsonLearningCase = new JSONObject(new String(Files.readAllBytes(Path.of(jsonLearningCasePath))));
-        String systemPrompt = jsonLearningCase.getString("system_prompt");
         ArrayList<QueryContext> learningCases = loadCases(LEARNING_CASE_PATH, numCasesToGenerate);
-        return new LearningQueryContext(systemPrompt, learningCases);
+        return new LearningQueryContext(jsonLearningCase.getString("system_prompt"), learningCases);
     }
 
     public PromptList generateInContextLearningJSON() throws Exception {

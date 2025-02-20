@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 
 public class Settings {
 
@@ -37,8 +36,8 @@ public class Settings {
         return Integer.parseInt(this.get("agent-limit"));
     }
 
-    public String getFluidTempFile() {
-        return this.get("fluid-temp-file");
+    public String getTempWorkingPath() {
+        return this.get("fluid-temp-folder");
     }
 
 }

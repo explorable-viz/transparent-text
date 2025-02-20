@@ -1,16 +1,15 @@
 package explorableviz.transparenttext;
 
 import explorableviz.transparenttext.textfragment.Expression;
-import explorableviz.transparenttext.textfragment.TextFragment;
 import explorableviz.transparenttext.textfragment.Literal;
+import explorableviz.transparenttext.textfragment.TextFragment;
+import org.codehaus.plexus.util.FileUtils;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
@@ -21,124 +20,111 @@ import java.util.stream.Collectors;
 public class QueryContext {
 
     public final Logger logger = Logger.getLogger(this.getClass().getName());
-    private HashMap<String, String> dataset;
-    private final HashMap<String, String> _loadedDatasets;
-
-    private ArrayList<String> imports;
+    private final Map<String, String> datasets;
+    private final List<String> imports;
     private final ArrayList<String> _loadedImports;
+    private final String fluidFileName = "llmTest";
+    private final String code;
+    private final List<TextFragment> paragraph;
+    private final String expected;
+    private final String testCaseFileName;
+    private final HashMap<String, String> _loadedDatasets;
+    private final Map<String, String> variables;
 
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    private String code;
-    private final ArrayList<TextFragment> paragraph;
-
-    private String expected;
-
-    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph) throws IOException {
-        this.dataset = dataset;
+    public QueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, String> variables, String expected, String testCaseFileName) throws IOException {
+        Map<String, String> computedVariables = computeVariableValue(variables, new Random(0));
+        this.variables = variables;
+        this.datasets = datasets;
         this.imports = imports;
-        this.paragraph = paragraph;
-        this.code = code;
-        this._loadedImports = new ArrayList<>();
-        this._loadedDatasets = new HashMap<>();
-        loadFiles();
+        this.testCaseFileName = testCaseFileName;
+        this._loadedDatasets = new HashMap<>(this.loadDatasets()
+                .entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> replaceVariables(entry.getValue(), computedVariables)
+                )));
+        this._loadedImports = this.loadImports();
+        this.code = replaceVariables(code, computedVariables);
+        this.expected = replaceVariables(expected, computedVariables);
+        this.paragraph = paragraph.stream()
+                .map(t -> t.replace(computedVariables))
+                .collect(Collectors.toList());
+        //Validation of the created object
+        Optional<String> result = this.validate(this.evaluate(this.getExpected()));
+        if (result.isPresent()) {
+            throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
+        }
     }
 
-    public QueryContext(HashMap<String, String> dataset, ArrayList<String> imports, String code, ArrayList<TextFragment> paragraph, String expected) throws IOException {
-        this(dataset, imports, code, paragraph);
-        this.expected = expected;
-    }
-
-    public HashMap<String, String> getDataset() {
-        return dataset;
-    }
-
-    public void setDataset(HashMap<String, String> dataset) {
-        this.dataset = dataset;
-    }
-
-    public ArrayList<String> getImports() {
-        return imports;
-    }
-
-    public void setImports(ArrayList<String> imports) {
-        this.imports = imports;
-    }
-
-    public ArrayList<TextFragment> getParagraph() {
-        return paragraph;
-    }
-
-    public void loadFiles() throws IOException {
-        for (Map.Entry<String, String> dataset : this.dataset.entrySet()) {
+    public HashMap<String, String> loadDatasets() throws IOException {
+        HashMap<String, String> loadedDatasets = new HashMap<>();
+        for (Map.Entry<String, String> dataset : this.datasets.entrySet()) {
             String path = STR."\{dataset.getValue()}";
-            this._loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
-        for (String path : imports) {
+        return loadedDatasets;
+    }
+
+    private ArrayList<String> loadImports() throws IOException {
+        ArrayList<String> loadedImports = new ArrayList<>();
+        for (String path : this.getImports()) {
             path = STR."\{path}";
-            this._loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
         }
+        return loadedImports;
     }
 
     public String toUserPrompt() {
         JSONObject object = new JSONObject();
-        object.put("datasets", this._loadedDatasets);
-        object.put("imports", this._loadedImports);
-        object.put("code", this.code);
-        object.put("paragraph", paragraphToString());
+        object.put("datasets", this.get_loadedDatasets());
+        object.put("imports", this.get_loadedImports());
+        object.put("code", this.getCode());
+        object.put("paragraph", this.paragraphToString());
         return object.toString();
     }
 
     public String paragraphToString() {
-        return STR."Paragraph([\{paragraph.stream().map(e -> {
+        return STR."Paragraph([\{this.getParagraph().stream().map(e -> {
             if (e instanceof Literal) return STR."\"\{e.getValue()}\"";
             if (e instanceof Expression) return ((Expression) e).getExpr();
             throw new RuntimeException("Error, it is possible to have only String or Expression element");
         }).collect(Collectors.joining(","))}])";
     }
 
-    public void addExpressionToParagraph(String expression) throws Exception {
-        for (int i = 0; i < paragraph.size(); i++) {
-            TextFragment textFragment = paragraph.get(i);
+    public void addExpressionToParagraph(String expression) {
+        List<TextFragment> paragraph = this.getParagraph();
+        ListIterator<TextFragment> iterator = paragraph.listIterator();
+
+        while (iterator.hasNext()) {
+            TextFragment textFragment = iterator.next();
             if (textFragment instanceof Literal && textFragment.getValue().contains("[REPLACE")) {
-                LiteralParts expectedValue = splitLiteral((Literal) textFragment);
-                paragraph.remove(textFragment);
-                paragraph.add(i, expectedValue.beforeTag());
-                paragraph.add(i + 1, new Expression(expression, expectedValue.tag().getValue()));
-                paragraph.add(i + 2, expectedValue.afterTag());
+                splitLiteral(textFragment).ifPresentOrElse(expectedValue -> {
+                    iterator.remove();
+                    iterator.add(expectedValue.beforeTag());
+                    iterator.add(new Expression(expression, expectedValue.tag().getValue()));
+                    iterator.add(expectedValue.afterTag());
+                }, () -> {
+                    throw new RuntimeException("REPLACE tag not found");
+                });
             }
         }
     }
-
-    public String getExpected() {
-        return expected;
-    }
-
-    public void setExpected(String expected) {
-        this.expected = expected;
-    }
-
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
-            String tempFile = Settings.getInstance().getFluidTempFile();
-            writeFluidFile(response, tempFile);
+            String tempWorkingPath = Settings.getInstance().getTempWorkingPath();
+            writeFluidFiles(response, tempWorkingPath);
             String os = System.getProperty("os.name").toLowerCase();
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempFile}");
-            this.getDataset().forEach((key, path) -> {
-                command.append(" -d \"(").append(key).append(", ").append(path).append(")\"");
+            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempWorkingPath}/\{this.getFluidFileName()}");
+            this.getDatasets().forEach((key, path) -> {
+                command.append(STR." -d \"(\{key}, \{tempWorkingPath}/\{path})\"");
             });
             this.getImports().forEach(path -> {
-                command.append(" -i ").append(path);
+                command.append(STR." -i \{path}");
             });
             logger.info(STR."Running command: \{command}");
             Process process;
@@ -154,22 +140,24 @@ public class QueryContext {
             String errorOutput = new String(process.getErrorStream().readAllBytes());
 
             logger.info(STR."Command output: \{output}");
-            if(!errorOutput.isEmpty()) {
+            if (!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
-            Files.delete(Path.of(new File(STR."fluid/\{tempFile}.fld").getPath()));
+            FileUtils.deleteDirectory(new File(tempWorkingPath));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
         }
     }
 
-    public Optional<String> validate(String output)  {
+    public Optional<String> validate(String output) {
         logger.info(STR."Validating output: \{output}");
-        //Extract value from input query.text
-        Optional<TextFragment> textFragment = paragraph.stream().filter(t -> t.getValue().contains("[REPLACE")).findFirst();
 
-        String expectedValue = splitLiteral((Literal) textFragment.get()).tag().getValue();
+        Optional<LiteralParts> parts = this.getParagraph().stream().map(this::splitLiteral).flatMap(Optional::stream).findFirst();
+        if(parts.isEmpty()) {
+            throw new RuntimeException("No REPLACE tag found");
+        }
+        String expectedValue = parts.get().tag().getValue();
         // Extract and clean the generated expression
         String[] outputLines = output.split("\n");
         if (outputLines.length < 2) {
@@ -185,39 +173,100 @@ public class QueryContext {
         }
     }
 
-    private LiteralParts splitLiteral(Literal literal) {
-        final String replaceRegex = "(.*)\\[REPLACE value=\"(.*?)\"](.*)";
-        Pattern valueReplacePattern = Pattern.compile(replaceRegex);
-        Matcher valueReplaceMatcher = valueReplacePattern.matcher(literal.getValue());
+    private Optional<LiteralParts> splitLiteral(TextFragment literal) {
+        Matcher valueReplaceMatcher = Pattern.compile("(.*)\\[REPLACE value=\"(.*?)\"](.*)").matcher(literal.getValue());
         if (!valueReplaceMatcher.find()) {
-            throw new RuntimeException("No matching value found in text");
+            return Optional.empty();
         }
-        return new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3)));
+        return Optional.of(new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3))));
     }
 
-    private void writeFluidFile(String response, String path) throws FileNotFoundException {
-        PrintWriter out = new PrintWriter(STR."\{path}.fld");
-        out.println(this.getCode());
-        out.println(STR."in \{response}");
-        out.flush();
-        out.close();
+    private void writeFluidFiles(String response, String tempWorkingPath) throws IOException {
+        Files.createDirectories(Paths.get(tempWorkingPath));
+        //Write temp fluid file
+        try (PrintWriter out = new PrintWriter(STR."\{tempWorkingPath}/\{this.fluidFileName}.fld")) {
+            out.println(this.getCode());
+            out.println(STR."in \{response}");
+        }
+        for (Map.Entry<String, String> dataset : this.getDatasets().entrySet()) {
+            Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{dataset.getValue()}.fld").getParent());
+            try (PrintWriter outData = new PrintWriter(STR."temp/\{dataset.getValue()}.fld")) {
+                outData.println(this.get_loadedDatasets().get(dataset.getKey()));
+            }
+        }
     }
 
-    public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws Exception {
-        ArrayList<QueryContext> queryContexts = new ArrayList<>();
-        Random random = new Random(0);
-        Files.list(Paths.get(casesFolder))
-                .filter(Files::isRegularFile) // Only process files, not directories
-                .map(path -> path.toAbsolutePath().toString()) // Get file name
-                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name).forEach(filePath -> {
-                    TestQueryContext queryContext;
-                    try {
-                        queryContext = TestQueryContext.importFromJson(filePath, random);
-                        queryContexts.addAll(queryContext.instantiate(numInstances));
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-        return queryContexts;
+    public static String replaceVariables(String textToReplace, Map<String, String> variables) {
+        for (Map.Entry<String, String> var : variables.entrySet()) {
+            String variablePlaceholder = STR."$\{var.getKey()}$";
+            textToReplace = textToReplace.replace(variablePlaceholder, var.getValue());
+        }
+        return textToReplace;
+    }
+
+    private HashMap<String, String> computeVariableValue(Map<String, String> variables, Random random) {
+        return new HashMap<>(variables.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> generateVariableValue(random, entry))));
+    }
+
+    private static String generateVariableValue(Random random, Map.Entry<String, String> entry) {
+        return switch (entry.getValue()) {
+            case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
+            case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
+            case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
+            default -> entry.getValue();
+        };
+    }
+
+    private static String getRandomString(int length, Random generator) {
+        StringBuilder sb = new StringBuilder(length);
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        for (int i = 0; i < length; i++) {
+            int randomIndex = generator.nextInt(characters.length());
+            sb.append(characters.charAt(randomIndex));
+        }
+        return sb.toString();
+    }
+
+    private ArrayList<String> get_loadedImports() {
+        return _loadedImports;
+    }
+
+    public HashMap<String, String> get_loadedDatasets() {
+        return _loadedDatasets;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public Map<String, String> getDatasets() {
+        return datasets;
+    }
+
+    public List<String> getImports() {
+        return imports;
+    }
+
+    public List<TextFragment> getParagraph() {
+        return paragraph;
+    }
+
+    public Map<String, String> getVariables() {
+        return variables;
+    }
+
+    public String getTestCaseFileName() {
+        return testCaseFileName;
+    }
+
+    public String getExpected() {
+        return expected;
+    }
+
+    private String getFluidFileName() {
+        return fluidFileName;
     }
 }
