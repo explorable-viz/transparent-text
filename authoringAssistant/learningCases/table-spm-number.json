@@ -1,0 +1,31 @@
+{
+  "variables": {
+    "random_var_1": "RANDOM_STRING",
+    "random_var_2": "RANDOM_STRING"
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "website/Ar6Wg1SPM/fluid/explainable-table"
+    },{
+      "var": "likelihoods",
+      "file": "website/Ar6Wg1SPM/fluid/likelihoods"
+    }
+  ],
+  "imports": ["lib/stats"],
+  "expected": "snd $random_var_1$.midRange",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value":"Under the low GHG emissions scenario (SSP1-1.9), global warming of [REPLACE value=\"2.0\"]°C would "
+    },{
+      "type": "expression",
+      "expression": "Text (probAsText (calcLikelihood ssp119.longRange 2.0))",
+      "value":""
+    },
+    {
+      "type": "literal",
+      "value":"be exceeded at the end of the 21st century.."
+    }
+  ]
+}

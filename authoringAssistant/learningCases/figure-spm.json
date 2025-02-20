@@ -1,0 +1,53 @@
+{
+  "variables": {
+    "random_var_1": "RANDOM_STRING",
+    "random_var_2": "RANDOM_STRING"
+  },
+  "datasets": [
+    {
+      "var": "likelihoods",
+      "file": "website/Ar6Wg1SPM/fluid/likelihoods"
+    },{
+      "var": "ssp119Source",
+      "file": "website/Ar6Wg1SPM/fluid/left-barchart-table"
+    },{
+      "var": "ssp245Source",
+      "file": "website/Ar6Wg1SPM/fluid/right-barchart-table"
+    }
+  ],
+  "imports": ["lib/stats"],
+  "expected": "nth 0 totals",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "Within each scenario bar plot, the bars represent:"
+    },
+    {
+      "type": "expression",
+      "expression": "Link totals",
+      "value": ""
+    },
+    {
+      "type": "literal",
+      "value": "total warming [REPLACE value=\"1.35\"] (°C),"
+    },
+    {
+      "type": "expression",
+      "expression": "Link co2s",
+      "value": ""
+    },
+    {
+      "type": "literal",
+      "value": "warming from CO2 (°C) and from"
+    },
+    {
+      "type": "expression",
+      "expression": "Link (map stackedBarHeight nonco2)",
+      "value": ""
+    },
+    {
+      "type": "literal",
+      "value": "Non-CO2 GHG's (°C)."
+    }
+  ]
+}
