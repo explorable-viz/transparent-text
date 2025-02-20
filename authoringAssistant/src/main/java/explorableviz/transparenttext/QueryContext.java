@@ -69,8 +69,8 @@ public class QueryContext {
     private ArrayList<String> loadImports() throws IOException {
         ArrayList<String> loadedImports = new ArrayList<>();
         for (String path : this.getImports()) {
-            path = STR."\{path}";
-            loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            path = STR."\{Settings.getInstance().getLibrariesBasePath()}/\{path}";
+            loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(STR."\{path}.fld").toURI()))));
         }
         return loadedImports;
     }

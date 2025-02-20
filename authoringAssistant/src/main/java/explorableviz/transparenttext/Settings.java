@@ -40,4 +40,8 @@ public class Settings {
         return this.get("fluid-temp-folder");
     }
 
+    public String getLibrariesBasePath() {
+        return this.get("base-path-library");
+    }
+
 }
