@@ -1,0 +1,19 @@
+{
+  "variables": {
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "website/Ar6Wg1SPM/fluid/datasets/methane-emissions"
+    }
+  ],
+  "imports": [],
+  "expected": "(sumEmissions 2030 td / length records)",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "The average methane emissions for the year 2030 is [REPLACE value=\"13.507941195555555\"] "
+    }
+  ]
+}
+
