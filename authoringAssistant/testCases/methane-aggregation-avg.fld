@@ -1,0 +1,13 @@
+let getByYear year data =
+   let helper [] acc = acc;
+      helper (x: xs) acc =
+            if x.year == year
+            then helper xs (x : acc)
+            else helper xs acc
+   in helper data [];
+let sumEmissions year data =
+   let records = getByYear year data;
+   let totals = sum(map (fun x -> x.emissions) records)
+   in totals;
+let records = getByYear 2030 tableData
+

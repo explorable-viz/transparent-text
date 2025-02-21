@@ -8,11 +8,11 @@
     }
   ],
   "imports": [],
-  "expected": "(sumEmissions 2030 td)",
+  "expected": "(sumEmissions 2030 tableData)",
   "paragraph": [
     {
       "type": "literal",
-      "value": "The total methane emissions for the year 2030 is [REPLACE value=\"121.57147076\"] "
+      "value": "The total methane emissions for the year 2030 is [REPLACE value=\"121.57147075999998\"] "
     }
   ]
 }
