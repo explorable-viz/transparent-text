@@ -10,6 +10,8 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -166,7 +168,7 @@ public class QueryContext {
             throw new RuntimeException("Output format is invalid");
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
-        if (value.equals(expectedValue)) {
+        if (value.equals(expectedValue) || roundedEquals(value, expectedValue)) {
             logger.info("Validation passed");
             return Optional.empty();
         } else {
@@ -174,6 +176,18 @@ public class QueryContext {
             return Optional.of(value);
         }
     }
+
+    private boolean roundedEquals(String value, String expectedValue) {
+        try {
+            BigDecimal bd1 = new BigDecimal(value);
+            BigDecimal bd2 = new BigDecimal(expectedValue);
+            bd1 = bd1.setScale(bd2.scale(), RoundingMode.HALF_UP);
+            return bd1.compareTo(bd2) == 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 
     private Optional<LiteralParts> splitLiteral(TextFragment literal) {
         Matcher valueReplaceMatcher = Pattern.compile("(.*)\\[REPLACE value=\"(.*?)\"](.*)").matcher(literal.getValue());
