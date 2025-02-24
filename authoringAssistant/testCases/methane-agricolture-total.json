@@ -1,0 +1,31 @@
+{
+  "variables": {
+    "categories": [
+      {
+        "key":"Agriculture",
+        "value":"18.17094166",
+        "year": "2030"
+      },
+      {
+        "key": "Energy Sector",
+        "value":"29.76188165",
+        "year": "2030"
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "website/Ar6Wg1SPM/fluid/datasets/methane-emissions"
+    }
+  ],
+  "imports": [],
+  "expected": "record.emissions",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "The total methane emissions for the year $categories.year$ is [REPLACE value=\"$categories.value$\"] for the $categories.key$ sector"
+    }
+  ]
+}
+

@@ -1,0 +1,19 @@
+{
+  "variables": {
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "website/Ar6Wg1SPM/fluid/datasets/methane-emissions"
+    }
+  ],
+  "imports": [],
+  "expected": "en2020.emissions - en2015.emissions",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "Between 2015 and 2020, methane emissions increased across most sectors, with the largest absolute rise seen in the Energy Sector ([REPLACE value=\"9.056956560000003\"] increase)."
+    }
+  ]
+}
+
