@@ -14,10 +14,28 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class TestQueryContext extends QueryContext {
+public class TestQueryContext  {
+
+    private final Map<String, Object> variables;
+    private final Map<String, String> datasets;
+    private final List<String> imports;
+    private final String testCaseFileName;
+    private final String code;
+    private final String expected;
+    private final List<TextFragment> paragraph;
 
     public TestQueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, Object> variables, String expected, String testCaseFileName) throws IOException {
-        super(datasets, imports, code, paragraph, variables, expected, testCaseFileName);
+        this.datasets = datasets;
+        this.imports = imports;
+        this.testCaseFileName = testCaseFileName;
+        this.code = code;
+        this.expected = expected;
+        this.variables = variables;
+        this.paragraph = paragraph;
+    }
+
+    public Map<String, Object> getVariables() {
+        return variables;
     }
 
     public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws IOException {
@@ -72,6 +90,29 @@ public class TestQueryContext extends QueryContext {
                 .collect(Collectors.toList());
 
         return new TestQueryContext(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, variables, testCase.getString("expected"), filePath);
+    }
+
+    public Map<String, String> getDatasets() {
+        return datasets;
+    }
+
+    public List<String> getImports() {
+        return imports;
+    }
+
+    public String getTestCaseFileName() {
+        return testCaseFileName;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getExpected() {
+        return expected;
+    }
+    public List<TextFragment> getParagraph() {
+        return paragraph;
     }
 
 }
