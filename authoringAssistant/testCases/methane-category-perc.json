@@ -1,0 +1,31 @@
+{
+  "variables": {
+    "categories": [
+      {
+        "key":"Agriculture",
+        "value":"31.05",
+        "year": "2030"
+      },
+      {
+        "key": "Energy Sector",
+        "value":"52.80",
+        "year": "2030"
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "website/Ar6Wg1SPM/fluid/datasets/methane-emissions"
+    }
+  ],
+  "imports": [],
+  "expected": "(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "The $categories.key$ sector accounts for [REPLACE value=\"$categories.value$\"]% of total methane emissions in $categories.year$."
+    }
+  ]
+}
+

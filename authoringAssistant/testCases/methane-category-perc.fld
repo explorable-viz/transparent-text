@@ -13,4 +13,4 @@ let getByCategory category year data =
                else helper xs
       in helper data;
 let year = 2030;
-let record = getByCategory "Agriculture" year tableData
+let record = getByCategory "$categories.key$" $categories.year$ tableData
