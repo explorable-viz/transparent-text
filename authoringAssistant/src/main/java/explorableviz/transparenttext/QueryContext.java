@@ -4,6 +4,7 @@ import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.Literal;
 import explorableviz.transparenttext.textfragment.TextFragment;
 import org.codehaus.plexus.util.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -29,10 +30,10 @@ public class QueryContext {
     private final String expected;
     private final String testCaseFileName;
     private final HashMap<String, String> _loadedDatasets;
-    private final Map<String, String> variables;
+    private final Map<String, Object> variables;
 
-    public QueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, String> variables, String expected, String testCaseFileName) throws IOException {
-        Map<String, String> computedVariables = computeVariableValue(variables, new Random(0));
+    public QueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, Object> variables, String expected, String testCaseFileName) throws IOException {
+        Map<String, String> computedVariables = computeVariables(variables, new Random(0));
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
@@ -110,6 +111,7 @@ public class QueryContext {
             }
         }
     }
+
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
@@ -154,7 +156,7 @@ public class QueryContext {
         logger.info(STR."Validating output: \{output}");
 
         Optional<LiteralParts> parts = this.getParagraph().stream().map(this::splitLiteral).flatMap(Optional::stream).findFirst();
-        if(parts.isEmpty()) {
+        if (parts.isEmpty()) {
             throw new RuntimeException("No REPLACE tag found");
         }
         String expectedValue = parts.get().tag().getValue();
@@ -204,20 +206,34 @@ public class QueryContext {
         return textToReplace;
     }
 
-    private HashMap<String, String> computeVariableValue(Map<String, String> variables, Random random) {
-        return new HashMap<>(variables.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> generateVariableValue(random, entry))));
+    private HashMap<String, String> computeVariables(Map<String, Object> variables, Random random) {
+        return variables.entrySet().stream()
+                .map(entry -> expandVariableEntry(random, entry))
+                .reduce(new HashMap<>(), (acc, map) -> {
+                    acc.putAll(map);
+                    return acc;
+                }, (m1, m2) -> {
+                    m1.putAll(m2);
+                    return m1;
+                });
     }
 
-    private static String generateVariableValue(Random random, Map.Entry<String, String> entry) {
-        return switch (entry.getValue()) {
-            case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
-            case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
-            case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
-            default -> entry.getValue();
-        };
+    private static Map<String, String> expandVariableEntry(Random random, Map.Entry<String, Object> entry) {
+        HashMap<String, String> vars = new HashMap<>();
+        if (entry.getValue() instanceof String value) {
+            vars.put(entry.getKey(), switch (value) {
+                case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
+                case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
+                case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
+                default -> value;
+            });
+        } else if (entry.getValue() instanceof JSONArray values && !values.isEmpty()) {
+            JSONObject value = values.getJSONObject(random.nextInt(values.length()));
+            value.keySet().forEach(k -> {
+                vars.put(STR."\{entry.getKey()}.\{k}", value.getString(k));
+            });
+        }
+        return vars;
     }
 
     private static String getRandomString(int length, Random generator) {
@@ -254,7 +270,7 @@ public class QueryContext {
         return paragraph;
     }
 
-    public Map<String, String> getVariables() {
+    public Map<String, Object> getVariables() {
         return variables;
     }
 

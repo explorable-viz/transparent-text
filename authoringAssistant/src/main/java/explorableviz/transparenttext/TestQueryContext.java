@@ -16,7 +16,7 @@ import java.util.stream.IntStream;
 
 public class TestQueryContext extends QueryContext {
 
-    public TestQueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, String> variables, String expected, String testCaseFileName) throws IOException {
+    public TestQueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, Object> variables, String expected, String testCaseFileName) throws IOException {
         super(datasets, imports, code, paragraph, variables, expected, testCaseFileName);
     }
 
@@ -57,8 +57,8 @@ public class TestQueryContext extends QueryContext {
                 })
                 .collect(Collectors.toList());
 
-        Map<String, String> variables = json_variables.keySet().stream()
-                .collect(Collectors.toMap(key -> key, json_variables::getString));
+        Map<String, Object> variables = json_variables.keySet().stream()
+                .collect(Collectors.toMap(key -> key, json_variables::get));
 
         Map<String, String> datasets = IntStream.range(0, json_datasets.length())
                 .boxed()
