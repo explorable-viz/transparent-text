@@ -43,5 +43,8 @@ public class Settings {
     public String getLibrariesBasePath() {
         return this.get("base-path-library");
     }
+    public String getCommonPath() {
+        return this.get("common-path");
+    }
 
 }
