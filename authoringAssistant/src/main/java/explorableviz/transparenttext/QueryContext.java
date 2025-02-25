@@ -63,8 +63,7 @@ public class QueryContext {
     public HashMap<String, String> loadDatasets() throws IOException {
         HashMap<String, String> loadedDatasets = new HashMap<>();
         for (Map.Entry<String, String> dataset : this.datasets.entrySet()) {
-            String path = STR."\{dataset.getValue()}";
-            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(path + ".fld").toURI()))));
+            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getInstance().getCommonPath()}/\{dataset.getValue()}.fld").toURI()))));
         }
         return loadedDatasets;
     }
@@ -72,8 +71,12 @@ public class QueryContext {
     private ArrayList<String> loadImports() throws IOException {
         ArrayList<String> loadedImports = new ArrayList<>();
         for (String path : this.getImports()) {
-            path = STR."\{Settings.getInstance().getLibrariesBasePath()}/\{path}";
-            loadedImports.add(new String(Files.readAllBytes(Paths.get(new File(STR."\{path}.fld").toURI()))));
+            File importLib = new File(STR."\{Settings.getInstance().getCommonPath()}/\{path}.fld");
+            if (importLib.exists()) {
+                loadedImports.add(new String(Files.readAllBytes(importLib.toPath())));
+            } else {
+                loadedImports.add(new String(Files.readAllBytes(Paths.get(STR."\{Settings.getInstance().getLibrariesBasePath()}/\{path}.fld"))));
+            }
         }
         return loadedImports;
     }
@@ -123,12 +126,12 @@ public class QueryContext {
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
 
             //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p './' -f \{tempWorkingPath}/\{this.getFluidFileName()}");
+            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p '\{tempWorkingPath}/' -f \{this.getFluidFileName()}");
             this.getDatasets().forEach((key, path) -> {
-                command.append(STR." -d \"(\{key}, \{tempWorkingPath}/\{path})\"");
+                command.append(STR." -d \"(\{key}, ./\{path})\"");
             });
             this.getImports().forEach(path -> {
-                command.append(STR." -i \{path}");
+                command.append(STR." -i \{Settings.getInstance().getCommonPath()}/\{path}");
             });
             logger.info(STR."Running command: \{command}");
             Process process;
@@ -203,6 +206,12 @@ public class QueryContext {
         try (PrintWriter out = new PrintWriter(STR."\{tempWorkingPath}/\{this.fluidFileName}.fld")) {
             out.println(this.getCode());
             out.println(STR."in \{response}");
+        }
+        for (int i = 0; i < this._loadedImports.size(); i++) {
+            Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/common/\{this.imports.get(i)}.fld").getParent());
+            try (PrintWriter outData = new PrintWriter(STR."temp/common/\{this.imports.get(i)}.fld")) {
+                outData.println(this.get_loadedImports().get(i));
+            }
         }
         for (Map.Entry<String, String> dataset : this.getDatasets().entrySet()) {
             Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{dataset.getValue()}.fld").getParent());
