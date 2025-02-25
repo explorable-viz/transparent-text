@@ -63,7 +63,7 @@ public class QueryContext {
     public HashMap<String, String> loadDatasets() throws IOException {
         HashMap<String, String> loadedDatasets = new HashMap<>();
         for (Map.Entry<String, String> dataset : this.datasets.entrySet()) {
-            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getInstance().getFluidCommonPath()}/\{dataset.getValue()}.fld").toURI()))));
+            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getInstance().getFluidCommonFolder()}/\{dataset.getValue()}.fld").toURI()))));
         }
         return loadedDatasets;
     }
@@ -71,7 +71,7 @@ public class QueryContext {
     private ArrayList<String> loadImports() throws IOException {
         ArrayList<String> loadedImports = new ArrayList<>();
         for (String path : this.getImports()) {
-            File importLib = new File(STR."\{Settings.getInstance().getFluidCommonPath()}/\{path}.fld");
+            File importLib = new File(STR."\{Settings.getInstance().getFluidCommonFolder()}/\{path}.fld");
             if (importLib.exists()) {
                 loadedImports.add(new String(Files.readAllBytes(importLib.toPath())));
             } else {
@@ -120,7 +120,7 @@ public class QueryContext {
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
-            String tempWorkingPath = Settings.getInstance().getFluidTempPath();
+            String tempWorkingPath = Settings.getInstance().getFluidTempFolder();
             writeFluidFiles(response, tempWorkingPath);
             String os = System.getProperty("os.name").toLowerCase();
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";

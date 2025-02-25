@@ -36,15 +36,15 @@ public class Settings {
         return Integer.parseInt(this.get("agent-limit"));
     }
 
-    public String getFluidTempPath() {
-        return this.get("fluid-temp-path");
+    public String getFluidTempFolder() {
+        return this.get("fluid-temp-folder");
     }
 
     public String getLibrariesBasePath() {
         return this.get("base-path-library");
     }
-    public String getFluidCommonPath() {
-        return this.get("fluid-common-path");
+    public String getFluidCommonFolder() {
+        return this.get("fluid-common-folder");
     }
 
 }
