@@ -1,7 +1,6 @@
 package explorableviz.transparenttext.textfragment;
 
-import java.util.HashMap;
-import java.util.Map;
+import explorableviz.transparenttext.variable.Variables;
 
 public abstract class TextFragment {
     private final String value;
@@ -17,5 +16,5 @@ public abstract class TextFragment {
     @Override
     public abstract Object clone();
 
-    public abstract TextFragment replace(Map<String, String> computedVariables);
+    public abstract TextFragment replace(Variables computedVariables);
 }

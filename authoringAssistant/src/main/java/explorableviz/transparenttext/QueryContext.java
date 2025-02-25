@@ -3,8 +3,10 @@ package explorableviz.transparenttext;
 import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.Literal;
 import explorableviz.transparenttext.textfragment.TextFragment;
+import explorableviz.transparenttext.variable.Variables;
+import explorableviz.transparenttext.variable.Variable;
+import explorableviz.transparenttext.variable.Variable.Map;
 import org.codehaus.plexus.util.FileUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -20,10 +22,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static explorableviz.transparenttext.variable.Variables.computeVariables;
+import static explorableviz.transparenttext.variable.Variables.replaceVariables;
+
 public class QueryContext {
 
     public final Logger logger = Logger.getLogger(this.getClass().getName());
-    private final Map<String, String> datasets;
+    private final java.util.Map<String, String> datasets;
     private final List<String> imports;
     private final ArrayList<String> _loadedImports;
     private final String fluidFileName = "llmTest";
@@ -32,10 +37,10 @@ public class QueryContext {
     private final String expected;
     private final String testCaseFileName;
     private final HashMap<String, String> _loadedDatasets;
-    private final Map<String, Object> variables;
+    private final Variables variables;
 
-    public QueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, Object> variables, String expected, String testCaseFileName) throws IOException {
-        Map<String, String> computedVariables = computeVariables(variables, new Random(0));
+    public QueryContext(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
+        Variables computedVariables = computeVariables(variables, new Random(0));
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
@@ -44,7 +49,7 @@ public class QueryContext {
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(
-                        Map.Entry::getKey,
+                        java.util.Map.Entry::getKey,
                         entry -> replaceVariables(entry.getValue(), computedVariables)
                 )));
         this._loadedImports = this.loadImports();
@@ -62,7 +67,7 @@ public class QueryContext {
 
     public HashMap<String, String> loadDatasets() throws IOException {
         HashMap<String, String> loadedDatasets = new HashMap<>();
-        for (Map.Entry<String, String> dataset : this.datasets.entrySet()) {
+        for (java.util.Map.Entry<String, String> dataset : this.datasets.entrySet()) {
             loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getInstance().getFluidCommonFolder()}/\{dataset.getValue()}.fld").toURI()))));
         }
         return loadedDatasets;
@@ -213,60 +218,12 @@ public class QueryContext {
                 outData.println(this.get_loadedImports().get(i));
             }
         }
-        for (Map.Entry<String, String> dataset : this.getDatasets().entrySet()) {
+        for (java.util.Map.Entry<String, String> dataset : this.getDatasets().entrySet()) {
             Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{dataset.getValue()}.fld").getParent());
             try (PrintWriter outData = new PrintWriter(STR."\{tempWorkingPath}/\{dataset.getValue()}.fld")) {
                 outData.println(this.get_loadedDatasets().get(dataset.getKey()));
             }
         }
-    }
-
-    public static String replaceVariables(String textToReplace, Map<String, String> variables) {
-        for (Map.Entry<String, String> var : variables.entrySet()) {
-            String variablePlaceholder = STR."$\{var.getKey()}$";
-            textToReplace = textToReplace.replace(variablePlaceholder, var.getValue());
-        }
-        return textToReplace;
-    }
-
-    private HashMap<String, String> computeVariables(Map<String, Object> variables, Random random) {
-        return variables.entrySet().stream()
-                .map(entry -> expandVariableEntry(random, entry))
-                .reduce(new HashMap<>(), (acc, map) -> {
-                    acc.putAll(map);
-                    return acc;
-                }, (m1, m2) -> {
-                    m1.putAll(m2);
-                    return m1;
-                });
-    }
-
-    private static Map<String, String> expandVariableEntry(Random random, Map.Entry<String, Object> entry) {
-        HashMap<String, String> vars = new HashMap<>();
-        if (entry.getValue() instanceof String value) {
-            vars.put(entry.getKey(), switch (value) {
-                case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
-                case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
-                case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
-                default -> value;
-            });
-        } else if (entry.getValue() instanceof JSONArray values && !values.isEmpty()) {
-            JSONObject value = values.getJSONObject(random.nextInt(values.length()));
-            value.keySet().forEach(k -> {
-                vars.put(STR."\{entry.getKey()}.\{k}", value.getString(k));
-            });
-        }
-        return vars;
-    }
-
-    private static String getRandomString(int length, Random generator) {
-        StringBuilder sb = new StringBuilder(length);
-        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-        for (int i = 0; i < length; i++) {
-            int randomIndex = generator.nextInt(characters.length());
-            sb.append(characters.charAt(randomIndex));
-        }
-        return sb.toString();
     }
 
     private ArrayList<String> get_loadedImports() {
@@ -281,7 +238,7 @@ public class QueryContext {
         return code;
     }
 
-    public Map<String, String> getDatasets() {
+    public java.util.Map<String, String> getDatasets() {
         return datasets;
     }
 
@@ -293,7 +250,7 @@ public class QueryContext {
         return paragraph;
     }
 
-    public Map<String, Object> getVariables() {
+    public Variables getVariables() {
         return variables;
     }
 

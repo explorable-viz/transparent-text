@@ -1,8 +1,7 @@
 package explorableviz.transparenttext.textfragment;
 
 import explorableviz.transparenttext.QueryContext;
-
-import java.util.Map;
+import explorableviz.transparenttext.variable.Variables;
 
 public class Literal extends TextFragment {
 
@@ -16,7 +15,7 @@ public class Literal extends TextFragment {
     }
 
     @Override
-    public TextFragment replace(Map<String, String> computedVariables) {
-        return new Literal(QueryContext.replaceVariables(getValue(), computedVariables));
+    public TextFragment replace(Variables computedVariables) {
+        return new Literal(Variables.replaceVariables(getValue(), computedVariables));
     }
 }

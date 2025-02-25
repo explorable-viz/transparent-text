@@ -1,8 +1,7 @@
 package explorableviz.transparenttext.textfragment;
 
 import explorableviz.transparenttext.QueryContext;
-
-import java.util.Map;
+import explorableviz.transparenttext.variable.Variables;
 
 public class Expression extends TextFragment {
 
@@ -21,7 +20,7 @@ public class Expression extends TextFragment {
         return new Expression(expr, getValue());
     }
 
-    public TextFragment replace(Map<String, String> computedVariables) {
-        return new Expression(QueryContext.replaceVariables(expr, computedVariables), getValue());
+    public TextFragment replace(Variables computedVariables) {
+        return new Expression(Variables.replaceVariables(expr, computedVariables), getValue());
     }
 }
