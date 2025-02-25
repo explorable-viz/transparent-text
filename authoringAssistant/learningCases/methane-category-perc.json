@@ -19,7 +19,7 @@
       "file": "datasets/methane-emissions"
     }
   ],
-  "imports": ["methane"],
+  "imports": [],
   "expected": "(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100",
   "paragraph": [
     {

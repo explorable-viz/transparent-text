@@ -7,8 +7,8 @@
         "year": "2030"
       },
       {
-        "key": "Energy Sector",
-        "value":"29.76188165",
+        "key":"Energy Sector",
+        "value":"64.19",
         "year": "2030"
       }
     ]
@@ -16,10 +16,10 @@
   "datasets": [
     {
       "var": "tableData",
-      "file": "website/Ar6Wg1SPM/fluid/datasets/methane-emissions"
+      "file": "datasets/methane-emissions"
     }
   ],
-  "imports": [],
+  "imports": ["methane"],
   "expected": "record.emissions",
   "paragraph": [
     {
