@@ -1,2 +1,2 @@
-let record = getByCategory "$categories.key$" $categories.year$ tableData
+let record = getByCategory "$emissions.source$" $emissions.year$ tableData
 

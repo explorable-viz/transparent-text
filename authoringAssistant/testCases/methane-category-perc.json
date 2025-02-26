@@ -1,14 +1,14 @@
 {
   "variables": {
-    "categories": [
+    "emissions": [
       {
-        "key":"Agriculture",
-        "value":"31.05",
+        "source":"Agriculture",
+        "quantity":"31.05",
         "year": "2030"
       },
       {
-        "key": "Energy Sector",
-        "value":"52.80",
+        "source": "Energy Sector",
+        "quantity":"52.80",
         "year": "2030"
       }
     ]
@@ -24,7 +24,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The $categories.key$ sector accounts for [REPLACE value=\"$categories.value$\"]% of total methane emissions in $categories.year$."
+      "value": "The $emissions.source$ sector accounts for [REPLACE value=\"$emissions.quantity$\"]% of total methane emissions in $emissions.year$."
     }
   ]
 }

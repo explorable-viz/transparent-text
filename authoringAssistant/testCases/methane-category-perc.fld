@@ -1,2 +1,2 @@
 let year = 2030;
-let record = getByCategory "$categories.key$" $categories.year$ tableData
+let record = getByCategory "$emissions.key$" $emissions.year$ tableData
