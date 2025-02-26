@@ -80,7 +80,7 @@ public class TestQueryContext {
         Variables var = new Variables();
         json_variables.keySet().forEach(k -> var.addVariable(k, switch (json_variables.get(k)) {
             case String s -> new Variable.StringVariable(s);
-            case Integer i -> new Variable.Int(i);
+            case Integer i -> new Variable.Number(i);
             case JSONArray array -> processJsonArray(array);
             default -> null;
         }));
@@ -108,6 +108,8 @@ public class TestQueryContext {
                 list.add(mapVar);
             } else if(array.get(i) instanceof String value) {
                 list.add(new Variable.StringVariable(value));
+            } else if(array.get(i) instanceof Integer value) {
+                list.add(new Variable.Number(value));
             }
         }
         return new Variable.List(list);

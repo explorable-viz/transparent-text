@@ -23,18 +23,18 @@ public class Variables extends HashMap<String, Variable> {
     private static Variables expandVariableEntry(Random random, java.util.Map.Entry<String, Variable> variable) {
         Variables vars = new Variables();
         if (variable.getValue() instanceof Variable.StringVariable value) {
-            vars.addVariable(variable.getKey(), new Variable.StringVariable(switch (value.get()) {
-                case "RANDOM_INT" -> String.valueOf(random.nextInt(10));
-                case "RANDOM_FLOAT" -> String.format("%.6f", random.nextDouble() * 10);
-                case "RANDOM_STRING" -> getRandomString(8, random).toLowerCase();
-                default -> value.get();
-            }));
+            vars.addVariable(variable.getKey(), switch (value.get()) {
+                case "RANDOM_INT" -> new Variable.Number(random.nextInt(10));
+                case "RANDOM_FLOAT" -> new Variable.Number(random.nextFloat() * 10);
+                case "RANDOM_STRING" -> new Variable.StringVariable(getRandomString(8, random).toLowerCase());
+                default -> value;
+            });
         } else if (variable.getValue() instanceof Variable.List values) {
             Variable value = values.get().get(random.nextInt(values.get().size()));
             if(value instanceof Variable.Map mapValue) {
-                mapValue.keySet().forEach(k -> vars.addVariable(STR."\{variable.getKey()}.\{k}", new Variable.StringVariable(mapValue.get().get(k))));
-            } else if(value instanceof Variable.StringVariable stringValue) {
-                vars.addVariable(variable.getKey(), stringValue);
+                mapValue.keySet().forEach(k -> vars.addVariable(STR."\{variable.getKey()}.\{k}", new Variable.StringVariable(mapValue.getValue(k))));
+            } else if(value instanceof Variable.StringVariable || value instanceof Variable.Number) {
+                vars.addVariable(variable.getKey(), value);
             }
         }
         return vars;

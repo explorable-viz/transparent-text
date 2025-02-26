@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Set;
 
 public abstract class Variable {
-    public abstract Object get();
+    public abstract Object get() throws Exception;
 
     public static class StringVariable extends Variable {
         private final String value;
@@ -19,15 +19,15 @@ public abstract class Variable {
         }
     }
 
-    public static class Int extends Variable {
-        private final int value;
+    public static class Number extends Variable {
+        private final float value;
 
-        public Int(int value) {
+        public Number(float value) {
             this.value = value;
         }
 
         @Override
-        public Integer get() {
+        public Float get() {
             return value;
         }
     }
@@ -43,8 +43,11 @@ public abstract class Variable {
             this.value.put(key, value);
         }
         @Override
-        public HashMap<String, String> get() {
+        public HashMap<String, String> get() throws Exception {
             return value;
+        }
+        public String getValue(String key) {
+            return value.get(key);
         }
         public Set<String> keySet() {
             return this.value.keySet();
