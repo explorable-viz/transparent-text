@@ -35,7 +35,6 @@ public class QueryContext {
     private final String code;
     private final List<TextFragment> paragraph;
     private final String expected;
-    private final String testCaseFileName;
     private final HashMap<String, String> _loadedDatasets;
     private final Variables variables;
 
@@ -44,7 +43,6 @@ public class QueryContext {
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
-        this.testCaseFileName = testCaseFileName;
         this._loadedDatasets = new HashMap<>(this.loadDatasets()
                 .entrySet()
                 .stream()
@@ -185,12 +183,12 @@ public class QueryContext {
         }
     }
 
-    private boolean roundedEquals(String value, String expectedValue) {
+    private boolean roundedEquals(String generated, String expected) {
         try {
-            BigDecimal bd1 = new BigDecimal(value);
-            BigDecimal bd2 = new BigDecimal(expectedValue);
-            bd1 = bd1.setScale(bd2.scale(), RoundingMode.HALF_UP);
-            return bd1.compareTo(bd2) == 0;
+            BigDecimal bdGen = new BigDecimal(generated);
+            BigDecimal bdExp = new BigDecimal(expected);
+            bdGen = bdGen.setScale(bdExp.scale(), RoundingMode.HALF_UP);
+            return bdGen.compareTo(bdExp) == 0;
         } catch (NumberFormatException e) {
             return false;
         }
@@ -252,10 +250,6 @@ public class QueryContext {
 
     public Variables getVariables() {
         return variables;
-    }
-
-    public String getTestCaseFileName() {
-        return testCaseFileName;
     }
 
     public String getExpected() {

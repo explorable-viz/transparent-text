@@ -9,10 +9,6 @@ public class Variables extends HashMap<String, Variable> {
         put(varName, value);
     }
 
-    public Variable getVariableValue(String varName) {
-        return get(varName);
-    }
-
     public static Variables computeVariables(Variables variables, Random random) {
         return variables.entrySet().stream()
                 .map(entry -> expandVariableEntry(random, entry))
