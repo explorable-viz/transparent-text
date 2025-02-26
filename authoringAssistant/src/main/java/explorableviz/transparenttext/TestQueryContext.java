@@ -4,11 +4,12 @@ import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.TextFragment;
 import explorableviz.transparenttext.textfragment.Literal;
 import explorableviz.transparenttext.variable.Variables;
-import explorableviz.transparenttext.variable.Variable;
+import explorableviz.transparenttext.variable.ValueOptions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,9 +79,10 @@ public class TestQueryContext {
                 .collect(Collectors.toList());
 
         Variables var = new Variables();
-        json_variables.keySet().forEach(k -> var.addVariable(k, switch (json_variables.get(k)) {
-            case String s -> new Variable.StringVariable(s);
-            case Integer i -> new Variable.Number(i);
+        json_variables.keySet().forEach(k -> var.put(k, switch (json_variables.get(k)) {
+            case String s -> new ValueOptions.StringValue(s);
+            case Integer i -> new ValueOptions.Number(i);
+            case BigDecimal f -> new ValueOptions.Number(f.floatValue());
             case JSONArray array -> processJsonArray(array);
             default -> null;
         }));
@@ -99,20 +101,23 @@ public class TestQueryContext {
         return new TestQueryContext(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
     }
 
-    private static Variable.List processJsonArray(JSONArray array) {
-        List<Variable> list = new ArrayList<>();
+    private static ValueOptions.List processJsonArray(JSONArray array) {
+        List<ValueOptions> list = new ArrayList<>();
+        //@todo check that list has all element of same type
         for (int i = 0; i < array.length(); i++) {
-            Variable.Map mapVar = new Variable.Map(new HashMap<>());
             if(array.get(i) instanceof JSONObject obj) {
+                ValueOptions.Map mapVar = new ValueOptions.Map(new HashMap<>());
                 obj.keySet().forEach(kk -> mapVar.add(kk, obj.getString(kk)));
                 list.add(mapVar);
             } else if(array.get(i) instanceof String value) {
-                list.add(new Variable.StringVariable(value));
+                list.add(new ValueOptions.StringValue(value));
             } else if(array.get(i) instanceof Integer value) {
-                list.add(new Variable.Number(value));
+                list.add(new ValueOptions.Number(value));
+            } else if(array.get(i) instanceof Float value) {
+                list.add(new ValueOptions.Number(value));
             }
         }
-        return new Variable.List(list);
+        return new ValueOptions.List(list);
     }
 
     public Map<String, String> getDatasets() {

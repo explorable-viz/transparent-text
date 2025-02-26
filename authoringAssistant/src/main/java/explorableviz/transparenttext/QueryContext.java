@@ -3,10 +3,8 @@ package explorableviz.transparenttext;
 import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.Literal;
 import explorableviz.transparenttext.textfragment.TextFragment;
+import explorableviz.transparenttext.variable.ValueOptions;
 import explorableviz.transparenttext.variable.Variables;
-import explorableviz.transparenttext.variable.Variable;
-import explorableviz.transparenttext.variable.Variable.Map;
-import org.codehaus.plexus.util.FileUtils;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -23,7 +21,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static explorableviz.transparenttext.variable.Variables.computeVariables;
-import static explorableviz.transparenttext.variable.Variables.replaceVariables;
 
 public class QueryContext {
 
@@ -153,7 +150,7 @@ public class QueryContext {
             if (!errorOutput.isEmpty()) {
                 logger.info(STR."Error output: \{errorOutput}");
             }
-            FileUtils.deleteDirectory(new File(tempWorkingPath));
+            //FileUtils.deleteDirectory(new File(tempWorkingPath));
             return output;
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
@@ -222,6 +219,14 @@ public class QueryContext {
                 outData.println(this.get_loadedDatasets().get(dataset.getKey()));
             }
         }
+    }
+
+    public static String replaceVariables(String textToReplace, Variables variables) {
+        for (java.util.Map.Entry<String, ValueOptions> var : variables.entrySet()) {
+            String variablePlaceholder = STR."$\{var.getKey()}$";
+            textToReplace = textToReplace.replace(variablePlaceholder, String.valueOf(var.getValue().get()));
+        }
+        return textToReplace;
     }
 
     private ArrayList<String> get_loadedImports() {
