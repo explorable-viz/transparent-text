@@ -37,7 +37,7 @@ public class QueryContext {
     private final Variables variables;
 
     public QueryContext(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
-        Variables computedVariables = computeVariables(variables, new Random(0));
+        Variables.Flat computedVariables = computeVariables(variables, new Random(0));
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
