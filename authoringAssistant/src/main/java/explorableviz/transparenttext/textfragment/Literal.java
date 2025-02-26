@@ -3,6 +3,8 @@ package explorableviz.transparenttext.textfragment;
 import explorableviz.transparenttext.QueryContext;
 import explorableviz.transparenttext.variable.Variables;
 
+import static explorableviz.transparenttext.QueryContext.replaceVariables;
+
 public class Literal extends TextFragment {
 
     public Literal(String value) {
@@ -16,6 +18,6 @@ public class Literal extends TextFragment {
 
     @Override
     public TextFragment replace(Variables computedVariables) {
-        return new Literal(Variables.replaceVariables(getValue(), computedVariables));
+        return new Literal(replaceVariables(getValue(), computedVariables));
     }
 }

@@ -3,6 +3,8 @@ package explorableviz.transparenttext.textfragment;
 import explorableviz.transparenttext.QueryContext;
 import explorableviz.transparenttext.variable.Variables;
 
+import static explorableviz.transparenttext.QueryContext.replaceVariables;
+
 public class Expression extends TextFragment {
 
     private final String expr;
@@ -21,6 +23,6 @@ public class Expression extends TextFragment {
     }
 
     public TextFragment replace(Variables computedVariables) {
-        return new Expression(Variables.replaceVariables(expr, computedVariables), getValue());
+        return new Expression(replaceVariables(expr, computedVariables), getValue());
     }
 }
