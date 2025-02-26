@@ -1,6 +1,7 @@
 package explorableviz.transparenttext.variable;
 
 import com.google.errorprone.annotations.Var;
+import org.json.JSONObject;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -9,7 +10,23 @@ import java.util.Set;
 
 public abstract class ValueOptions {
     public abstract Object get();
-
+    public static ValueOptions of(Object value) {
+        if (value instanceof JSONObject obj) {
+            ValueOptions.Map mapVar = new ValueOptions.Map(new HashMap<>());
+            obj.keySet().forEach(kk -> mapVar.add(kk, obj.getString(kk)));
+            return mapVar;
+        }
+        if (value instanceof String str) {
+            return new ValueOptions.StringValue(str);
+        }
+        if (value instanceof Integer num) {
+            return new ValueOptions.Number(num);
+        }
+        if (value instanceof Float num) {
+            return new ValueOptions.Number(num);
+        }
+        throw new IllegalArgumentException("Unsupported value type: " + value.getClass().getSimpleName());
+    }
     public abstract Variables expandVariable(Random random, String varName);
 
     public static class StringValue extends ValueOptions {
