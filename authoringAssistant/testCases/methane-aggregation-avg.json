@@ -1,5 +1,19 @@
 {
   "variables": {
+    "emissions": [
+      {
+        "year": "2030",
+        "quantity": "13.51"
+      },
+      {
+        "year": "2015",
+        "quantity": "7.20"
+      },
+      {
+        "year": "2020",
+        "quantity": "8.71"
+      }
+    ]
   },
   "datasets": [
     {
@@ -7,12 +21,14 @@
       "file": "datasets/methane-emissions"
     }
   ],
-  "imports": ["methane"],
-  "expected": "(sumEmissions 2030 tableData / length records)",
+  "imports": [
+    "methane"
+  ],
+  "expected": "(sumEmissions $emissions.year$ tableData / length records)",
   "paragraph": [
     {
       "type": "literal",
-      "value": "The average methane emissions for the year 2030 is [REPLACE value=\"13.507941195555553\"] "
+      "value": "The average methane emissions for the year $emissions.year$ is [REPLACE value=\"$emissions.quantity$\"] "
     }
   ]
 }
