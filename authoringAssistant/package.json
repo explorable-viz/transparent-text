@@ -13,7 +13,7 @@
   "scripts": {
     "build": "./script/build.sh",
     "install-dependencies": "./script/install-dependencies.sh",
-    "bundle": "yarn fluid publish -w Ar6Wg1SPM -l",
+    "bundle-website": "yarn fluid bundle-website -w Ar6Wg1SPM -l",
     "pull-llama3": "./script/model-pull.sh llama3",
     "pull-llama3-1": "./script/ollama-model-pull.sh llama3.1",
     "ollama-install": "./script/ollama-install.sh",

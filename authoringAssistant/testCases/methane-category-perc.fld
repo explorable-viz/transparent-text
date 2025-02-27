@@ -1,0 +1,2 @@
+let year = 2030;
+let record = getByCategory "$emissions.source$" $emissions.year$ tableData

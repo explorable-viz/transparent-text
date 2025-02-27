@@ -5,7 +5,7 @@
   "datasets": [
     {
       "var": "tableData",
-      "file": "website/Ar6Wg1SPM/fluid/datasets/test-dataset"
+      "file": "datasets/test-dataset"
     }
   ],
   "imports": [],

@@ -3,6 +3,7 @@ package explorableviz.transparenttext;
 import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.TextFragment;
 import explorableviz.transparenttext.textfragment.Literal;
+import explorableviz.transparenttext.variable.Variables;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -14,10 +15,28 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class TestQueryContext extends QueryContext {
+public class TestQueryContext {
 
-    public TestQueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Map<String, String> variables, String expected, String testCaseFileName) throws IOException {
-        super(datasets, imports, code, paragraph, variables, expected, testCaseFileName);
+    private final Variables variables;
+    private final Map<String, String> datasets;
+    private final List<String> imports;
+    private final String testCaseFileName;
+    private final String code;
+    private final String expected;
+    private final List<TextFragment> paragraph;
+
+    public TestQueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
+        this.datasets = datasets;
+        this.imports = imports;
+        this.testCaseFileName = testCaseFileName;
+        this.code = code;
+        this.expected = expected;
+        this.variables = variables;
+        this.paragraph = paragraph;
+    }
+
+    public Variables getVariables() {
+        return variables;
     }
 
     public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws IOException {
@@ -57,9 +76,7 @@ public class TestQueryContext extends QueryContext {
                 })
                 .collect(Collectors.toList());
 
-        Map<String, String> variables = json_variables.keySet().stream()
-                .collect(Collectors.toMap(key -> key, json_variables::getString));
-
+        Variables var = Variables.fromJSON(json_variables);
         Map<String, String> datasets = IntStream.range(0, json_datasets.length())
                 .boxed()
                 .collect(Collectors.toMap(
@@ -71,7 +88,31 @@ public class TestQueryContext extends QueryContext {
                 .mapToObj(json_imports::getString)
                 .collect(Collectors.toList());
 
-        return new TestQueryContext(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, variables, testCase.getString("expected"), filePath);
+        return new TestQueryContext(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
+    }
+
+    public Map<String, String> getDatasets() {
+        return datasets;
+    }
+
+    public List<String> getImports() {
+        return imports;
+    }
+
+    public String getTestCaseFileName() {
+        return testCaseFileName;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getExpected() {
+        return expected;
+    }
+
+    public List<TextFragment> getParagraph() {
+        return paragraph;
     }
 
 }

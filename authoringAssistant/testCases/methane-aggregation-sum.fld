@@ -1,0 +1,5 @@
+let sumEmissions year data =
+   let records = getByYear year data;
+   let totals = sum(map (fun x -> x.emissions) records)
+   in totals
+

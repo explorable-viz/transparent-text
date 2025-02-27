@@ -2,7 +2,7 @@
   "variables": {},
   "datasets": [{
     "var": "tableData",
-    "file": "website/Ar6Wg1SPM/fluid/datasets/test-dataset"
+    "file": "datasets/test-dataset"
   }],
   "imports": [],
   "expected": "likelihoodMap(findLikelihood(stressedScenario.low81100, stressedScenario.high81100) 0.6)",
