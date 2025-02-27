@@ -4233,7 +4233,6 @@ var toUnfoldable4 = (dictUnfoldable) => {
 };
 var toUnfoldable1 = /* @__PURE__ */ toUnfoldable4(unfoldableArray);
 var size2 = (v) => size(v);
-var singleton2 = (a) => $$$Map("Two", Leaf2, a, void 0, Leaf2);
 var showSet = (dictShow) => ({ show: (s) => "(fromFoldable " + showArrayImpl(dictShow.show)(toUnfoldable1(s)) + ")" });
 var member = (dictOrd) => (a) => (v) => {
   const $0 = lookup2(dictOrd)(a)(v);
@@ -9600,7 +9599,7 @@ var toAscUnfoldable = (dictUnfoldable) => {
   const $1 = toArrayWithKey(Tuple);
   return (x) => toUnfoldable(dictUnfoldable)($0($1(x)));
 };
-var singleton3 = (k) => (v) => {
+var singleton2 = (k) => (v) => {
   const $0 = {};
   $0[k] = v;
   return $0;
@@ -10070,7 +10069,7 @@ function intersectionWith_Object(f) {
 // output-es/Util.Map/index.js
 var identity14 = (x) => x;
 var mapObjectString = {
-  maplet: singleton3,
+  maplet: singleton2,
   keys: /* @__PURE__ */ (() => {
     const $0 = foldlArray((m) => (a) => insert(ordString)(a)()(m))(Leaf2);
     return (x) => $0(Object.keys(x));
@@ -11570,12 +11569,6 @@ var fromFoldable22 = /* @__PURE__ */ (() => foldableSet.foldr(Cons)(Nil))();
 var Vertex = (x) => x;
 var eqVertex = { eq: (x) => (y) => x === y };
 var ordVertex = { compare: (x) => (y) => ordString.compare(x)(y), Eq0: () => eqVertex };
-var verticesVertex = (dictFunctor) => (dictFoldable) => ({
-  vertices: (() => {
-    const $0 = dictFoldable.foldl(union(ordVertex))(Leaf2);
-    return (x) => $0(dictFunctor.map(singleton2)(x));
-  })()
-});
 var showVertices = (\u03B1s) => "{" + joinWith(", ")(fromFoldable5(map(ordString)(unsafeCoerce)(\u03B1s))) + "}";
 var showEdgeList = (es) => joinWith("\n")([
   "digraph G {",
@@ -17190,7 +17183,6 @@ var botOfUnit$x215Raw$x215 = (dictBoundedJoinSemilattice) => ({
     return (x) => $Tuple($0, $1(x._2));
   })()
 });
-var functorEnvExpr = { map: (f) => (m) => $EnvExpr(_fmapObject(m._1, functorVal.map(f)), functorExpr.map(f)(m._2)) };
 var foldableVal = {
   foldl: (f) => (z) => (m) => foldableBaseVal.foldl(f)(f(z)(m._1))(m._2),
   foldr: (f) => (z) => (m) => f(m._1)(foldableBaseVal.foldr(f)(z)(m._2)),
@@ -18228,8 +18220,6 @@ var concatM = (dictMonad) => foldableList.foldr((() => {
 })())(dictMonad.Applicative0().pure);
 var fwdSlice2 = /* @__PURE__ */ fwdSlice(graphGraphImpl);
 var bwdSlice2 = /* @__PURE__ */ bwdSlice(graphGraphImpl);
-var vertices = /* @__PURE__ */ (() => verticesVertex(functorEnvExpr)(foldableEnvExpr).vertices)();
-var vertices1 = /* @__PURE__ */ (() => verticesVertex(functorVal)(foldableVal).vertices)();
 var matchMany = (dictMonadWithGraphAlloc) => {
   const Monad0 = dictMonadWithGraphAlloc.MonadWithGraph2().Monad0();
   const $0 = Monad0.Applicative0();
@@ -18710,13 +18700,13 @@ var graphEval = (dictMonadError) => {
     const $1 = v["\u03B3"];
     const $2 = spyFunWhen(false)("fwdSlice")((x) => $Tuple(showVertices(x._1), showEdgeList(toEdgeList(graphGraphImpl)(x._2))))(showGraph(graphGraphImpl))(fwdSlice2);
     const $3 = spyFunWhen(false)("bwdSlice")((x) => $Tuple(showVertices(x._1), showEdgeList(toEdgeList(graphGraphImpl)(x._2))))(showGraph(graphGraphImpl))(bwdSlice2);
-    return Monad0.Bind1().bind(runAllocT(Monad0)(bindStateT2.bind(alloc(e))((e\u03B1) => bindStateT2.bind(runWithGraphT_spy2(eval1($1)(e\u03B1)(Leaf2))(vertices($EnvExpr(
+    return Monad0.Bind1().bind(runAllocT(Monad0)(bindStateT2.bind(alloc(e))((e\u03B1) => bindStateT2.bind(runWithGraphT_spy2(eval1($1)(e\u03B1)(Leaf2))(foldableEnvExpr.foldl((m) => (a) => insert(ordVertex)(a)()(m))(Leaf2)($EnvExpr(
       $1,
       e\u03B1
     ))))((v1) => {
       const $4 = v1._1;
       const $5 = v1._2;
-      return bindStateT2.bind(check2(difference2(ordVertex)(vertices1($5))($4._1.vertices).tag === "Leaf")("outputs in graph"))(() => applicativeStateT(Monad0).pure($Tuple(
+      return bindStateT2.bind(check2(difference2(ordVertex)(foldableBaseVal.foldl((m) => (a) => insert(ordVertex)(a)()(m))(insert(ordVertex)($5._1)()(Leaf2))($5._2))($4._1.vertices).tag === "Leaf")("outputs in graph"))(() => applicativeStateT(Monad0).pure($Tuple(
         $4,
         $Tuple($EnvExpr($1, e\u03B1), $5)
       )));
@@ -24808,7 +24798,6 @@ var traversableProgCxt = {
 
 // output-es/Module/index.js
 var boundedLattice2 = { BoundedJoinSemilattice0: () => boundedJoinSemilatticeUni, BoundedMeetSemilattice1: () => boundedMeetSemilatticeUni };
-var verticesVertex2 = /* @__PURE__ */ verticesVertex(functorProgCxt)(foldableProgCxt);
 var concatM2 = (dictMonad) => foldrArray((() => {
   const $0 = dictMonad.Bind1();
   return (f) => (g) => (a) => $0.bind(f(a))(g);
@@ -24865,7 +24854,7 @@ var initialConfig = (dictMonadError) => {
     Bind1: () => bindStateT(Monad0)
   })(graphGraphImpl);
   const eval_progCxt2 = eval_progCxt(monadWithGraphAllocWithGr(dictMonadError));
-  return (dictFV) => (e) => (progCxt) => Bind1.bind(Applicative0.pure())(() => Bind1.bind(runAllocT(Monad0)($1.bind(alloc(progCxt))((progCxt$p) => $1.bind(runWithGraphT_spy2(eval_progCxt2(progCxt$p))(verticesVertex2.vertices(progCxt$p)))((v) => applicativeStateT(Monad0).pure($Tuple(
+  return (dictFV) => (e) => (progCxt) => Bind1.bind(Applicative0.pure())(() => Bind1.bind(runAllocT(Monad0)($1.bind(alloc(progCxt))((progCxt$p) => $1.bind(runWithGraphT_spy2(eval_progCxt2(progCxt$p))(foldableProgCxt.foldl((m) => (a) => insert(ordVertex)(a)()(m))(Leaf2)(progCxt$p)))((v) => applicativeStateT(Monad0).pure($Tuple(
     progCxt$p,
     (() => {
       const $2 = dictFV.fv(e);
@@ -26055,7 +26044,6 @@ var mkCommand = (m) => {
   const $0 = v.cmdCommands;
   return $Tuple(v.cmdGroup, $Tuple(arrayMap(fst)($0), $Tuple((v1) => lookup4(v1)($0), void 0)));
 };
-var flagFieldsHasName = { name: (n) => (fields) => ({ flagNames: [n, ...fields.flagNames], flagActive: fields.flagActive }) };
 var modSemigroup = {
   append: (v) => (v1) => $Mod((x) => v1._1(v._1(x)), $DefaultProp(v1._2._1.tag === "Nothing" ? v._2._1 : v1._2._1, v1._2._2.tag === "Nothing" ? v._2._2 : v1._2._2), (x) => v1._3(v._3(x)))
 };
@@ -28426,14 +28414,32 @@ var execParserPure = (pprefs) => (pinfo) => (args) => {
 };
 
 // output-es/Fluid/index.js
-var $Command = (tag, _1, _2) => ({ tag, _1, _2 });
-var $Program = (_1) => ({ tag: "Program", _1 });
+var $BundleArgs = (_1, _2) => ({ tag: "BundleArgs", _1, _2 });
+var $Command = (tag, _1) => ({ tag, _1 });
+var $EvalArgs = (_1) => ({ tag: "EvalArgs", _1 });
 var loadProgCxt3 = /* @__PURE__ */ loadProgCxt2(monadAffAff)(monadErrorAff);
 var prepConfig3 = /* @__PURE__ */ prepConfig2(monadAffAff)(monadErrorAff);
 var graphEval2 = /* @__PURE__ */ graphEval(monadErrorAff);
 var fromFoldable29 = /* @__PURE__ */ (() => fromFoldableImpl(foldableList.foldr))();
 var Evaluate = (value0) => $Command("Evaluate", value0);
-var Publish = (value0) => (value1) => $Command("Publish", value0, value1);
+var BundleWebsite = (value0) => $Command("BundleWebsite", value0);
+var parseLocal = /* @__PURE__ */ $Parser(
+  "AltP",
+  /* @__PURE__ */ flag$p(true)(/* @__PURE__ */ (() => {
+    const $0 = help("Are you running fluid as a library?");
+    const $1 = $0._2._1.tag === "Nothing" ? Nothing : $0._2._1;
+    const $2 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
+    return $Mod(
+      (x) => $0._1({
+        flagNames: [$OptName("OptShort", "l"), $OptName("OptLong", "local"), ...x.flagNames],
+        flagActive: x.flagActive
+      }),
+      $DefaultProp($1.tag === "Nothing" ? Nothing : $1, $2.tag === "Nothing" ? Nothing : $2),
+      (x) => $0._3(x)
+    );
+  })()),
+  /* @__PURE__ */ $Parser("NilP", false)
+);
 var parseImports = /* @__PURE__ */ $Parser(
   "BindP",
   /* @__PURE__ */ manyM(/* @__PURE__ */ option(readerAsk)(/* @__PURE__ */ (() => {
@@ -28451,9 +28457,28 @@ var parseImports = /* @__PURE__ */ $Parser(
     );
   })()))
 );
+var parseBundleArgs = /* @__PURE__ */ (() => $Parser(
+  "MultP",
+  $MultPE(
+    parserFunctor.map((v) => (v1) => $BundleArgs(v, v1))(parserFunctor.map(Folder)(option(readerAsk)((() => {
+      const $0 = help("root directory of website under dist/");
+      const $1 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
+      return $Mod(
+        (x) => $0._1({
+          optNames: [$OptName("OptShort", "w"), $OptName("OptLong", "website"), ...x.optNames],
+          optCompleter: x.optCompleter,
+          optNoArgError: x.optNoArgError
+        }),
+        $DefaultProp($Maybe("Just", "Misc"), $1.tag === "Nothing" ? Nothing : $1),
+        (x) => $0._3(x)
+      );
+    })()))),
+    parseLocal
+  )
+))();
 var evaluate = (v) => {
   const $0 = v._1.fileName;
-  const fluidSrcPaths = [v._1.prefix, ...v._1.library ? ["node_modules/@explorable-viz/fluid/dist/fluid/fluid"] : []];
+  const fluidSrcPaths = [v._1.fluidSrcPath, ...v._1.local ? ["node_modules/@explorable-viz/fluid/dist/fluid/fluid"] : []];
   return _bind(loadProgCxt3(fluidSrcPaths)(v._1.imports)(v._1.datasets))((progCxt) => _bind(prepConfig3(fluidSrcPaths)($0)(progCxt))((v1) => _bind(graphEval2(v1.gconfig)(v1.e))((v2) => _pure($Val(
     void 0,
     functorBaseVal.map((v$1) => {
@@ -28471,12 +28496,22 @@ var copyOptions = {
   encoding: Nothing,
   shell: Nothing
 };
-var publish = (website) => (library) => exec2((library ? "./node_modules/@explorable-viz/fluid/script/bundle-website.sh -w " : "./script/bundle-website.sh -w ") + (library ? website + " -r" : website + ""))(copyOptions)((v) => {
-  if (v.error.tag === "Just") {
-    return log(showErrorImpl(v.error._1));
+var callback = (v) => {
+  if (v.tag === "Left") {
+    return log(showErrorImpl(v._1));
   }
-  if (v.error.tag === "Nothing") {
-    const $0 = toString2(monadEffect)(ASCII)(v.stdout);
+  if (v.tag === "Right") {
+    return () => {
+    };
+  }
+  fail();
+};
+var bundleWebsite = (v) => exec2((v._2 ? "./node_modules/@explorable-viz/fluid/script/bundle-website.sh -w " : "./script/bundle-website.sh -w ") + (v._2 ? v._1 + " -l" : v._1 + ""))(copyOptions)((v1) => {
+  if (v1.error.tag === "Just") {
+    return log(showErrorImpl(v1.error._1));
+  }
+  if (v1.error.tag === "Nothing") {
+    const $0 = toString2(monadEffect)(ASCII)(v1.stdout);
     return () => {
       const $1 = $0();
       return log($1)();
@@ -28488,19 +28523,9 @@ var dispatchCommand = (v) => {
   if (v.tag === "Evaluate") {
     return _bind(evaluate(v._1))((v1) => _liftEffect(log(intercalate4("\n")(removeDocWS(prettyVal(highlightableUnit).pretty(v1)).lines))));
   }
-  if (v.tag === "Publish") {
+  if (v.tag === "BundleWebsite") {
     return _map((v$1) => {
-    })(_liftEffect(publish(v._1)(v._2)));
-  }
-  fail();
-};
-var callback = (v) => {
-  if (v.tag === "Left") {
-    return log(showErrorImpl(v._1));
-  }
-  if (v.tag === "Right") {
-    return () => {
-    };
+    })(_liftEffect(bundleWebsite(v._1)));
   }
   fail();
 };
@@ -28547,7 +28572,7 @@ var parseDatasets = /* @__PURE__ */ $Parser(
     );
   })()))
 );
-var program = /* @__PURE__ */ (() => $Parser(
+var parseEvaluate = /* @__PURE__ */ (() => $Parser(
   "MultP",
   $MultPE(
     $Parser(
@@ -28559,23 +28584,7 @@ var program = /* @__PURE__ */ (() => $Parser(
             $Parser(
               "MultP",
               $MultPE(
-                parserFunctor.map((v) => (v1) => (v2) => (v3) => (v4) => $Program({ library: v, imports: v1, datasets: v2, fileName: v3, prefix: v4 }))($Parser(
-                  "AltP",
-                  flag$p(true)((() => {
-                    const $0 = help("Are you running fluid as a library?");
-                    const $1 = $0._2._1.tag === "Nothing" ? Nothing : $0._2._1;
-                    const $2 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
-                    return $Mod(
-                      (x) => $0._1({
-                        flagNames: [$OptName("OptShort", "l"), $OptName("OptLong", "library"), ...x.flagNames],
-                        flagActive: x.flagActive
-                      }),
-                      $DefaultProp($1.tag === "Nothing" ? Nothing : $1, $2.tag === "Nothing" ? Nothing : $2),
-                      (x) => $0._3(x)
-                    );
-                  })()),
-                  $Parser("NilP", false)
-                )),
+                parserFunctor.map((v) => (v1) => (v2) => (v3) => (v4) => $EvalArgs({ local: v, imports: v1, datasets: v2, fileName: v3, fluidSrcPath: v4 }))(parseLocal),
                 parserFunctor.map(fromFoldable29)(parseImports)
               )
             ),
@@ -28599,12 +28608,12 @@ var program = /* @__PURE__ */ (() => $Parser(
       )
     ),
     parserFunctor.map(Folder)(option(readerAsk)((() => {
-      const $0 = help("The prefix for the file");
+      const $0 = help("The path containing the program files");
       const $1 = $0._2._1.tag === "Nothing" ? Nothing : $0._2._1;
       const $2 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
       return $Mod(
         (x) => $0._1({
-          optNames: [$OptName("OptShort", "p"), $OptName("OptLong", "prefix"), ...x.optNames],
+          optNames: [$OptName("OptShort", "p"), $OptName("OptLong", "fluid-src-path"), ...x.optNames],
           optCompleter: x.optCompleter,
           optNoArgError: x.optNoArgError
         }),
@@ -28614,44 +28623,7 @@ var program = /* @__PURE__ */ (() => $Parser(
     })()))
   )
 ))();
-var commands = /* @__PURE__ */ (() => ({
-  publish: $Parser(
-    "MultP",
-    $MultPE(
-      parserFunctor.map(Publish)(parserFunctor.map(Folder)(option(readerAsk)((() => {
-        const $0 = help("root directory of website under dist/");
-        const $1 = $0._2._2.tag === "Nothing" ? Nothing : $0._2._2;
-        return $Mod(
-          (x) => $0._1({
-            optNames: [$OptName("OptShort", "w"), $OptName("OptLong", "website"), ...x.optNames],
-            optCompleter: x.optCompleter,
-            optNoArgError: x.optNoArgError
-          }),
-          $DefaultProp($Maybe("Just", "Misc"), $1.tag === "Nothing" ? Nothing : $1),
-          (x) => $0._3(x)
-        );
-      })()))),
-      $Parser(
-        "AltP",
-        flag$p(true)(foldableArray.foldMap(modMonoid)(identity3)([
-          $Mod(
-            flagFieldsHasName.name($OptName("OptLong", "local")),
-            $DefaultProp(Nothing, Nothing),
-            identity26
-          ),
-          $Mod(
-            flagFieldsHasName.name($OptName("OptShort", "l")),
-            $DefaultProp(Nothing, Nothing),
-            identity26
-          ),
-          help("Are you publishing from source (false), or an npm package (true)?")
-        ])),
-        $Parser("NilP", false)
-      )
-    )
-  ),
-  evaluate: parserFunctor.map(Evaluate)(program)
-}))();
+var commands = /* @__PURE__ */ (() => ({ bundleWebsite: parserFunctor.map(BundleWebsite)(parseBundleArgs), evaluate: parserFunctor.map(Evaluate)(parseEvaluate) }))();
 var commandParser = /* @__PURE__ */ subparser(/* @__PURE__ */ (() => {
   const $0 = command("evaluate")(progDesc("Evaluate a file")({
     infoParser: commands.evaluate,
@@ -28662,8 +28634,8 @@ var commandParser = /* @__PURE__ */ subparser(/* @__PURE__ */ (() => {
     infoFailureCode: $$Error,
     infoPolicy: Intersperse
   }));
-  const $1 = command("publish")(progDesc("Publish a file")({
-    infoParser: commands.publish,
+  const $1 = command("bundle-website")(progDesc("Bundle a website to dist")({
+    infoParser: commands.bundleWebsite,
     infoFullDesc: true,
     infoProgDesc: mempty12,
     infoHeader: mempty12,

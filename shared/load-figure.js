@@ -27868,12 +27868,6 @@ var select\u03B1s\u{1D539}Vertex = (dictApply) => {
     };
   };
 };
-var verticesVertex = (dictFunctor) => (dictFoldable) => ({
-  vertices: (() => {
-    const $0 = dictFoldable.foldl(union3(ordVertex))(Leaf2);
-    return (x2) => $0(dictFunctor.map(singleton3)(x2));
-  })()
-});
 var showVertices = (\u03B1s) => "{" + joinWith(", ")(fromFoldable4(map2(ordString)(unsafeCoerce)(\u03B1s))) + "}";
 var showEdgeList = (es) => joinWith("\n")([
   "digraph G {",
@@ -38010,8 +38004,6 @@ var concatM = (dictMonad) => foldableList.foldr((() => {
 })())(dictMonad.Applicative0().pure);
 var fwdSlice2 = /* @__PURE__ */ fwdSlice(graphGraphImpl);
 var bwdSlice2 = /* @__PURE__ */ bwdSlice(graphGraphImpl);
-var vertices = /* @__PURE__ */ (() => verticesVertex(functorEnvExpr)(foldableEnvExpr).vertices)();
-var vertices1 = /* @__PURE__ */ (() => verticesVertex(functorVal)(foldableVal).vertices)();
 var matchMany = (dictMonadWithGraphAlloc) => {
   const Monad0 = dictMonadWithGraphAlloc.MonadWithGraph2().Monad0();
   const $0 = Monad0.Applicative0();
@@ -38516,13 +38508,13 @@ var graphEval = (dictMonadError) => {
     const $1 = v["\u03B3"];
     const $2 = spyFunWhen(false)("fwdSlice")((x2) => $Tuple(showVertices(x2._1), showEdgeList(toEdgeList(graphGraphImpl)(x2._2))))(showGraph(graphGraphImpl))(fwdSlice2);
     const $3 = spyFunWhen(false)("bwdSlice")((x2) => $Tuple(showVertices(x2._1), showEdgeList(toEdgeList(graphGraphImpl)(x2._2))))(showGraph(graphGraphImpl))(bwdSlice2);
-    return Monad0.Bind1().bind(runAllocT(Monad0)(bindStateT2.bind(alloc(e))((e\u03B1) => bindStateT2.bind(runWithGraphT_spy2(eval1($1)(e\u03B1)(Leaf2))(vertices($EnvExpr(
+    return Monad0.Bind1().bind(runAllocT(Monad0)(bindStateT2.bind(alloc(e))((e\u03B1) => bindStateT2.bind(runWithGraphT_spy2(eval1($1)(e\u03B1)(Leaf2))(foldableEnvExpr.foldl((m) => (a) => insert3(ordVertex)(a)()(m))(Leaf2)($EnvExpr(
       $1,
       e\u03B1
     ))))((v1) => {
       const $4 = v1._1;
       const $5 = v1._2;
-      return bindStateT2.bind(check2(difference2(ordVertex)(vertices1($5))($4._1.vertices).tag === "Leaf")("outputs in graph"))(() => applicativeStateT(Monad0).pure($Tuple(
+      return bindStateT2.bind(check2(difference2(ordVertex)(foldableBaseVal.foldl((m) => (a) => insert3(ordVertex)(a)()(m))(insert3(ordVertex)($5._1)()(Leaf2))($5._2))($4._1.vertices).tag === "Leaf")("outputs in graph"))(() => applicativeStateT(Monad0).pure($Tuple(
         $4,
         $Tuple($EnvExpr($1, e\u03B1), $5)
       )));
@@ -43760,7 +43752,6 @@ var traversableProgCxt = {
 
 // output-es/Module/index.js
 var boundedLattice2 = { BoundedJoinSemilattice0: () => boundedJoinSemilatticeUni, BoundedMeetSemilattice1: () => boundedMeetSemilatticeUni };
-var verticesVertex2 = /* @__PURE__ */ verticesVertex(functorProgCxt)(foldableProgCxt);
 var concatM2 = (dictMonad) => foldrArray((() => {
   const $0 = dictMonad.Bind1();
   return (f) => (g) => (a) => $0.bind(f(a))(g);
@@ -43817,7 +43808,7 @@ var initialConfig = (dictMonadError) => {
     Bind1: () => bindStateT(Monad0)
   })(graphGraphImpl);
   const eval_progCxt2 = eval_progCxt(monadWithGraphAllocWithGr(dictMonadError));
-  return (dictFV) => (e) => (progCxt) => Bind1.bind(Applicative0.pure())(() => Bind1.bind(runAllocT(Monad0)($1.bind(alloc(progCxt))((progCxt$p) => $1.bind(runWithGraphT_spy2(eval_progCxt2(progCxt$p))(verticesVertex2.vertices(progCxt$p)))((v) => applicativeStateT(Monad0).pure($Tuple(
+  return (dictFV) => (e) => (progCxt) => Bind1.bind(Applicative0.pure())(() => Bind1.bind(runAllocT(Monad0)($1.bind(alloc(progCxt))((progCxt$p) => $1.bind(runWithGraphT_spy2(eval_progCxt2(progCxt$p))(foldableProgCxt.foldl((m) => (a) => insert3(ordVertex)(a)()(m))(Leaf2)(progCxt$p)))((v) => applicativeStateT(Monad0).pure($Tuple(
     progCxt$p,
     (() => {
       const $2 = dictFV.fv(e);
