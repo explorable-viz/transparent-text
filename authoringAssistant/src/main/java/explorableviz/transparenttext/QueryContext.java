@@ -21,7 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static explorableviz.transparenttext.variable.Variables.computeVariables;
+import static explorableviz.transparenttext.variable.Variables.Flat.computeVariables;
 
 public class QueryContext {
 

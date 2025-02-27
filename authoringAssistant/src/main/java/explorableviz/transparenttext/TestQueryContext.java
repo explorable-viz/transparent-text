@@ -4,12 +4,10 @@ import explorableviz.transparenttext.textfragment.Expression;
 import explorableviz.transparenttext.textfragment.TextFragment;
 import explorableviz.transparenttext.textfragment.Literal;
 import explorableviz.transparenttext.variable.Variables;
-import explorableviz.transparenttext.variable.ValueOptions;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -78,15 +76,7 @@ public class TestQueryContext {
                 })
                 .collect(Collectors.toList());
 
-        Variables var = new Variables();
-        json_variables.keySet().forEach(k -> var.put(k, switch (json_variables.get(k)) {
-            case String s -> new ValueOptions.StringValue(s);
-            case Integer i -> new ValueOptions.Number(i);
-            case BigDecimal f -> new ValueOptions.Number(f.floatValue());
-            case JSONArray array -> processJsonArray(array, k);
-            default -> null;
-        }));
-
+        Variables var = Variables.fromJSON(json_variables);
         Map<String, String> datasets = IntStream.range(0, json_datasets.length())
                 .boxed()
                 .collect(Collectors.toMap(
@@ -99,17 +89,6 @@ public class TestQueryContext {
                 .collect(Collectors.toList());
 
         return new TestQueryContext(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
-    }
-
-    private static ValueOptions.List processJsonArray(JSONArray array, String varName) {
-        return new ValueOptions.List((IntStream.range(0, array.length())
-                .mapToObj(array::get)
-                .map(e -> {
-                    if (!e.getClass().equals(array.get(0).getClass())) {
-                        throw new RuntimeException(STR."Different types in a list are not allowed. Check the type of '\{varName}'.");
-                    }
-                    return ValueOptions.of(e);
-                }).collect(Collectors.toList())));
     }
 
     public Map<String, String> getDatasets() {
