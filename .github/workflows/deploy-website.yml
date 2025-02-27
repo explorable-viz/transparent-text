@@ -32,7 +32,7 @@ jobs:
         cd authoringAssistant
         yarn install
         set -x -e
-        yarn fluid publish -w Ar6Wg1SPM -l
+        yarn bundle-website
         export PUPPETEER_CACHE_DIR=$GITHUB_WORKSPACE/authoringAssistant/
         # requires Puppeteer to be installed at same version as used in Fluid
         yarn puppeteer browsers install chrome
