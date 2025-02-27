@@ -29,7 +29,7 @@ public class AuthoringAssistant {
         for (int attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
-            String candidateExpr = llm.evaluate(prompts, "");
+            String candidateExpr = llm.evaluate(sessionPrompt, "");
             logger.info(STR."Received response: \{candidateExpr}");
 
             Optional<String> result = query.validate(query.evaluate(candidateExpr));
