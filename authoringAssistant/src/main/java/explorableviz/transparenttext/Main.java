@@ -39,7 +39,11 @@ public class Main {
 
     private static boolean computeAccuracy(List<String> results, List<QueryContext> queryContexts, int queryLimit, float threshold) {
         logger.info("Computing accuracy");
-        float rate = (float) IntStream.range(0, results.size()).filter(i -> queryContexts.get(i).getExpected().equals(results.get(i))).count() / queryLimit;
+        long count = IntStream.range(0, results.size()).filter(i -> {
+            logger.info(STR."I=\{i}exp=\{queryContexts.get(i).getExpected()} obtained=\{results.get(i)}");
+            return queryContexts.get(i).getExpected().equals(results.get(i));
+        }).count();
+        float rate = (float) count /queryLimit;
         System.out.println(STR."Accuracy: \{rate}");
         if (rate < threshold) {
             System.out.println("FAILED: Accuracy too low");
