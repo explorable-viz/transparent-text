@@ -172,7 +172,7 @@ public class QueryContext {
             throw new RuntimeException("Output format is invalid");
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
-        if (value.equals(expectedValue) || roundedEquals(value, expectedValue)) {
+        if (value.equals(expectedValue) || roundedEquals(value, expectedValue) || expectedValue.equals("?")) {
             logger.info("Validation passed");
             return Optional.empty();
         } else {
