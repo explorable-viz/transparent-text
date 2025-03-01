@@ -15,8 +15,8 @@ node_modules
 *.synctex(busy)
 venv/
 benchmark/
-*.agdai
 /preprocessing/.ipynb_checkpoints/*
 ./ipynb_checkpoints
 preprocessing/.ipynb_checkpoints/preprocess_CMIP6-checkpoint.ipynb
 /preprocessing/CMIP6_tas_landsea/.ipynb_checkpoints
+.vscode/
