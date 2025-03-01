@@ -12,7 +12,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "Between 2015 and 2020, methane emissions increased across most sectors, with the largest absolute rise seen in the Energy Sector ([REPLACE value=\"9.06\"] increase)."
+      "value": "Between 2015 and 2020, methane emissions increased across most sectors, with the largest absolute rise seen in the [REPLACE value=\"?\"]."
     }
   ]
 }
