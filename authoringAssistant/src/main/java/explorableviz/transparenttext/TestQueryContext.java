@@ -49,7 +49,7 @@ public class TestQueryContext {
         for (String casePath : casePaths) {
             TestQueryContext testQuery = TestQueryContext.importFromJson(casePath);
             for (int i = 0; i < numInstances; i++) {
-                queries.add(new QueryContext(testQuery.getDatasets(), testQuery.getImports(), testQuery.getCode(), testQuery.getParagraph(), testQuery.getVariables(), testQuery.getExpected(), testQuery.getTestCaseFileName()));
+                queries.add(new QueryContext(testQuery.getDatasets(), testQuery.getImports(), testQuery.getCode(), testQuery.getParagraph(), testQuery.getVariables(), testQuery.getExpected(), STR."\{Path.of(testQuery.getTestCaseFileName()).getFileName().toString()}-\{i}"));
             }
         }
         return queries;
