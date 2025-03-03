@@ -35,9 +35,10 @@ public class QueryContext {
     private final String expected;
     private final HashMap<String, String> _loadedDatasets;
     private final Variables variables;
+    private final String testCaseFileName;
 
     public QueryContext(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
-        Variables.Flat computedVariables = computeVariables(variables, new Random(0));
+        Variables.Flat computedVariables = computeVariables(variables, new Random());
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
@@ -54,6 +55,7 @@ public class QueryContext {
         this.paragraph = paragraph.stream()
                 .map(t -> t.replace(computedVariables))
                 .collect(Collectors.toList());
+        this.testCaseFileName = testCaseFileName;
         //Validation of the created object
         Optional<String> result = this.validate(this.evaluate(this.getExpected()));
         if (result.isPresent()) {
@@ -264,5 +266,9 @@ public class QueryContext {
 
     private String getFluidFileName() {
         return fluidFileName;
+    }
+
+    public String getTestCaseFileName() {
+        return testCaseFileName;
     }
 }

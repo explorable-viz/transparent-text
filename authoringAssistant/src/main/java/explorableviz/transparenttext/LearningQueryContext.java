@@ -32,4 +32,8 @@ public class LearningQueryContext {
         }
         return inContextLearning;
     }
+
+    public int size() {
+        return this.learningCasePaths.size();
+    }
 }
