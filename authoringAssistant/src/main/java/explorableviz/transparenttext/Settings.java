@@ -46,5 +46,14 @@ public class Settings {
     public String getFluidCommonFolder() {
         return this.get("fluid-common-folder");
     }
+    public String getTemperature() {
+        return this.get("temperature");
+    }
+    public String getNumContextToken() {
+        return this.get("num_ctx");
+    }
 
+    public String getLogFolder() {
+        return this.get("log-folder");
+    }
 }
