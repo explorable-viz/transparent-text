@@ -1,8 +1,9 @@
 package explorableviz.transparenttext;
 
-import org.jetbrains.annotations.NotNull;
-
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -25,36 +26,56 @@ public class Main {
             learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(arguments.get("inContextLearningPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
             queryContexts = TestQueryContext.loadCases(arguments.get("testPath"), Integer.parseInt(arguments.get("numTestToGenerate")));
             final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
-            final ArrayList<String> results = execute(learningQueryContext, arguments.get("agent"), queryLimit, queryContexts);
-            if (computeAccuracy(results, queryContexts, queryLimit, Integer.parseInt(arguments.get("threshold")))) {
+            final ArrayList<AuthoringAssistantResult> results = execute(learningQueryContext, arguments.get("agent"), queryLimit, queryContexts);
+            float accuracy = computeAccuracy(results, queryContexts, queryLimit);
+            writeLog(results, arguments.get("agent"), learningQueryContext.size());
+            if (accuracy >= Float.parseFloat(arguments.get("threshold"))) {
+                System.out.println(STR."Accuracy OK =\{accuracy}");
                 System.exit(0);
             } else {
+                System.out.println(STR."Accuracy KO =\{accuracy}");
                 System.exit(1);
             }
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(1);
         }
+
     }
 
-    private static boolean computeAccuracy(List<String> results, List<QueryContext> queryContexts, int queryLimit, float threshold) {
+    private static void writeLog(ArrayList<AuthoringAssistantResult> results, String agent, int learningContextSize) throws IOException {
+        Files.createDirectories(Paths.get(Settings.getInstance().getLogFolder()));
+        PrintWriter out = new PrintWriter(new FileOutputStream(STR."\{Settings.getInstance().getLogFolder()}/log_\{System.currentTimeMillis()}.csv"));
+        out.append("test-case;llm-agent;temperature;num-token;in-context-learning-size;attempts;result;generated-expression;duration(ms)\n");
+
+        results.forEach(result -> {
+            out.append(STR."\{result.query().getTestCaseFileName()};");
+            out.append(STR."\{agent};");
+            out.append(STR."\{Settings.getInstance().getTemperature()};");
+            out.append(STR."\{Settings.getInstance().getNumContextToken()};");
+            out.append(STR."\{learningContextSize};");
+            out.append(STR."\{result.attempt()};");
+            out.append(STR."\{result.response() != null ? "OK" : "KO"};");
+            out.append(STR."\{result.response()};");
+            out.append(STR."\{result.duration()};");
+            out.append("\n");
+        });
+
+        out.flush();
+        out.close();
+    }
+
+    private static float computeAccuracy(List<AuthoringAssistantResult> results, List<QueryContext> queryContexts, int queryLimit) {
         logger.info("Computing accuracy");
         long count = IntStream.range(0, results.size()).filter(i -> {
-            logger.info(STR."I=\{i}exp=\{queryContexts.get(i).getExpected()} obtained=\{results.get(i)}");
-            return queryContexts.get(i).getExpected().equals(results.get(i));
+            logger.info(STR."I=\{i}exp=\{queryContexts.get(i).getExpected()} obtained=\{results.get(i).response()}");
+            return queryContexts.get(i).getExpected().equals(results.get(i).response());
         }).count();
-        float rate = (float) count /queryLimit;
-        System.out.println(STR."Accuracy: \{rate}");
-        if (rate < threshold) {
-            System.out.println("FAILED: Accuracy too low");
-            return false;
-        }
-        System.out.println("PASS: Accuracy ok");
-        return true;
+        return (float) count / queryLimit;
     }
 
-    private static ArrayList<String> execute(LearningQueryContext learningQueryContext, String agent, int queryLimit, ArrayList<QueryContext> queryContexts) throws Exception {
-        final ArrayList<String> results = new ArrayList<>();
+    private static ArrayList<AuthoringAssistantResult> execute(LearningQueryContext learningQueryContext, String agent, int queryLimit, ArrayList<QueryContext> queryContexts) throws Exception {
+        final ArrayList<AuthoringAssistantResult> results = new ArrayList<>();
         AuthoringAssistant workflow = new AuthoringAssistant(learningQueryContext, agent);
         for (int i = 0; i < queryLimit; i++) {
             QueryContext queryContext = queryContexts.get(i);
@@ -62,8 +83,8 @@ public class Main {
             results.add(workflow.execute(queryContext));
         }
         logger.info("Printing generated expression");
-        for (String result : results) {
-            logger.info(result);
+        for (AuthoringAssistantResult result : results) {
+            logger.info(result.response());
         }
         return results;
     }

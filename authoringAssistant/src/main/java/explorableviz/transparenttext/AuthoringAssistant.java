@@ -20,18 +20,19 @@ public class AuthoringAssistant {
         llm = initialiseAgent(agentClassName);
     }
 
-    public String execute(QueryContext query) throws Exception {
+    public AuthoringAssistantResult execute(QueryContext query) throws Exception {
         String response = null;
         int limit = Settings.getInstance().getLimit();
         // Add the input query to the KB that will be sent to the LLM
         PromptList sessionPrompt = (PromptList) prompts.clone();
         sessionPrompt.addPrompt(PromptList.USER, query.toUserPrompt());
-        for (int attempts = 0; response == null && attempts <= limit; attempts++) {
+        int attempts = 0;
+        long start = System.currentTimeMillis();
+        for (attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
             String candidateExpr = llm.evaluate(sessionPrompt, "");
             logger.info(STR."Received response: \{candidateExpr}");
-
             Optional<String> result = query.validate(query.evaluate(candidateExpr));
             if(result.isPresent()) {
                 //Add the prev. expression to the SessionPrompt to say to the LLM that the response is wrong.
@@ -41,6 +42,7 @@ public class AuthoringAssistant {
                 response = (candidateExpr);
             }
         }
+        long end = System.currentTimeMillis();
         if (response == null) {
             logger.warning(STR."Expression validation failed after \{limit} attempts");
         } else {
@@ -48,7 +50,7 @@ public class AuthoringAssistant {
             logger.info(query.paragraphToString());
         }
 
-        return response;
+        return new AuthoringAssistantResult(response, attempts, query, end-start);
     }
 
    private LLMEvaluatorAgent initialiseAgent(String agentClassName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
