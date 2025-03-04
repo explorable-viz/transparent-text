@@ -57,7 +57,7 @@ public class QueryContext {
                 .collect(Collectors.toList());
         this.testCaseFileName = testCaseFileName;
         //Validation of the created object
-        Optional<String> result = this.validate(this.evaluate(this.getExpected()), true);
+        Optional<String> result = this.validate(this.evaluate(this.getExpected()));
         if (result.isPresent()) {
             throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
         }
@@ -161,7 +161,7 @@ public class QueryContext {
         }
     }
 
-    public Optional<String> validate(String output, boolean skipQMark) {
+    public Optional<String> validate(String output) {
         logger.info(STR."Validating output: \{output}");
 
         Optional<LiteralParts> parts = this.getParagraph().stream().map(this::splitLiteral).flatMap(Optional::stream).findFirst();
