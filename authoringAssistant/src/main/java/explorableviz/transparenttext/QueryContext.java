@@ -176,9 +176,9 @@ public class QueryContext {
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
 
-        //compiler errors detection -
+        //interpreter errors detection -
         if(output.contains("Error: ")) {
-            logger.info(STR."Validation failed because compiler error");
+            logger.info(STR."Validation failed because interpreter error");
             return Optional.of(value);
         }
         if (value.equals(expectedValue) || roundedEquals(value, expectedValue) || expectedValue.equals("?")) {
