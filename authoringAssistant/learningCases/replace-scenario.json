@@ -9,7 +9,7 @@
     }
   ],
   "imports": [],
-  "expected": "earlyScenario.scenario",
+  "expected": "in earlyScenario.scenario",
   "paragraph": [
     {
       "type": "literal",
