@@ -4,31 +4,31 @@ import org.json.JSONObject;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import static explorableviz.transparenttext.TestQueryContext.loadCases;
+import static explorableviz.transparenttext.TestQuery.loadCases;
 
-public class LearningQueryContext {
+public class LearningQuery {
     private static final String LEARNING_CASE_PATH = "learningCases";
     private final String systemPrompt;
 
-    private final ArrayList<QueryContext> learningCasePaths;
+    private final ArrayList<Query> learningCasePaths;
 
-    public LearningQueryContext(String systemPrompt, ArrayList<QueryContext> learningCasePaths) {
+    public LearningQuery(String systemPrompt, ArrayList<Query> learningCasePaths) {
         this.systemPrompt = systemPrompt;
         this.learningCasePaths = learningCasePaths;
     }
 
-    public static LearningQueryContext importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
+    public static LearningQuery importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
         JSONObject jsonLearningCase = new JSONObject(new String(Files.readAllBytes(Path.of(jsonLearningCasePath))));
-        ArrayList<QueryContext> learningCases = loadCases(LEARNING_CASE_PATH, numCasesToGenerate);
-        return new LearningQueryContext(jsonLearningCase.getString("system_prompt"), learningCases);
+        ArrayList<Query> learningCases = loadCases(LEARNING_CASE_PATH, numCasesToGenerate);
+        return new LearningQuery(jsonLearningCase.getString("system_prompt"), learningCases);
     }
 
     public PromptList generateInContextLearningJSON() throws Exception {
         PromptList inContextLearning = new PromptList();
         inContextLearning.addPrompt(PromptList.SYSTEM, this.systemPrompt);
-        for (QueryContext queryContext : this.learningCasePaths) {
-            inContextLearning.addPrompt(PromptList.USER, queryContext.toUserPrompt());
-            inContextLearning.addPrompt(PromptList.ASSISTANT, queryContext.getExpected());
+        for (Query query : this.learningCasePaths) {
+            inContextLearning.addPrompt(PromptList.USER, query.toUserPrompt());
+            inContextLearning.addPrompt(PromptList.ASSISTANT, query.getExpected());
         }
         return inContextLearning;
     }

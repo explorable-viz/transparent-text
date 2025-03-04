@@ -15,7 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class TestQueryContext {
+public class TestQuery {
 
     private final Variables variables;
     private final Map<String, String> datasets;
@@ -25,7 +25,7 @@ public class TestQueryContext {
     private final String expected;
     private final List<TextFragment> paragraph;
 
-    public TestQueryContext(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
+    public TestQuery(Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
         this.datasets = datasets;
         this.imports = imports;
         this.testCaseFileName = testCaseFileName;
@@ -39,23 +39,23 @@ public class TestQueryContext {
         return variables;
     }
 
-    public static ArrayList<QueryContext> loadCases(String casesFolder, int numInstances) throws IOException {
-        ArrayList<QueryContext> queries = new ArrayList<>();
+    public static ArrayList<Query> loadCases(String casesFolder, int numInstances) throws IOException {
+        ArrayList<Query> queries = new ArrayList<>();
         Set<String> casePaths = Files.list(Paths.get(casesFolder))
                 .filter(Files::isRegularFile) // Only process files, not directories
                 .map(path -> path.toAbsolutePath().toString()) // Get file name
                 .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
                 .collect(Collectors.toSet());
         for (String casePath : casePaths) {
-            TestQueryContext testQuery = TestQueryContext.importFromJson(casePath);
+            TestQuery testQuery = TestQuery.importFromJson(casePath);
             for (int i = 0; i < numInstances; i++) {
-                queries.add(new QueryContext(testQuery.getDatasets(), testQuery.getImports(), testQuery.getCode(), testQuery.getParagraph(), testQuery.getVariables(), testQuery.getExpected(), STR."\{Path.of(testQuery.getTestCaseFileName()).getFileName().toString()}-\{i}"));
+                queries.add(new Query(testQuery.getDatasets(), testQuery.getImports(), testQuery.getCode(), testQuery.getParagraph(), testQuery.getVariables(), testQuery.getExpected(), STR."\{Path.of(testQuery.getTestCaseFileName()).getFileName().toString()}-\{i}"));
             }
         }
         return queries;
     }
 
-    public static TestQueryContext importFromJson(String filePath) throws IOException {
+    public static TestQuery importFromJson(String filePath) throws IOException {
         JSONObject testCase = new JSONObject(new String(Files.readAllBytes(Path.of(STR."\{filePath}.json"))));
         JSONArray json_datasets = testCase.getJSONArray("datasets");
         JSONObject json_variables = testCase.getJSONObject("variables");
@@ -88,7 +88,7 @@ public class TestQueryContext {
                 .mapToObj(json_imports::getString)
                 .collect(Collectors.toList());
 
-        return new TestQueryContext(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
+        return new TestQuery(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
     }
 
     public Map<String, String> getDatasets() {

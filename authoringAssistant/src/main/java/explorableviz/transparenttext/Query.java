@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import static explorableviz.transparenttext.variable.Variables.Flat.computeVariables;
 
-public class QueryContext {
+public class Query {
 
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final java.util.Map<String, String> datasets;
@@ -37,7 +37,7 @@ public class QueryContext {
     private final Variables variables;
     private final String testCaseFileName;
 
-    public QueryContext(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
+    public Query(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
         Variables.Flat computedVariables = computeVariables(variables, new Random());
         this.variables = variables;
         this.datasets = datasets;

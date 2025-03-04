@@ -1,6 +1,5 @@
 package explorableviz.transparenttext;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,17 +17,17 @@ public class Main {
         Map<String, String> arguments = parseArguments(args);
         logger.info("Arguments passed from command line");
         logger.info(arguments.toString().replace(",", "\n"));
-        final ArrayList<QueryContext> queryContexts;
-        final LearningQueryContext learningQueryContext;
+        final ArrayList<Query> queries;
+        final LearningQuery learningQuery;
         final Optional<Integer> numQueryToExecute = arguments.containsKey("numQueryToExecute") ? Optional.of(Integer.parseInt(arguments.get("numQueryToExecute"))) : Optional.empty();
         try {
             Settings.getInstance().loadSettings(arguments.get("settings"));
-            learningQueryContext = LearningQueryContext.importLearningCaseFromJSON(arguments.get("inContextLearningPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
-            queryContexts = TestQueryContext.loadCases(arguments.get("testPath"), Integer.parseInt(arguments.get("numTestToGenerate")));
-            final int queryLimit = numQueryToExecute.orElseGet(queryContexts::size);
-            final ArrayList<AuthoringAssistantResult> results = execute(learningQueryContext, arguments.get("agent"), queryLimit, queryContexts);
-            float accuracy = computeAccuracy(results, queryContexts, queryLimit);
-            writeLog(results, arguments.get("agent"), learningQueryContext.size());
+            learningQuery = LearningQuery.importLearningCaseFromJSON(arguments.get("inContextLearningPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
+            queries = TestQuery.loadCases(arguments.get("testPath"), Integer.parseInt(arguments.get("numTestToGenerate")));
+            final int queryLimit = numQueryToExecute.orElseGet(queries::size);
+            final ArrayList<QueryResult> results = execute(learningQuery, arguments.get("agent"), queryLimit, queries);
+            float accuracy = computeAccuracy(results, queries, queryLimit);
+            writeLog(results, arguments.get("agent"), learningQuery.size());
             if (accuracy >= Float.parseFloat(arguments.get("threshold"))) {
                 System.out.println(STR."Accuracy OK =\{accuracy}");
                 System.exit(0);
@@ -43,7 +42,7 @@ public class Main {
 
     }
 
-    private static void writeLog(ArrayList<AuthoringAssistantResult> results, String agent, int learningContextSize) throws IOException {
+    private static void writeLog(ArrayList<QueryResult> results, String agent, int learningContextSize) throws IOException {
         Files.createDirectories(Paths.get(Settings.getInstance().getLogFolder()));
         PrintWriter out = new PrintWriter(new FileOutputStream(STR."\{Settings.getInstance().getLogFolder()}/log_\{System.currentTimeMillis()}.csv"));
         out.append("test-case;llm-agent;temperature;num-token;in-context-learning-size;attempts;result;generated-expression;expected;duration(ms)\n");
@@ -66,25 +65,25 @@ public class Main {
         out.close();
     }
 
-    private static float computeAccuracy(List<AuthoringAssistantResult> results, List<QueryContext> queryContexts, int queryLimit) {
+    private static float computeAccuracy(List<QueryResult> results, List<Query> queries, int queryLimit) {
         logger.info("Computing accuracy");
         long count = IntStream.range(0, results.size()).filter(i -> {
-            logger.info(STR."I=\{i}exp=\{queryContexts.get(i).getExpected()} obtained=\{results.get(i).response()}");
-            return queryContexts.get(i).getExpected().equals(results.get(i).response());
+            logger.info(STR."I=\{i}exp=\{queries.get(i).getExpected()} obtained=\{results.get(i).response()}");
+            return queries.get(i).getExpected().equals(results.get(i).response());
         }).count();
         return (float) count / queryLimit;
     }
 
-    private static ArrayList<AuthoringAssistantResult> execute(LearningQueryContext learningQueryContext, String agent, int queryLimit, ArrayList<QueryContext> queryContexts) throws Exception {
-        final ArrayList<AuthoringAssistantResult> results = new ArrayList<>();
-        AuthoringAssistant workflow = new AuthoringAssistant(learningQueryContext, agent);
+    private static ArrayList<QueryResult> execute(LearningQuery learningQuery, String agent, int queryLimit, ArrayList<Query> queries) throws Exception {
+        final ArrayList<QueryResult> results = new ArrayList<>();
+        AuthoringAssistant workflow = new AuthoringAssistant(learningQuery, agent);
         for (int i = 0; i < queryLimit; i++) {
-            QueryContext queryContext = queryContexts.get(i);
+            Query query = queries.get(i);
             logger.info(STR."Analysing query id=\{i}");
-            results.add(workflow.execute(queryContext));
+            results.add(workflow.execute(query));
         }
         logger.info("Printing generated expression");
-        for (AuthoringAssistantResult result : results) {
+        for (QueryResult result : results) {
             logger.info(result.response());
         }
         return results;

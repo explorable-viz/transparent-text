@@ -6,8 +6,6 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
 public class AuthoringAssistant {
@@ -16,12 +14,12 @@ public class AuthoringAssistant {
     private final PromptList prompts;
     private final LLMEvaluatorAgent llm;
 
-    public AuthoringAssistant(LearningQueryContext learningQueryContext, String agentClassName) throws Exception {
-        this.prompts = learningQueryContext.generateInContextLearningJSON();
+    public AuthoringAssistant(LearningQuery learningQuery, String agentClassName) throws Exception {
+        this.prompts = learningQuery.generateInContextLearningJSON();
         llm = initialiseAgent(agentClassName);
     }
 
-    public AuthoringAssistantResult execute(QueryContext query) throws Exception {
+    public QueryResult execute(Query query) throws Exception {
         String response = null;
         int limit = Settings.getInstance().getLimit();
         // Add the input query to the KB that will be sent to the LLM
@@ -55,10 +53,10 @@ public class AuthoringAssistant {
             query.addExpressionToParagraph(response);
             logger.info(query.paragraphToString());
         }
-        return new AuthoringAssistantResult(response, attempts, query, end - start);
+        return new QueryResult(response, attempts, query, end - start);
     }
 
-    private void addReasoningSteps(PromptList sessionPrompt, QueryContext query) throws Exception {
+    private void addReasoningSteps(PromptList sessionPrompt, Query query) throws Exception {
         logger.info("enter in the reasoning prompting");
         sessionPrompt.addPrompt(PromptList.USER, STR."\{query.toUserPrompt()}\nWhat does the task ask you to calculate?");
         sessionPrompt.addPrompt(PromptList.ASSISTANT, llm.evaluate(sessionPrompt, ""));
