@@ -52,8 +52,11 @@ public class Settings {
     public String getNumContextToken() {
         return this.get("num_ctx");
     }
-
     public String getLogFolder() {
         return this.get("log-folder");
     }
+    public boolean isReasoningEnabled() {
+        return this.get("enable-reasoning").equals("true");
+    }
+
 }

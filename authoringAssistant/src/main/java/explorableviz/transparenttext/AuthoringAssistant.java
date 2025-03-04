@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Logger;
 
@@ -25,18 +26,23 @@ public class AuthoringAssistant {
         int limit = Settings.getInstance().getLimit();
         // Add the input query to the KB that will be sent to the LLM
         PromptList sessionPrompt = (PromptList) prompts.clone();
-        sessionPrompt.addPrompt(PromptList.USER, query.toUserPrompt());
-        int attempts = 0;
+
+        int attempts;
         long start = System.currentTimeMillis();
+        if (query.toUserPrompt().contains("REPLACE value=\\\"?") && Settings.getInstance().isReasoningEnabled()) {
+            addReasoningSteps(sessionPrompt, query);
+        } else {
+            sessionPrompt.addPrompt(PromptList.USER, query.toUserPrompt());
+        }
         for (attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
             String candidateExpr = llm.evaluate(sessionPrompt, "");
             logger.info(STR."Received response: \{candidateExpr}");
-            Optional<String> result = query.validate(query.evaluate(candidateExpr));
-            if(result.isPresent()) {
+            Optional<String> result = query.validate(query.evaluate(candidateExpr), false);
+            sessionPrompt.addPrompt(PromptList.ASSISTANT, candidateExpr);
+            if (result.isPresent()) {
                 //Add the prev. expression to the SessionPrompt to say to the LLM that the response is wrong.
-                sessionPrompt.addPrompt(PromptList.ASSISTANT, candidateExpr);
                 sessionPrompt.addPrompt(PromptList.USER, generateLoopBackMessage(candidateExpr, result.get()));
             } else {
                 response = (candidateExpr);
@@ -49,11 +55,20 @@ public class AuthoringAssistant {
             query.addExpressionToParagraph(response);
             logger.info(query.paragraphToString());
         }
-
-        return new AuthoringAssistantResult(response, attempts, query, end-start);
+        sessionPrompt.exportToJson(STR."logs/28_feb_\{query.getTestCaseFileName()}.json");
+        return new AuthoringAssistantResult(response, attempts, query, end - start);
     }
 
-   private LLMEvaluatorAgent initialiseAgent(String agentClassName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private void addReasoningSteps(PromptList sessionPrompt, QueryContext query) throws Exception {
+        logger.info("enter in the reasoning prompting");
+        sessionPrompt.addPrompt(PromptList.USER, STR."\{query.toUserPrompt()}\nWhat does the task ask you to calculate?");
+        sessionPrompt.addPrompt(PromptList.ASSISTANT, llm.evaluate(sessionPrompt, ""));
+        sessionPrompt.addPrompt(PromptList.USER, "What is the expected value that make the statement true? Reply only with the value");
+        sessionPrompt.addPrompt(PromptList.ASSISTANT, llm.evaluate(sessionPrompt, ""));
+        sessionPrompt.addPrompt(PromptList.USER, "What is the function that generates the value?");
+    }
+
+    private LLMEvaluatorAgent initialiseAgent(String agentClassName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         logger.info(STR."Initializing agent: \{agentClassName}");
         LLMEvaluatorAgent llmAgent;
         Class<?> agentClass = Class.forName(agentClassName);
