@@ -55,7 +55,6 @@ public class AuthoringAssistant {
             query.addExpressionToParagraph(response);
             logger.info(query.paragraphToString());
         }
-        sessionPrompt.exportToJson(STR."logs/28_feb_\{query.getTestCaseFileName()}.json");
         return new AuthoringAssistantResult(response, attempts, query, end - start);
     }
 
