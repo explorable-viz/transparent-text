@@ -38,3 +38,4 @@ let envDataTable = newDataTable 13;
     probMetric = newModel 0.35;
     earlyScenario = getByScenario "$random_var_1$" envDataTable;
     lateScenario = getByScenario "SSP1-1.9" envDataTable
+in

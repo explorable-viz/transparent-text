@@ -18,7 +18,7 @@
     }
   ],
   "imports": ["methane"],
-  "expected": "in record.emissions",
+  "expected": "record.emissions",
   "paragraph": [
     {
       "type": "literal",

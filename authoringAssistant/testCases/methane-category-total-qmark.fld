@@ -1,2 +1,2 @@
 let record = getByCategory "$emissions.source$" $emissions.year$ tableData
-
+in

@@ -5,7 +5,7 @@
     "file": "datasets/test-dataset"
   }],
   "imports": [],
-  "expected": "in likelihoodMap(findLikelihood(stressedScenario.low81100, stressedScenario.high81100) 0.6)",
+  "expected": "likelihoodMap(findLikelihood(stressedScenario.low81100, stressedScenario.high81100) 0.6)",
   "paragraph": [
     {
       "type": "literal",

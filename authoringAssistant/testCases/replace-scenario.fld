@@ -38,3 +38,4 @@ let envDataTable = newDataTable 13;
     probMetric = newModel 0.35;
     earlyScenario = getByScenario "SSP3-7.0" envDataTable;
     lateScenario = getByScenario "SSP1-1.9" envDataTable
+in

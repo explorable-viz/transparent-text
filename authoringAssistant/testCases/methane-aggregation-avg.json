@@ -24,7 +24,7 @@
   "imports": [
     "methane"
   ],
-  "expected": "in (sumEmissions $emissions.year$ tableData / length records)",
+  "expected": "(sumEmissions $emissions.year$ tableData / length records)",
   "paragraph": [
     {
       "type": "literal",

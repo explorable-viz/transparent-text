@@ -20,7 +20,7 @@
     }
   ],
   "imports": ["methane"],
-  "expected": "in (record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100",
+  "expected": "(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100",
   "paragraph": [
     {
       "type": "literal",
