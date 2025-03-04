@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import static explorableviz.transparenttext.variable.Variables.Flat.computeVariables;
 
-public class QueryContext {
+public class Query {
 
     public final Logger logger = Logger.getLogger(this.getClass().getName());
     private final java.util.Map<String, String> datasets;
@@ -35,9 +35,10 @@ public class QueryContext {
     private final String expected;
     private final HashMap<String, String> _loadedDatasets;
     private final Variables variables;
+    private final String testCaseFileName;
 
-    public QueryContext(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
-        Variables.Flat computedVariables = computeVariables(variables, new Random(0));
+    public Query(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
+        Variables.Flat computedVariables = computeVariables(variables, new Random());
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;
@@ -54,17 +55,19 @@ public class QueryContext {
         this.paragraph = paragraph.stream()
                 .map(t -> t.replace(computedVariables))
                 .collect(Collectors.toList());
+        this.testCaseFileName = testCaseFileName;
         //Validation of the created object
         Optional<String> result = this.validate(this.evaluate(this.getExpected()));
         if (result.isPresent()) {
             throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
         }
+
     }
 
     public HashMap<String, String> loadDatasets() throws IOException {
         HashMap<String, String> loadedDatasets = new HashMap<>();
         for (java.util.Map.Entry<String, String> dataset : this.datasets.entrySet()) {
-            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getInstance().getFluidCommonFolder()}/\{dataset.getValue()}.fld").toURI()))));
+            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getFluidCommonFolder()}/\{dataset.getValue()}.fld").toURI()))));
         }
         return loadedDatasets;
     }
@@ -72,11 +75,11 @@ public class QueryContext {
     private ArrayList<String> loadImports() throws IOException {
         ArrayList<String> loadedImports = new ArrayList<>();
         for (String path : this.getImports()) {
-            File importLib = new File(STR."\{Settings.getInstance().getFluidCommonFolder()}/\{path}.fld");
+            File importLib = new File(STR."\{Settings.getFluidCommonFolder()}/\{path}.fld");
             if (importLib.exists()) {
                 loadedImports.add(new String(Files.readAllBytes(importLib.toPath())));
             } else {
-                loadedImports.add(new String(Files.readAllBytes(Paths.get(STR."\{Settings.getInstance().getLibrariesBasePath()}/\{path}.fld"))));
+                loadedImports.add(new String(Files.readAllBytes(Paths.get(STR."\{Settings.getLibrariesBasePath()}/\{path}.fld"))));
             }
         }
         return loadedImports;
@@ -121,7 +124,7 @@ public class QueryContext {
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
-            String tempWorkingPath = Settings.getInstance().getFluidTempFolder();
+            String tempWorkingPath = Settings.getFluidTempFolder();
             writeFluidFiles(response, tempWorkingPath);
             String os = System.getProperty("os.name").toLowerCase();
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
@@ -172,6 +175,12 @@ public class QueryContext {
             throw new RuntimeException("Output format is invalid");
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
+
+        //interpreter errors detection -
+        if(output.contains("Error: ")) {
+            logger.info(STR."Validation failed because interpreter error");
+            return Optional.of(value);
+        }
         if (value.equals(expectedValue) || roundedEquals(value, expectedValue) || expectedValue.equals("?")) {
             logger.info("Validation passed");
             return Optional.empty();
@@ -206,7 +215,7 @@ public class QueryContext {
         //Write temp fluid file
         try (PrintWriter out = new PrintWriter(STR."\{tempWorkingPath}/\{this.fluidFileName}.fld")) {
             out.println(this.getCode());
-            out.println(STR."in \{response}");
+            out.println(response);
         }
         for (int i = 0; i < this._loadedImports.size(); i++) {
             Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{this.imports.get(i)}.fld").getParent());
@@ -264,5 +273,9 @@ public class QueryContext {
 
     private String getFluidFileName() {
         return fluidFileName;
+    }
+
+    public String getTestCaseFileName() {
+        return testCaseFileName;
     }
 }

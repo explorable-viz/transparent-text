@@ -38,3 +38,4 @@ let dataSet = newDataTable 16;
     analysisModel = newModel 0.50;
     stressedScenario = getByScenario "SSP3-7.0" dataSet;
     highEmissionScenario = getByScenario "SSP5-8.5" dataSet
+in

@@ -38,3 +38,4 @@ let $random_var_1$ = newDataTable 0;
     probEstimate = newModel 0.0;
     scenarioI = getByScenario "SSP1-1.9" $random_var_1$;
     scenarioII = getByScenario "SSP5-8.5" $random_var_1$
+in
