@@ -57,10 +57,11 @@ public class QueryContext {
                 .collect(Collectors.toList());
         this.testCaseFileName = testCaseFileName;
         //Validation of the created object
-        Optional<String> result = this.validate(this.evaluate(this.getExpected()));
+        Optional<String> result = this.validate(this.evaluate(this.getExpected()), true);
         if (result.isPresent()) {
             throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
         }
+
     }
 
     public HashMap<String, String> loadDatasets() throws IOException {
@@ -160,7 +161,7 @@ public class QueryContext {
         }
     }
 
-    public Optional<String> validate(String output) {
+    public Optional<String> validate(String output, boolean skipQMark) {
         logger.info(STR."Validating output: \{output}");
 
         Optional<LiteralParts> parts = this.getParagraph().stream().map(this::splitLiteral).flatMap(Optional::stream).findFirst();
@@ -174,6 +175,12 @@ public class QueryContext {
             throw new RuntimeException("Output format is invalid");
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
+
+        //compiler errors detection -
+        if(output.contains("Error: ")) {
+            logger.info(STR."Validation failed because compiler error");
+            return Optional.of(value);
+        }
         if (value.equals(expectedValue) || roundedEquals(value, expectedValue) || expectedValue.equals("?")) {
             logger.info("Validation passed");
             return Optional.empty();
@@ -208,7 +215,7 @@ public class QueryContext {
         //Write temp fluid file
         try (PrintWriter out = new PrintWriter(STR."\{tempWorkingPath}/\{this.fluidFileName}.fld")) {
             out.println(this.getCode());
-            out.println(STR."in \{response}");
+            out.println(response);
         }
         for (int i = 0; i < this._loadedImports.size(); i++) {
             Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{this.imports.get(i)}.fld").getParent());
