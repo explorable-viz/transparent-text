@@ -21,7 +21,7 @@ public class Main {
         final LearningQuery learningQuery;
         final Optional<Integer> numQueryToExecute = arguments.containsKey("numQueryToExecute") ? Optional.of(Integer.parseInt(arguments.get("numQueryToExecute"))) : Optional.empty();
         try {
-            Settings.getInstance().loadSettings(arguments.get("settings"));
+            Settings.init(arguments.get("settings"));
             learningQuery = LearningQuery.importLearningCaseFromJSON(arguments.get("inContextLearningPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
             queries = TestQuery.loadCases(arguments.get("testPath"), Integer.parseInt(arguments.get("numTestToGenerate")));
             final int queryLimit = numQueryToExecute.orElseGet(queries::size);
@@ -43,15 +43,15 @@ public class Main {
     }
 
     private static void writeLog(ArrayList<QueryResult> results, String agent, int learningContextSize) throws IOException {
-        Files.createDirectories(Paths.get(Settings.getInstance().getLogFolder()));
-        PrintWriter out = new PrintWriter(new FileOutputStream(STR."\{Settings.getInstance().getLogFolder()}/log_\{System.currentTimeMillis()}.csv"));
+        Files.createDirectories(Paths.get(Settings.getLogFolder()));
+        PrintWriter out = new PrintWriter(new FileOutputStream(STR."\{Settings.getLogFolder()}/log_\{System.currentTimeMillis()}.csv"));
         out.append("test-case;llm-agent;temperature;num-token;in-context-learning-size;attempts;result;generated-expression;expected;duration(ms)\n");
 
         results.forEach(result -> {
             out.append(STR."\{result.query().getTestCaseFileName()};");
             out.append(STR."\{agent};");
-            out.append(STR."\{Settings.getInstance().getTemperature()};");
-            out.append(STR."\{Settings.getInstance().getNumContextToken()};");
+            out.append(STR."\{Settings.getTemperature()};");
+            out.append(STR."\{Settings.getNumContextToken()};");
             out.append(STR."\{learningContextSize};");
             out.append(STR."\{result.attempt()};");
             out.append(STR."\{result.response() != null ? "OK" : "KO"};");

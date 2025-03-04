@@ -5,58 +5,58 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class Settings {
 
     private static Settings instance;
-    private JSONObject settings;
-    public static Settings getInstance() {
-        if(instance == null) instance = new Settings();
+    private final JSONObject settings;
+    private static Settings getInstance() {
+        if(instance == null) throw new AssertionError("You have to call init first");
         return instance;
     }
 
-    public void loadSettings(String settingsPath) throws IOException {
-        File f = new File(settingsPath);
-        Path p = Paths.get(f.toURI());
-        String content_settings = new String(Files.readAllBytes(p));
-        this.settings = new JSONObject(content_settings);
+    public static Settings init(String settingsPath) throws IOException {
+        instance = new Settings(settingsPath);
+        return instance;
+    }
+    private Settings(String settingsPath) throws IOException {
+        this.settings = new JSONObject(new String(Files.readAllBytes(Paths.get(new File(settingsPath).toURI()))));
     }
 
     private String get(String key) {
         return this.settings.getString(key);
     }
 
-    public JSONObject getSettings() {
-        return settings;
+    public static JSONObject getSettings() {
+        return getInstance().settings;
     }
 
-    public int getLimit() {
-        return Integer.parseInt(this.get("agent-limit"));
+    public static int getLimit() {
+        return Integer.parseInt(getInstance().get("agent-limit"));
     }
 
-    public String getFluidTempFolder() {
-        return this.get("fluid-temp-folder");
+    public static String getFluidTempFolder() {
+        return getInstance().get("fluid-temp-folder");
     }
 
-    public String getLibrariesBasePath() {
-        return this.get("base-path-library");
+    public static String getLibrariesBasePath() {
+        return getInstance().get("base-path-library");
     }
-    public String getFluidCommonFolder() {
-        return this.get("fluid-common-folder");
+    public static String getFluidCommonFolder() {
+        return getInstance().get("fluid-common-folder");
     }
-    public String getTemperature() {
-        return this.get("temperature");
+    public static String getTemperature() {
+        return getInstance().get("temperature");
     }
-    public String getNumContextToken() {
-        return this.get("num_ctx");
+    public static String getNumContextToken() {
+        return getInstance().get("num_ctx");
     }
-    public String getLogFolder() {
-        return this.get("log-folder");
+    public static String getLogFolder() {
+        return getInstance().get("log-folder");
     }
-    public boolean isReasoningEnabled() {
-        return this.get("enable-reasoning").equals("true");
+    public static boolean isReasoningEnabled() {
+        return getInstance().get("enable-reasoning").equals("true");
     }
 
 }

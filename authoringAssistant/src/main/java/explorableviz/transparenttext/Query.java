@@ -67,7 +67,7 @@ public class Query {
     public HashMap<String, String> loadDatasets() throws IOException {
         HashMap<String, String> loadedDatasets = new HashMap<>();
         for (java.util.Map.Entry<String, String> dataset : this.datasets.entrySet()) {
-            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getInstance().getFluidCommonFolder()}/\{dataset.getValue()}.fld").toURI()))));
+            loadedDatasets.put(dataset.getKey(), new String(Files.readAllBytes(Paths.get(new File(STR."\{Settings.getFluidCommonFolder()}/\{dataset.getValue()}.fld").toURI()))));
         }
         return loadedDatasets;
     }
@@ -75,11 +75,11 @@ public class Query {
     private ArrayList<String> loadImports() throws IOException {
         ArrayList<String> loadedImports = new ArrayList<>();
         for (String path : this.getImports()) {
-            File importLib = new File(STR."\{Settings.getInstance().getFluidCommonFolder()}/\{path}.fld");
+            File importLib = new File(STR."\{Settings.getFluidCommonFolder()}/\{path}.fld");
             if (importLib.exists()) {
                 loadedImports.add(new String(Files.readAllBytes(importLib.toPath())));
             } else {
-                loadedImports.add(new String(Files.readAllBytes(Paths.get(STR."\{Settings.getInstance().getLibrariesBasePath()}/\{path}.fld"))));
+                loadedImports.add(new String(Files.readAllBytes(Paths.get(STR."\{Settings.getLibrariesBasePath()}/\{path}.fld"))));
             }
         }
         return loadedImports;
@@ -124,7 +124,7 @@ public class Query {
     public String evaluate(String response) {
         try {
             //Generate the fluid program that will be processed and evaluated by the compiler
-            String tempWorkingPath = Settings.getInstance().getFluidTempFolder();
+            String tempWorkingPath = Settings.getFluidTempFolder();
             writeFluidFiles(response, tempWorkingPath);
             String os = System.getProperty("os.name").toLowerCase();
             String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";

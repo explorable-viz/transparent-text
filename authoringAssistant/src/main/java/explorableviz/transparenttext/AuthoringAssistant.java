@@ -21,13 +21,13 @@ public class AuthoringAssistant {
 
     public QueryResult execute(Query query) throws Exception {
         String response = null;
-        int limit = Settings.getInstance().getLimit();
+        int limit = Settings.getLimit();
         // Add the input query to the KB that will be sent to the LLM
         PromptList sessionPrompt = (PromptList) prompts.clone();
 
         int attempts;
         long start = System.currentTimeMillis();
-        if (query.toUserPrompt().contains("REPLACE value=\\\"?") && Settings.getInstance().isReasoningEnabled()) {
+        if (query.toUserPrompt().contains("REPLACE value=\\\"?") && Settings.isReasoningEnabled()) {
             addReasoningSteps(sessionPrompt, query);
         } else {
             sessionPrompt.addPrompt(PromptList.USER, query.toUserPrompt());
@@ -71,7 +71,7 @@ public class AuthoringAssistant {
         Class<?> agentClass = Class.forName(agentClassName);
         llmAgent = (LLMEvaluatorAgent) agentClass
                 .getDeclaredConstructor(JSONObject.class)
-                .newInstance(Settings.getInstance().getSettings());
+                .newInstance(Settings.getSettings());
 
         return llmAgent;
     }
