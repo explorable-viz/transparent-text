@@ -8,7 +8,7 @@
     }
   ],
   "imports": ["methane"],
-  "expected": "en2020.emissions - en2015.emissions",
+  "expected": "in en2020.emissions - en2015.emissions",
   "paragraph": [
     {
       "type": "literal",
