@@ -46,7 +46,7 @@ public class Main {
     private static void writeLog(ArrayList<AuthoringAssistantResult> results, String agent, int learningContextSize) throws IOException {
         Files.createDirectories(Paths.get(Settings.getInstance().getLogFolder()));
         PrintWriter out = new PrintWriter(new FileOutputStream(STR."\{Settings.getInstance().getLogFolder()}/log_\{System.currentTimeMillis()}.csv"));
-        out.append("test-case;llm-agent;temperature;num-token;in-context-learning-size;attempts;result;generated-expression;duration(ms)\n");
+        out.append("test-case;llm-agent;temperature;num-token;in-context-learning-size;attempts;result;generated-expression;expected;duration(ms)\n");
 
         results.forEach(result -> {
             out.append(STR."\{result.query().getTestCaseFileName()};");
@@ -57,6 +57,7 @@ public class Main {
             out.append(STR."\{result.attempt()};");
             out.append(STR."\{result.response() != null ? "OK" : "KO"};");
             out.append(STR."\{result.response()};");
+            out.append(STR."\{result.query().getExpected()};");
             out.append(STR."\{result.duration()};");
             out.append("\n");
         });
