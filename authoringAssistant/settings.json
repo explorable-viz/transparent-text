@@ -17,5 +17,10 @@
   "fluid-common-folder": "./fluid-common",
   "enable-reasoning": "false",
   "learning-case-folder": "learningCases",
-  "test-case-folder": "testCases"
+  "test-case-folder": "testCases",
+  "threshold": "0",
+  "system-prompt-path":"system-prompt.json",
+  "num-test-to-generate":"5",
+  "num-learning-case-to-generate": "1",
+  "num-query-to-execute": ""
 }

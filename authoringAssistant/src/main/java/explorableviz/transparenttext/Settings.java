@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 public class Settings {
 
@@ -64,5 +65,21 @@ public class Settings {
     public static String getTestCaseFolder() {
         return getInstance().get("test-case-folder");
     }
+    public static float getThreshold() {
+        return Float.parseFloat(getInstance().get("threshold"));
+    }
+    public static String getSystemPromptPath() {
+        return getInstance().get("system-prompt-path");
+    }
+    public static int getNumTestToGenerate() {
+        return Integer.parseInt(getInstance().get("num-test-to-generate"));
+    }
+    public static int getNumLearningCaseToGenerate() {
+        return Integer.parseInt(getInstance().get("num-learning-case-to-generate"));
+    }
+    public static Optional<Integer> getNumQueryToExecute() {
+        return getInstance().get("num-query-to-execute").isEmpty() ? Optional.empty() : Optional.of(Integer.parseInt(getInstance().get("num-query-to-execute")));
+    }
+
 
 }

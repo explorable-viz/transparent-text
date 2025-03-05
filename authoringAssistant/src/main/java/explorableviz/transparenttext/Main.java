@@ -19,17 +19,16 @@ public class Main {
         logger.info(arguments.toString().replace(",", "\n"));
         final ArrayList<Query> queries;
         final LearningQuery learningQuery;
-        final Optional<Integer> numQueryToExecute = arguments.containsKey("numQueryToExecute") ? Optional.of(Integer.parseInt(arguments.get("numQueryToExecute"))) : Optional.empty();
         final String agent = arguments.get("agent");
         try {
-            Settings.init(arguments.get("settings"));
-            learningQuery = LearningQuery.importLearningCaseFromJSON(arguments.get("systemPromptPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
-            queries = TestQuery.loadCases(Settings.getTestCaseFolder(), Integer.parseInt(arguments.get("numTestToGenerate")));
-            final int queryLimit = numQueryToExecute.orElseGet(queries::size);
+            Settings.init("settings.json");
+            learningQuery = LearningQuery.importLearningCaseFromJSON(Settings.getSystemPromptPath(), Settings.getNumLearningCaseToGenerate());
+            queries = TestQuery.loadCases(Settings.getTestCaseFolder(), Settings.getNumTestToGenerate());
+            final int queryLimit = Settings.getNumQueryToExecute().orElseGet(queries::size);
             final ArrayList<QueryResult> results = execute(learningQuery, agent, queryLimit, queries);
             float accuracy = computeAccuracy(results, queries, queryLimit);
             writeLog(results, agent, learningQuery.size());
-            if (accuracy >= Float.parseFloat(arguments.get("threshold"))) {
+            if (accuracy >= Settings.getThreshold()) {
                 System.out.println(STR."Accuracy OK =\{accuracy}");
                 System.exit(0);
             } else {
