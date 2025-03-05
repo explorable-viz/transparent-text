@@ -58,5 +58,11 @@ public class Settings {
     public static boolean isReasoningEnabled() {
         return getInstance().get("enable-reasoning").equals("true");
     }
+    public static String getLearningCaseFolder() {
+        return getInstance().get("learning-case-folder");
+    }
+    public static String getTestCaseFolder() {
+        return getInstance().get("test-case-folder");
+    }
 
 }

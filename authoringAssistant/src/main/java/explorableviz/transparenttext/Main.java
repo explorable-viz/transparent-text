@@ -20,14 +20,15 @@ public class Main {
         final ArrayList<Query> queries;
         final LearningQuery learningQuery;
         final Optional<Integer> numQueryToExecute = arguments.containsKey("numQueryToExecute") ? Optional.of(Integer.parseInt(arguments.get("numQueryToExecute"))) : Optional.empty();
+        final String agent = arguments.get("agent");
         try {
             Settings.init(arguments.get("settings"));
-            learningQuery = LearningQuery.importLearningCaseFromJSON(arguments.get("inContextLearningPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
-            queries = TestQuery.loadCases(arguments.get("testPath"), Integer.parseInt(arguments.get("numTestToGenerate")));
+            learningQuery = LearningQuery.importLearningCaseFromJSON(arguments.get("systemPromptPath"), Integer.parseInt(arguments.get("numLearningCaseToGenerate")));
+            queries = TestQuery.loadCases(Settings.getTestCaseFolder(), Integer.parseInt(arguments.get("numTestToGenerate")));
             final int queryLimit = numQueryToExecute.orElseGet(queries::size);
-            final ArrayList<QueryResult> results = execute(learningQuery, arguments.get("agent"), queryLimit, queries);
+            final ArrayList<QueryResult> results = execute(learningQuery, agent, queryLimit, queries);
             float accuracy = computeAccuracy(results, queries, queryLimit);
-            writeLog(results, arguments.get("agent"), learningQuery.size());
+            writeLog(results, agent, learningQuery.size());
             if (accuracy >= Float.parseFloat(arguments.get("threshold"))) {
                 System.out.println(STR."Accuracy OK =\{accuracy}");
                 System.exit(0);
@@ -44,25 +45,33 @@ public class Main {
 
     private static void writeLog(ArrayList<QueryResult> results, String agent, int learningContextSize) throws IOException {
         Files.createDirectories(Paths.get(Settings.getLogFolder()));
-        PrintWriter out = new PrintWriter(new FileOutputStream(STR."\{Settings.getLogFolder()}/log_\{System.currentTimeMillis()}.csv"));
-        out.append("test-case;llm-agent;temperature;num-token;in-context-learning-size;attempts;result;generated-expression;expected;duration(ms)\n");
-
-        results.forEach(result -> {
-            out.append(STR."\{result.query().getTestCaseFileName()};");
-            out.append(STR."\{agent};");
-            out.append(STR."\{Settings.getTemperature()};");
-            out.append(STR."\{Settings.getNumContextToken()};");
-            out.append(STR."\{learningContextSize};");
-            out.append(STR."\{result.attempt()};");
-            out.append(STR."\{result.response() != null ? "OK" : "KO"};");
-            out.append(STR."\{result.response()};");
-            out.append(STR."\{result.query().getExpected()};");
-            out.append(STR."\{result.duration()};");
-            out.append("\n");
-        });
-
-        out.flush();
-        out.close();
+        try (PrintWriter out = new PrintWriter(new FileOutputStream(STR."\{Settings.getLogFolder()}/log_\{System.currentTimeMillis()}.csv"))) {
+            String[] headers = {
+                    "test-case", "llm-agent", "temperature", "num-token", "in-context-learning-size",
+                    "attempts", "result", "generated-expression", "expected", "duration(ms)"
+            };
+            out.println(String.join(";", headers));
+            String content = results.stream()
+                    .map(result -> {
+                        String[] values = {
+                                result.query().getTestCaseFileName(),
+                                agent,
+                                String.valueOf(Settings.getTemperature()),
+                                String.valueOf(Settings.getNumContextToken()),
+                                String.valueOf(learningContextSize),
+                                String.valueOf(result.attempt()),
+                                result.response() != null ? "OK" : "KO",
+                                String.valueOf(result.response()),
+                                result.query().getExpected(),
+                                String.valueOf(result.duration())
+                        };
+                        assert headers.length == values.length :
+                                STR."Mismatch: headers=\{headers.length}, values=\{values.length}";
+                        return String.join(";", values);
+                    })
+                    .collect(Collectors.joining("\n"));
+            out.println(content);
+        }
     }
 
     private static float computeAccuracy(List<QueryResult> results, List<Query> queries, int queryLimit) {
@@ -78,9 +87,8 @@ public class Main {
         final ArrayList<QueryResult> results = new ArrayList<>();
         AuthoringAssistant workflow = new AuthoringAssistant(learningQuery, agent);
         for (int i = 0; i < queryLimit; i++) {
-            Query query = queries.get(i);
             logger.info(STR."Analysing query id=\{i}");
-            results.add(workflow.execute(query));
+            results.add(workflow.execute(queries.get(i)));
         }
         logger.info("Printing generated expression");
         for (QueryResult result : results) {

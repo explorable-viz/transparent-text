@@ -7,26 +7,25 @@ import java.util.ArrayList;
 import static explorableviz.transparenttext.TestQuery.loadCases;
 
 public class LearningQuery {
-    private static final String LEARNING_CASE_PATH = "learningCases";
     private final String systemPrompt;
 
-    private final ArrayList<Query> learningCasePaths;
+    private final ArrayList<Query> cases;
 
-    public LearningQuery(String systemPrompt, ArrayList<Query> learningCasePaths) {
+    public LearningQuery(String systemPrompt, ArrayList<Query> cases) {
         this.systemPrompt = systemPrompt;
-        this.learningCasePaths = learningCasePaths;
+        this.cases = cases;
     }
 
     public static LearningQuery importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
         JSONObject jsonLearningCase = new JSONObject(new String(Files.readAllBytes(Path.of(jsonLearningCasePath))));
-        ArrayList<Query> learningCases = loadCases(LEARNING_CASE_PATH, numCasesToGenerate);
+        ArrayList<Query> learningCases = loadCases(Settings.getLearningCaseFolder(), numCasesToGenerate);
         return new LearningQuery(jsonLearningCase.getString("system_prompt"), learningCases);
     }
 
     public PromptList generateInContextLearningJSON() throws Exception {
         PromptList inContextLearning = new PromptList();
         inContextLearning.addPrompt(PromptList.SYSTEM, this.systemPrompt);
-        for (Query query : this.learningCasePaths) {
+        for (Query query : this.cases) {
             inContextLearning.addPrompt(PromptList.USER, query.toUserPrompt());
             inContextLearning.addPrompt(PromptList.ASSISTANT, query.getExpected());
         }
@@ -34,6 +33,6 @@ public class LearningQuery {
     }
 
     public int size() {
-        return this.learningCasePaths.size();
+        return this.cases.size();
     }
 }
