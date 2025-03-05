@@ -17,5 +17,5 @@
   "fluid-common-folder": "./fluid-common",
   "enable-reasoning": "false",
   "learning-case-folder": "learningCases",
-  "test-case-folder": "testCases-copy"
+  "test-case-folder": "testCases"
 }
