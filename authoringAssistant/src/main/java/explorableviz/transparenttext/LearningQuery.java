@@ -26,8 +26,7 @@ public class LearningQuery {
         PromptList inContextLearning = new PromptList();
         inContextLearning.addPrompt(PromptList.SYSTEM, this.systemPrompt);
         for (Query query : this.cases) {
-            inContextLearning.addPrompt(PromptList.USER, query.toUserPrompt());
-            inContextLearning.addPrompt(PromptList.ASSISTANT, query.getExpected());
+            inContextLearning.addPairPrompt(query.toUserPrompt(), query.getExpected());
         }
         return inContextLearning;
     }

@@ -58,10 +58,8 @@ public class AuthoringAssistant {
 
     private void addReasoningSteps(PromptList sessionPrompt, Query query) throws Exception {
         logger.info("enter in the reasoning prompting");
-        sessionPrompt.addPrompt(PromptList.USER, STR."\{query.toUserPrompt()}\nWhat does the task ask you to calculate?");
-        sessionPrompt.addPrompt(PromptList.ASSISTANT, llm.evaluate(sessionPrompt, ""));
-        sessionPrompt.addPrompt(PromptList.USER, "What is the expected value that make the statement true? Reply only with the value");
-        sessionPrompt.addPrompt(PromptList.ASSISTANT, llm.evaluate(sessionPrompt, ""));
+        sessionPrompt.addPairPrompt(STR."\{query.toUserPrompt()}\nWhat does the task ask you to calculate?", llm.evaluate(sessionPrompt, ""));
+        sessionPrompt.addPairPrompt("What is the expected value that make the statement true? Reply only with the value", llm.evaluate(sessionPrompt, ""));
         sessionPrompt.addPrompt(PromptList.USER, "What is the function that generates the value?");
     }
 
