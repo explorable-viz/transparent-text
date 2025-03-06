@@ -27,6 +27,10 @@ public class Settings {
         this.settings = new JSONObject(new String(Files.readAllBytes(Paths.get(new File(settingsPath).toURI()))));
     }
 
+//    private String get(String key) {
+//        return this.settings.getString(key);
+//    }
+
     public static JSONObject getSettings() {
         return getInstance().settings;
     }
