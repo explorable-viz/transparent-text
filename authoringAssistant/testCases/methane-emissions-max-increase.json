@@ -17,7 +17,7 @@
   "imports": [
     "methane"
   ],
-  "expected": "$emissions.sector",
+  "expected": "\"$emissions.sector\"",
   "paragraph": [
     {
       "type": "literal",
