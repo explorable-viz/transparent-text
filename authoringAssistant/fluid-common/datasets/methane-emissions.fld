@@ -4,7 +4,7 @@
    -- 2015
 
    { year: 2015, type: "Agricultural Waste Burning", emissions: 0.41125300 },
-   { year: 2015, type: "Agriculture", emissions: 18.17094166 },
+   { year: 2015, type: "Agriculture", emissions: 8.17094166 },
    { year: 2015, type: "Energy Sector", emissions: 29.76188165 },
    { year: 2015, type: "Forest Burning", emissions: 0.51736129 },
    { year: 2015, type: "Grassland Burning", emissions: 4.12193675 },

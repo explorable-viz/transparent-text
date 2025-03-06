@@ -1,9 +1,8 @@
-package explorableviz.transparenttext.textfragment;
+package explorableviz.transparenttext.paragraph;
 
-import explorableviz.transparenttext.QueryContext;
 import explorableviz.transparenttext.variable.Variables;
 
-import static explorableviz.transparenttext.QueryContext.replaceVariables;
+import static explorableviz.transparenttext.Query.replaceVariables;
 
 public class Literal extends TextFragment {
 
