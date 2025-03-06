@@ -1,3 +1,0 @@
-let en2015 = getByCategory "Energy Sector" 2015 tableData;
-let en2020 = getByCategory "Energy Sector" 2020 tableData
-in
