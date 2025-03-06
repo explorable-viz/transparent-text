@@ -1,4 +1,4 @@
-package explorableviz.transparenttext.textfragment;
+package explorableviz.transparenttext.paragraph;
 
 import explorableviz.transparenttext.variable.Variables;
 

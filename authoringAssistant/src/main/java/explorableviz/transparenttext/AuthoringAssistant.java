@@ -14,8 +14,8 @@ public class AuthoringAssistant {
     private final PromptList prompts;
     private final LLMEvaluatorAgent llm;
 
-    public AuthoringAssistant(LearningQuery learningQuery, String agentClassName) throws Exception {
-        this.prompts = learningQuery.generateInContextLearningJSON();
+    public AuthoringAssistant(InContextLearning inContextLearning, String agentClassName) throws Exception {
+        this.prompts = inContextLearning.toPromptList();
         llm = initialiseAgent(agentClassName);
     }
 
@@ -27,17 +27,19 @@ public class AuthoringAssistant {
 
         int attempts;
         long start = System.currentTimeMillis();
+        sessionPrompt.addUserPrompt(query.toUserPrompt());
         if (query.toUserPrompt().contains("REPLACE value=\\\"?") && Settings.isReasoningEnabled()) {
             addReasoningSteps(sessionPrompt, query);
         } else {
-            sessionPrompt.addUserPrompt(query.toUserPrompt());
+
         }
+
         for (attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
             String candidateExpr = llm.evaluate(sessionPrompt, "");
             logger.info(STR."Received response: \{candidateExpr}");
-            Optional<String> result = query.validate(query.evaluate(candidateExpr));
+            Optional<String> result = query.validate(new FluidCLI(query).evaluate(candidateExpr));
             sessionPrompt.addAssistantPrompt(candidateExpr);
             if (result.isPresent()) {
                 //Add the prev. expression to the SessionPrompt to say to the LLM that the response is wrong.
@@ -50,8 +52,8 @@ public class AuthoringAssistant {
         if (response == null) {
             logger.warning(STR."Expression validation failed after \{limit} attempts");
         } else {
-            query.addExpressionToParagraph(response);
-            logger.info(query.paragraphToString());
+            query.getParagraph().spliceExpression(response);
+            logger.info(query.getParagraph().toString());
         }
         return new QueryResult(response, attempts, query, end - start);
     }

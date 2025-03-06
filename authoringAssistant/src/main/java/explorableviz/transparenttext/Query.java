@@ -1,25 +1,24 @@
 package explorableviz.transparenttext;
 
-import explorableviz.transparenttext.textfragment.Expression;
-import explorableviz.transparenttext.textfragment.Literal;
-import explorableviz.transparenttext.textfragment.TextFragment;
+import explorableviz.transparenttext.paragraph.Expression;
+import explorableviz.transparenttext.paragraph.Literal;
+import explorableviz.transparenttext.paragraph.Paragraph;
 import explorableviz.transparenttext.variable.ValueOptions;
 import explorableviz.transparenttext.variable.Variables;
-import org.codehaus.plexus.util.FileUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static explorableviz.transparenttext.variable.Variables.Flat.computeVariables;
 
@@ -29,15 +28,14 @@ public class Query {
     private final java.util.Map<String, String> datasets;
     private final List<String> imports;
     private final ArrayList<String> _loadedImports;
-    private final String fluidFileName = "llmTest";
     private final String code;
-    private final List<TextFragment> paragraph;
+    private final Paragraph paragraph;
     private final String expected;
     private final HashMap<String, String> _loadedDatasets;
     private final Variables variables;
     private final String testCaseFileName;
 
-    public Query(java.util.Map<String, String> datasets, List<String> imports, String code, List<TextFragment> paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
+    public Query(java.util.Map<String, String> datasets, List<String> imports, String code, Paragraph paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
         Variables.Flat computedVariables = computeVariables(variables, new Random());
         this.variables = variables;
         this.datasets = datasets;
@@ -54,10 +52,10 @@ public class Query {
         this.expected = replaceVariables(expected, computedVariables);
         this.paragraph = paragraph.stream()
                 .map(t -> t.replace(computedVariables))
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(Paragraph::new));
         this.testCaseFileName = testCaseFileName;
         //Validation of the created object
-        Optional<String> result = this.validate(this.evaluate(this.getExpected()));
+        Optional<String> result = this.validate(new FluidCLI(this).evaluate(this.getExpected()));
         if (result.isPresent()) {
             throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
         }
@@ -90,81 +88,13 @@ public class Query {
         object.put("datasets", this.get_loadedDatasets());
         object.put("imports", this.get_loadedImports());
         object.put("code", this.getCode());
-        object.put("paragraph", this.paragraphToString());
+        object.put("paragraph", this.paragraph.toString());
         return object.toString();
-    }
-
-    public String paragraphToString() {
-        return STR."Paragraph([\{this.getParagraph().stream().map(e -> {
-            if (e instanceof Literal) return STR."\"\{e.getValue()}\"";
-            if (e instanceof Expression) return ((Expression) e).getExpr();
-            throw new RuntimeException("Error, it is possible to have only String or Expression element");
-        }).collect(Collectors.joining(","))}])";
-    }
-
-    public void addExpressionToParagraph(String expression) {
-        List<TextFragment> paragraph = this.getParagraph();
-        ListIterator<TextFragment> iterator = paragraph.listIterator();
-
-        while (iterator.hasNext()) {
-            TextFragment textFragment = iterator.next();
-            if (textFragment instanceof Literal && textFragment.getValue().contains("[REPLACE")) {
-                splitLiteral(textFragment).ifPresentOrElse(expectedValue -> {
-                    iterator.remove();
-                    iterator.add(expectedValue.beforeTag());
-                    iterator.add(new Expression(expression, expectedValue.tag().getValue()));
-                    iterator.add(expectedValue.afterTag());
-                }, () -> {
-                    throw new RuntimeException("REPLACE tag not found");
-                });
-            }
-        }
-    }
-
-    public String evaluate(String response) {
-        try {
-            //Generate the fluid program that will be processed and evaluated by the compiler
-            String tempWorkingPath = Settings.getFluidTempFolder();
-            writeFluidFiles(response, tempWorkingPath);
-            String os = System.getProperty("os.name").toLowerCase();
-            String bashPrefix = os.contains("win") ? "cmd.exe /c " : "";
-
-            //Command construction
-            StringBuilder command = new StringBuilder(STR."\{bashPrefix}yarn fluid evaluate -l -p '\{tempWorkingPath}/' -f \{this.getFluidFileName()}");
-            this.getDatasets().forEach((key, path) -> {
-                command.append(STR." -d \"(\{key}, ./\{path})\"");
-            });
-            this.getImports().forEach(path -> {
-                command.append(STR." -i \{path}");
-            });
-            logger.info(STR."Running command: \{command}");
-            Process process;
-            if (os.contains("win")) {
-                process = Runtime.getRuntime().exec(new String[]{"cmd.exe", "/c", command.toString()});
-            } else {
-                process = Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", command.toString()});
-            }
-            process.waitFor();
-
-            //Reading command output
-            String output = new String(process.getInputStream().readAllBytes());
-            String errorOutput = new String(process.getErrorStream().readAllBytes());
-
-            logger.info(STR."Command output: \{output}");
-            if (!errorOutput.isEmpty()) {
-                logger.info(STR."Error output: \{errorOutput}");
-            }
-            FileUtils.deleteDirectory(new File(tempWorkingPath));
-            return output;
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error during the execution of the fluid evaluate command", e);
-        }
     }
 
     public Optional<String> validate(String output) {
         logger.info(STR."Validating output: \{output}");
-
-        Optional<LiteralParts> parts = this.getParagraph().stream().map(this::splitLiteral).flatMap(Optional::stream).findFirst();
+        Optional<LiteralParts> parts = this.getParagraph().stream().map(Paragraph::splitLiteral).flatMap(Optional::stream).findFirst();
         if (parts.isEmpty()) {
             throw new RuntimeException("No REPLACE tag found");
         }
@@ -201,36 +131,6 @@ public class Query {
         }
     }
 
-
-    private Optional<LiteralParts> splitLiteral(TextFragment literal) {
-        Matcher valueReplaceMatcher = Pattern.compile("(.*)\\[REPLACE value=\"(.*?)\"](.*)").matcher(literal.getValue());
-        if (!valueReplaceMatcher.find()) {
-            return Optional.empty();
-        }
-        return Optional.of(new LiteralParts(new Literal(valueReplaceMatcher.group(1)), new Literal(valueReplaceMatcher.group(2)), new Literal(valueReplaceMatcher.group(3))));
-    }
-
-    private void writeFluidFiles(String response, String tempWorkingPath) throws IOException {
-        Files.createDirectories(Paths.get(tempWorkingPath));
-        //Write temp fluid file
-        try (PrintWriter out = new PrintWriter(STR."\{tempWorkingPath}/\{this.fluidFileName}.fld")) {
-            out.println(this.getCode());
-            out.println(response);
-        }
-        for (int i = 0; i < this._loadedImports.size(); i++) {
-            Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{this.imports.get(i)}.fld").getParent());
-            try (PrintWriter outData = new PrintWriter(STR."\{tempWorkingPath}/\{this.imports.get(i)}.fld")) {
-                outData.println(this.get_loadedImports().get(i));
-            }
-        }
-        for (java.util.Map.Entry<String, String> dataset : this.getDatasets().entrySet()) {
-            Files.createDirectories(Paths.get(STR."\{tempWorkingPath}/\{dataset.getValue()}.fld").getParent());
-            try (PrintWriter outData = new PrintWriter(STR."\{tempWorkingPath}/\{dataset.getValue()}.fld")) {
-                outData.println(this.get_loadedDatasets().get(dataset.getKey()));
-            }
-        }
-    }
-
     public static String replaceVariables(String textToReplace, Variables variables) {
         for (java.util.Map.Entry<String, ValueOptions> var : variables.entrySet()) {
             String variablePlaceholder = STR."$\{var.getKey()}$";
@@ -239,7 +139,58 @@ public class Query {
         return textToReplace;
     }
 
-    private ArrayList<String> get_loadedImports() {
+    public static ArrayList<Query> loadQuery(String casesFolder, int numInstances) throws IOException {
+        ArrayList<Query> queries = new ArrayList<>();
+        Set<String> casePaths = Files.list(Paths.get(casesFolder))
+                .filter(Files::isRegularFile) // Only process files, not directories
+                .map(path -> path.toAbsolutePath().toString()) // Get file name
+                .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
+                .collect(Collectors.toSet());
+        for (String casePath : casePaths) {
+            JSONObject testCase = new JSONObject(new String(Files.readAllBytes(Path.of(STR."\{casePath}.json"))));
+            for (int i = 0; i < numInstances; i++) {
+                queries.add(importFromJson(testCase, casePath));
+            }
+        }
+        return queries;
+    }
+
+    public static Query importFromJson(JSONObject testCase, String filePath) throws IOException {
+        JSONArray json_datasets = testCase.getJSONArray("datasets");
+        JSONObject json_variables = testCase.getJSONObject("variables");
+        JSONArray json_imports = testCase.getJSONArray("imports");
+        JSONArray json_paragraph = testCase.getJSONArray("paragraph");
+
+        Paragraph paragraph = IntStream.range(0, json_paragraph.length())
+                .mapToObj(i -> {
+                    JSONObject paragraphElement = json_paragraph.getJSONObject(i);
+                    String type = paragraphElement.getString("type");
+
+                    return switch (type) {
+                        case "literal" -> new Literal(paragraphElement.getString("value"));
+                        case "expression" ->
+                                new Expression(paragraphElement.getString("expression"), paragraphElement.getString("value"));
+                        default -> throw new RuntimeException(STR."\{type} type is invalid");
+                    };
+                })
+                .collect(Collectors.toCollection(Paragraph::new));
+
+        Variables var = Variables.fromJSON(json_variables);
+        Map<String, String> datasets = IntStream.range(0, json_datasets.length())
+                .boxed()
+                .collect(Collectors.toMap(
+                        i -> json_datasets.getJSONObject(i).getString("var"),
+                        i -> json_datasets.getJSONObject(i).getString("file")
+                ));
+
+        List<String> imports = IntStream.range(0, json_imports.length())
+                .mapToObj(json_imports::getString)
+                .collect(Collectors.toList());
+
+        return new Query(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
+    }
+
+    public ArrayList<String> get_loadedImports() {
         return _loadedImports;
     }
 
@@ -259,7 +210,7 @@ public class Query {
         return imports;
     }
 
-    public List<TextFragment> getParagraph() {
+    public Paragraph getParagraph() {
         return paragraph;
     }
 
@@ -269,10 +220,6 @@ public class Query {
 
     public String getExpected() {
         return expected;
-    }
-
-    private String getFluidFileName() {
-        return fluidFileName;
     }
 
     public String getTestCaseFileName() {

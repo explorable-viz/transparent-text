@@ -18,16 +18,16 @@ public class Main {
         logger.info("Arguments passed from command line");
         logger.info(arguments.toString().replace(",", "\n"));
         final ArrayList<Query> queries;
-        final LearningQuery learningQuery;
+        final InContextLearning inContextLearning;
         final String agent = arguments.get("agent");
         try {
             Settings.init("settings.json");
-            learningQuery = LearningQuery.importLearningCaseFromJSON(Settings.getSystemPromptPath(), Settings.getNumLearningCaseToGenerate());
-            queries = TestQuery.loadCases(Settings.getTestCaseFolder(), Settings.getNumTestToGenerate());
+            inContextLearning = InContextLearning.importLearningCaseFromJSON(Settings.getSystemPromptPath(), Settings.getNumLearningCaseToGenerate());
+            queries = Query.loadQuery(Settings.getTestCaseFolder(), Settings.getNumTestToGenerate());
             final int queryLimit = Settings.getNumQueryToExecute().orElseGet(queries::size);
-            final ArrayList<QueryResult> results = execute(learningQuery, agent, queryLimit, queries);
+            final ArrayList<QueryResult> results = execute(inContextLearning, agent, queryLimit, queries);
             float accuracy = computeAccuracy(results, queries, queryLimit);
-            writeLog(results, agent, learningQuery.size());
+            writeLog(results, agent, inContextLearning.size());
             if (accuracy >= Settings.getThreshold()) {
                 System.out.println(STR."Accuracy OK =\{accuracy}");
                 System.exit(0);
@@ -80,9 +80,9 @@ public class Main {
         return (float) count / queryLimit;
     }
 
-    private static ArrayList<QueryResult> execute(LearningQuery learningQuery, String agent, int queryLimit, ArrayList<Query> queries) throws Exception {
+    private static ArrayList<QueryResult> execute(InContextLearning inContextLearning, String agent, int queryLimit, ArrayList<Query> queries) throws Exception {
         final ArrayList<QueryResult> results = new ArrayList<>();
-        AuthoringAssistant workflow = new AuthoringAssistant(learningQuery, agent);
+        AuthoringAssistant workflow = new AuthoringAssistant(inContextLearning, agent);
         for (int i = 0; i < queryLimit; i++) {
             logger.info(STR."Analysing query id=\{i}");
             results.add(workflow.execute(queries.get(i)));
