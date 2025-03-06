@@ -12,8 +12,9 @@ public class Settings {
 
     private static Settings instance;
     private final JSONObject settings;
+
     private static Settings getInstance() {
-        if(instance == null) throw new AssertionError("You have to call init first");
+        if (instance == null) throw new AssertionError("You have to call init first");
         return instance;
     }
 
@@ -21,12 +22,9 @@ public class Settings {
         instance = new Settings(settingsPath);
         return instance;
     }
+
     private Settings(String settingsPath) throws IOException {
         this.settings = new JSONObject(new String(Files.readAllBytes(Paths.get(new File(settingsPath).toURI()))));
-    }
-
-    private String get(String key) {
-        return this.settings.getString(key);
     }
 
     public static JSONObject getSettings() {
@@ -34,52 +32,62 @@ public class Settings {
     }
 
     public static int getLimit() {
-        return Integer.parseInt(getInstance().get("agent-limit"));
+        return getSettings().getInt("agent-limit");
     }
 
     public static String getFluidTempFolder() {
-        return getInstance().get("fluid-temp-folder");
+        return getSettings().getString("fluid-temp-folder");
     }
 
     public static String getLibrariesBasePath() {
-        return getInstance().get("base-path-library");
+        return getSettings().getString("base-path-library");
     }
+
     public static String getFluidCommonFolder() {
-        return getInstance().get("fluid-common-folder");
+        return getSettings().getString("fluid-common-folder");
     }
-    public static String getTemperature() {
-        return getInstance().get("temperature");
+
+    public static float getTemperature() {
+        return getSettings().getFloat("temperature");
     }
-    public static String getNumContextToken() {
-        return getInstance().get("num_ctx");
+
+    public static int getNumContextToken() {
+        return getSettings().getInt("num_ctx");
     }
+
     public static String getLogFolder() {
-        return getInstance().get("log-folder");
+        return getSettings().getString("log-folder");
     }
+
     public static boolean isReasoningEnabled() {
-        return getInstance().get("enable-reasoning").equals("true");
+        return getSettings().getBoolean("enable-reasoning");
     }
+
     public static String getLearningCaseFolder() {
-        return getInstance().get("learning-case-folder");
+        return getSettings().getString("learning-case-folder");
     }
+
     public static String getTestCaseFolder() {
-        return getInstance().get("test-case-folder");
+        return getSettings().getString("test-case-folder");
     }
+
     public static float getThreshold() {
-        return Float.parseFloat(getInstance().get("threshold"));
+        return getSettings().getFloat("threshold");
     }
+
     public static String getSystemPromptPath() {
-        return getInstance().get("system-prompt-path");
+        return getSettings().getString("system-prompt-path");
     }
+
     public static int getNumTestToGenerate() {
-        return Integer.parseInt(getInstance().get("num-test-to-generate"));
+        return getSettings().getInt("num-test-to-generate");
     }
+
     public static int getNumLearningCaseToGenerate() {
-        return Integer.parseInt(getInstance().get("num-learning-case-to-generate"));
+        return getSettings().getInt("num-learning-case-to-generate");
     }
+
     public static Optional<Integer> getNumQueryToExecute() {
-        return getInstance().get("num-query-to-execute").isEmpty() ? Optional.empty() : Optional.of(Integer.parseInt(getInstance().get("num-query-to-execute")));
+        return (getSettings().has("num-query-to-execute") && !getSettings().isNull("num-query-to-execute")) ? Optional.of(getSettings().getInt("num-query-to-execute")) : Optional.empty();
     }
-
-
 }
