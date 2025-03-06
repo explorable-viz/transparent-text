@@ -30,7 +30,7 @@ public class AuthoringAssistant {
         if (query.toUserPrompt().contains("REPLACE value=\\\"?") && Settings.isReasoningEnabled()) {
             addReasoningSteps(sessionPrompt, query);
         } else {
-            sessionPrompt.addPrompt(PromptList.USER, query.toUserPrompt());
+            sessionPrompt.addUserPrompt(query.toUserPrompt());
         }
         for (attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
@@ -38,10 +38,10 @@ public class AuthoringAssistant {
             String candidateExpr = llm.evaluate(sessionPrompt, "");
             logger.info(STR."Received response: \{candidateExpr}");
             Optional<String> result = query.validate(query.evaluate(candidateExpr));
-            sessionPrompt.addPrompt(PromptList.ASSISTANT, candidateExpr);
+            sessionPrompt.addAssistantPrompt(candidateExpr);
             if (result.isPresent()) {
                 //Add the prev. expression to the SessionPrompt to say to the LLM that the response is wrong.
-                sessionPrompt.addPrompt(PromptList.USER, generateLoopBackMessage(candidateExpr, result.get()));
+                sessionPrompt.addUserPrompt(generateLoopBackMessage(candidateExpr, result.get()));
             } else {
                 response = (candidateExpr);
             }
@@ -60,7 +60,7 @@ public class AuthoringAssistant {
         logger.info("enter in the reasoning prompting");
         sessionPrompt.addPairPrompt(STR."\{query.toUserPrompt()}\nWhat does the task ask you to calculate?", llm.evaluate(sessionPrompt, ""));
         sessionPrompt.addPairPrompt("What is the expected value that make the statement true? Reply only with the value", llm.evaluate(sessionPrompt, ""));
-        sessionPrompt.addPrompt(PromptList.USER, "What is the function that generates the value?");
+        sessionPrompt.addUserPrompt("What is the function that generates the value?");
     }
 
     private LLMEvaluatorAgent initialiseAgent(String agentClassName) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

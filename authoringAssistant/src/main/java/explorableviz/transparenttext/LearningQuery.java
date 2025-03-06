@@ -24,7 +24,7 @@ public class LearningQuery {
 
     public PromptList generateInContextLearningJSON() throws Exception {
         PromptList inContextLearning = new PromptList();
-        inContextLearning.addPrompt(PromptList.SYSTEM, this.systemPrompt);
+        inContextLearning.addSystemPrompt(this.systemPrompt);
         for (Query query : this.cases) {
             inContextLearning.addPairPrompt(query.toUserPrompt(), query.getExpected());
         }

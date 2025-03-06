@@ -64,8 +64,6 @@ public class Main {
                                 result.query().getExpected(),
                                 String.valueOf(result.duration())
                         };
-                        assert headers.length == values.length :
-                                STR."Mismatch: headers=\{headers.length}, values=\{values.length}";
                         return String.join(";", values);
                     })
                     .collect(Collectors.joining("\n"));
