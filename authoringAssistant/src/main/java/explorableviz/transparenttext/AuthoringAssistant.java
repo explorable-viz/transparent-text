@@ -39,7 +39,8 @@ public class AuthoringAssistant {
             // Send the query to the LLM to be processed
             String candidateExpr = llm.evaluate(sessionPrompt, "");
             logger.info(STR."Received response: \{candidateExpr}");
-            Optional<String> result = query.validate(new FluidCLI(query).evaluate(candidateExpr));
+            query.writeFluidFiles(candidateExpr);
+            Optional<String> result = query.validate(new FluidCLI(query.getDatasets(), query.getImports()).evaluate(query.getFluidFileName()));
             sessionPrompt.addAssistantPrompt(candidateExpr);
             if (result.isPresent()) {
                 //Add the prev. expression to the SessionPrompt to say to the LLM that the response is wrong.

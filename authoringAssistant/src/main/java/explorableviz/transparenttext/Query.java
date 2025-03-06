@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
@@ -34,6 +35,7 @@ public class Query {
     private final HashMap<String, String> _loadedDatasets;
     private final Variables variables;
     private final String testCaseFileName;
+    private final String fluidFileName = "llmTest";
 
     public Query(java.util.Map<String, String> datasets, List<String> imports, String code, Paragraph paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
         Variables.Flat computedVariables = computeVariables(variables, new Random());
@@ -55,7 +57,8 @@ public class Query {
                 .collect(Collectors.toCollection(Paragraph::new));
         this.testCaseFileName = testCaseFileName;
         //Validation of the created object
-        Optional<String> result = this.validate(new FluidCLI(this).evaluate(this.getExpected()));
+        writeFluidFiles(this.getExpected());
+        Optional<String> result = this.validate(new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName));
         if (result.isPresent()) {
             throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
         }
@@ -190,6 +193,27 @@ public class Query {
         return new Query(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
     }
 
+    public void writeFluidFiles(String response) throws IOException {
+        Files.createDirectories(Paths.get(Settings.getFluidTempFolder()));
+        //Write temp fluid file
+        try (PrintWriter out = new PrintWriter(STR."\{Settings.getFluidTempFolder()}/\{fluidFileName}.fld")) {
+            out.println(code);
+            out.println(response);
+        }
+        for (int i = 0; i < get_loadedImports().size(); i++) {
+            Files.createDirectories(Paths.get(STR."\{Settings.getFluidTempFolder()}/\{imports.get(i)}.fld").getParent());
+            try (PrintWriter outData = new PrintWriter(STR."\{Settings.getFluidTempFolder()}/\{imports.get(i)}.fld")) {
+                outData.println(get_loadedImports().get(i));
+            }
+        }
+        for (java.util.Map.Entry<String, String> dataset : datasets.entrySet()) {
+            Files.createDirectories(Paths.get(STR."\{Settings.getFluidTempFolder()}/\{dataset.getValue()}.fld").getParent());
+            try (PrintWriter outData = new PrintWriter(STR."\{Settings.getFluidTempFolder()}/\{dataset.getValue()}.fld")) {
+                outData.println(get_loadedDatasets().get(dataset.getKey()));
+            }
+        }
+    }
+
     public ArrayList<String> get_loadedImports() {
         return _loadedImports;
     }
@@ -224,5 +248,9 @@ public class Query {
 
     public String getTestCaseFileName() {
         return testCaseFileName;
+    }
+
+    public String getFluidFileName() {
+        return fluidFileName;
     }
 }
