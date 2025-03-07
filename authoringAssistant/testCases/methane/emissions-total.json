@@ -3,12 +3,12 @@
     "emissions": [
       {
         "source":"Agriculture",
-        "quantity":"31.05",
+        "quantity":"37.74",
         "year": "2030"
       },
       {
         "source": "Energy Sector",
-        "quantity":"52.80",
+        "quantity":"64.186",
         "year": "2030"
       }
     ]
@@ -20,11 +20,11 @@
     }
   ],
   "imports": ["methane"],
-  "expected": "(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100",
+  "expected": "record.emissions",
   "paragraph": [
     {
       "type": "literal",
-      "value": "The $emissions.source$ sector accounts for [REPLACE value=\"$emissions.quantity$\"]% of total methane emissions in $emissions.year$."
+      "value": "The total methane emissions for the year $emissions.year$ is [REPLACE value=\"$emissions.quantity$\"] for the $emissions.source$ source"
     }
   ]
 }
