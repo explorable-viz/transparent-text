@@ -24,16 +24,13 @@ public class AuthoringAssistant {
         int limit = Settings.getLimit();
         // Add the input query to the KB that will be sent to the LLM
         PromptList sessionPrompt = (PromptList) prompts.clone();
-
         int attempts;
         long start = System.currentTimeMillis();
-        sessionPrompt.addUserPrompt(query.toUserPrompt());
         if (query.toUserPrompt().contains("REPLACE value=\\\"?") && Settings.isReasoningEnabled()) {
             addReasoningSteps(sessionPrompt, query);
         } else {
-
+            sessionPrompt.addUserPrompt(query.toUserPrompt());
         }
-
         for (attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
