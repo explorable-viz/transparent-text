@@ -4,17 +4,17 @@
       {
         "year": "2020",
         "rank": "first",
-        "source": "Energy Sector"
+        "type": "Energy Sector"
       },
       {
         "year": "2015",
         "rank": "second",
-        "source": "Energy Sector"
+        "type": "Energy Sector"
       },
       {
         "year": "2030",
         "rank": "last",
-        "source": "Energy Sector"
+        "type": "Energy Sector"
       }
     ]
   },
@@ -25,7 +25,7 @@
     }
   ],
   "imports": ["methane"],
-  "expected": "\"$emissions.source$\"",
+  "expected": "\"$emissions.type$\"",
   "paragraph": [
     {
       "type": "literal",

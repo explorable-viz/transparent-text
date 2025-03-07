@@ -2,11 +2,11 @@
   "variables": {
     "emissions": [
       {
-        "source":"Agriculture",
+        "type":"Agriculture",
         "year": "2030"
       },
       {
-        "source": "Energy Sector",
+        "type": "Energy Sector",
         "year": "2030"
       }
     ]
@@ -22,7 +22,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The total methane emissions for the year $emissions.year$ is [REPLACE value=\"?\"] for the $emissions.source$ source"
+      "value": "The total methane emissions for the year $emissions.year$ is [REPLACE value=\"?\"] for the $emissions.type$ source"
     }
   ]
 }
