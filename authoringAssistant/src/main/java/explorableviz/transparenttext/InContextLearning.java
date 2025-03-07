@@ -48,7 +48,7 @@ public class InContextLearning {
                         try {
                             return Files.readString(path);
                         } catch (IOException e) {
-                            throw new RuntimeException("Error reading file: " + path, e);
+                            throw new RuntimeException(STR."Error reading file: \{path}", e);
                         }
                     })
                     .collect(Collectors.joining("\n"));
