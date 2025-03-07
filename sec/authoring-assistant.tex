@@ -2,13 +2,6 @@
 
 \subsection{Introduction}
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.95\linewidth]{fig/authoring-assistant-architecture.png}
-    \caption{Draft architecture of the LLM-based code generation}
-    \label{fig:authoring-assistant-architecture}
-\end{figure}
-
 \begin{itemize}
     \item \textbf{QueryContext}: Represents the input, containing dataset details (path and variable name), library imports, code, and paragraphs (lists of strings and fluid expressions).
     \item \textbf{Fluid Generator}: Receives the QueryContext and requests the LLM to generate a Fluid Expression.
@@ -28,6 +21,13 @@ conventions, affect performance of LLM?
 Analyse the impact of the structure of the in-context learning dataset on the accuracy of responses, with a
 particular focus on the complexity of datasets. By complexity, we mean the number of Fluid elements that the
 in-context learning dataset contains for each example.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.95\linewidth]{fig/authoring-assistant-architecture.png}
+    \caption{Draft architecture of the LLM-based code generation}
+    \label{fig:authoring-assistant-architecture}
+\end{figure}
 
 \textbf{Related work (links)}
 \begin{itemize}

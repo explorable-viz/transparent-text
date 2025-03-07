@@ -56,48 +56,18 @@ was computed. We stress that generic tooling for this sort of thing does not yet
 comes with an account of how it was generated \emph{self-certifying text}.
 
 \subsection{Self-Certifying Text}
-What does it mean for supporting text to be self-certifying?
+Examples of text we might want to link or interpret semi-formally/quantitatively:
 
-\subsubsection{Quantitative Expressions}
 \begin{itemize}
-   \item Raw results
+\item Quantitative expressions
+\begin{itemize}
+   \item pure numerical values
    \item percentages
-   \item rounded or normalized information
+   \item rounded or normalised numbers
 \end{itemize}
-% Directly embedding a quantitative expression into the text seems to be the simplest
-% of the linguistic categories we have identified thus far, but this may not be the case. Embedding
-% a percentage may be simple: requiring the user to only provide a numerical value, and scaling it
-% to be in the range of $0$-$100$, but more complicated expressions, such as a description of a calculation
-% may be more difficult to synthesize. Solving the problem of explaining a calculation or piece of a program
-% will itself go a long way to improving the transparency of a piece of science communication.
-
-\subsubsection{Graded Adjectives}
-A graded adjective is an adjective that can be modified to make its form stronger or weaker. As an example,
-consider mapping ranges of probabilities onto natural language. If the probability of an event occurring is
-$1$, we can say it is \emph{certain} to occur. If instead it is $0.99$ or some other value arbitrarily close
-to $1$, we will \emph{grade} the adjective to weaken it: it is \emph{virtually certain} to occur. We see
-examples of this in \figref{ipcc-mockup}, with the terms ``exceptionally unlikely'' and ``virtually certain''.
-
-% Considered in more depth, we arrive at the concept of modalities in natural language. Similar to
-% the concepts in modal logic, a modality allows the expression of concepts such as necessity or possibility.
-% In the context described above, the idea that a probability is \emph{virtually certain} introduces the modality of
-% possibility -- an event must be possible in order to be virtually certain to occur. Even something simple
-% like the discussion of probabilities above can combine the two into the idea of graded modality:
-% if something is ``very likely'', we would still believe that it is less likely to occur than something that
-% is ``virtually certain''. Handling these sorts of linguistic constructs will be a key part of addressing
-% the problem.
-
-\subsubsection{Selecting Visual Elements: Iteration, Scope and Mereology}
-Text that refers to objects of discourse is relatively common, but even direct references are non-trivial
-linguistically. \figref{ipcc-mockup}, taken from \citet{lee23}, shows an example \textit{in situ}, the report
-it is taken from collates a large amount of climate research data, and attempts to synthesize useful
-information for policymakers. Even this simple example shows the complexity of the problem: the text
-highlighted in orange refers to the collection of bar-charts shown on the left hand side, introducing a set of
-5 bar-charts into the scope of discourse. The text highlighted in green refers to the bars within these
-charts, mapping a narrowing of scope across the bar-charts that have already been introduced. Then, the text
-highlighted in purple narrows this scope further to talk about the bar representing total warming, again
-within each of the charts at the same time. To handle this kind of reference, we need a generic mechanism for
-referencing containers independently of their contents.
+\item Graded Adjectives (e.g.~\emph{virtually certain}, \emph{exceptionally unlikely})
+\item References to visual elements and their parts (mereology)
+\end{itemize}
 
 % This illustrative example showcases several sub-problems our system will need to be able to handle. First
 % is that of creating an iterative scope for the references that follow. We can imagine that the orange-highlighted
