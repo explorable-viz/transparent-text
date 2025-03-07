@@ -1,0 +1,19 @@
+{
+  "variables": {
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/methane-emissions"
+    }
+  ],
+  "imports": ["methane"],
+  "expected": "\"Residential Commercial Other\"",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "Between 2015 and 2030, methane emissions decreased the most in the sector called [REPLACE value=\"?\"]."
+    }
+  ]
+}
+

@@ -1,0 +1,33 @@
+{
+  "variables": {
+      "emissions": [
+        {
+          "year": "2015",
+          "result": "Waste"
+        },
+        {
+          "year": "2020",
+          "result": "Agriculture"
+        },
+        {
+          "year": "2030",
+          "result": "Agriculture"
+        }
+      ]
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/methane-emissions"
+    }
+  ],
+  "imports": ["methane"],
+  "expected": "\"$emissions.result$\"",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "In $emissions.year$, the maximum methane emissions increased was reached by the Energy Sector, followed by [REPLACE value=\"?\"]."
+    }
+  ]
+}
+

@@ -38,7 +38,7 @@ public class Query {
     private final String fluidFileName = "llmTest";
 
     public Query(java.util.Map<String, String> datasets, List<String> imports, String code, Paragraph paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
-        Variables.Flat computedVariables = computeVariables(variables, new Random());
+        Variables.Flat computedVariables = computeVariables(variables, new Random(0));
         this.variables = variables;
         this.datasets = datasets;
         this.imports = imports;

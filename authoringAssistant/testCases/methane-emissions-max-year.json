@@ -1,0 +1,35 @@
+{
+  "variables": {
+    "emissions": [
+      {
+        "sector":"Agricultural Waste Burning",
+        "year": "2030"
+      },
+      {
+        "sector":"Agriculture",
+        "year": "2020"
+      },
+      {
+        "sector":"Energy Sector",
+        "year": "2030"
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/methane-emissions"
+    }
+  ],
+  "imports": [
+    "methane"
+  ],
+  "expected": "$emissions.year$",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "The $emissions.sector$ recorded its highest methane emissions in [REPLACE value=\"?\"]."
+    }
+  ]
+}
+

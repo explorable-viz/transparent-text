@@ -1,0 +1,19 @@
+{
+  "variables": {
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/methane-emissions"
+    }
+  ],
+  "imports": ["methane"],
+  "expected": "\"Transportation Sector\"",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "The [REPLACE value=\"?\"] consistently contributed the least methane emissions, with no significant change between 2015 and 2020."
+    }
+  ]
+}
+
