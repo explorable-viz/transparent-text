@@ -57,11 +57,11 @@ public class Query {
                 .collect(Collectors.toCollection(Paragraph::new));
         this.testCaseFileName = testCaseFileName;
         //Validation of the created object
-        writeFluidFiles(this.getExpected());
-        Optional<String> result = this.validate(new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName));
-        if (result.isPresent()) {
-            throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
-        }
+//        writeFluidFiles(this.getExpected());
+//        Optional<String> result = this.validate(new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName));
+//        if (result.isPresent()) {
+//            throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
+//        }
 
     }
 

@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "emissions": [
+      {
+        "type":"Agricultural Waste Burning",
+        "year": "2030",
+        "peak": "highest"
+      },
+      {
+        "type":"Agriculture",
+        "year": "2020",
+        "peak": "highest"
+      },
+      {
+        "type":"Energy Sector",
+        "year": "2030",
+        "peak": "highest"
+      },
+      {
+        "type":"Residential Commercial Other",
+        "year": "2030",
+        "peak": "lowest"
+      },
+      {
+        "type":"Grassland Burning",
+        "year": "2020",
+        "peak": "lowest"
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/methane-emissions"
+    }
+  ],
+  "imports": [
+    "methane"
+  ],
+  "expected": "$emissions.year$",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "The $emissions.type$ recorded its $emissions.record$ methane emissions in [REPLACE value=\"?\"]."
+    }
+  ]
+}
+

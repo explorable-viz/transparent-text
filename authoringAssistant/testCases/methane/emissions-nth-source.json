@@ -1,0 +1,35 @@
+{
+  "variables": {
+    "emissions": [
+      {
+        "year": "2020",
+        "rank": "first",
+        "type": "Energy Sector"
+      },
+      {
+        "year": "2015",
+        "rank": "second",
+        "type": "Energy Sector"
+      },
+      {
+        "year": "2030",
+        "rank": "last",
+        "type": "Energy Sector"
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/methane-emissions"
+    }
+  ],
+  "imports": ["methane"],
+  "expected": "\"$emissions.type$\"",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "In $emissions.year$, the [REPLACE value=\"?\"] had the $emissions.rank$ greatest amount in methane emissions."
+    }
+  ]
+}

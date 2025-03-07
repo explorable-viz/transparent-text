@@ -1,0 +1,9 @@
+let getByCategory category year data =
+   let helper [] = [];
+         helper (x: xs) =
+               if ((x.type == category) `and` (x.year == year))
+               then x
+               else helper xs
+      in helper data;
+let cat = getByCategory "Agriculture" 2015 tableData
+in cat.emissions
