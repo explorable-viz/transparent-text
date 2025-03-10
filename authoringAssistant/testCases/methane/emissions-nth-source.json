@@ -3,17 +3,17 @@
     "emissions": [
       {
         "year": "2020",
-        "rank": "first",
+        "rank": "highest",
         "type": "Energy Sector"
       },
       {
         "year": "2015",
-        "rank": "second",
+        "rank": "second highest",
         "type": "Energy Sector"
       },
       {
         "year": "2030",
-        "rank": "last",
+        "rank": "lowest",
         "type": "Energy Sector"
       }
     ]
@@ -29,7 +29,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "In $emissions.year$, the [REPLACE value=\"?\"] had the $emissions.rank$ greatest amount in methane emissions."
+      "value": "In $emissions.year$, the [REPLACE value=\"?\"] had the $emissions.rank$ amount in methane emissions."
     }
   ]
 }

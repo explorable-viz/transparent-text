@@ -7,7 +7,7 @@
         "year": "2030"
       },
       {
-        "type": "Energy Sector",
+        "type": "The Energy Sector",
         "quantity":"52.80",
         "year": "2030"
       }
@@ -24,7 +24,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The $emissions.type$ source accounts for [REPLACE value=\"$emissions.quantity$\"]% of total methane emissions in $emissions.year$."
+      "value": "$emissions.type$ accounts for total methane emissions of [REPLACE value=\"$emissions.quantity$\"]% in $emissions.year$."
     }
   ]
 }

@@ -28,7 +28,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The [REPLACE value=\"?\"] source exhibited the highest percentage $emissions.change$ between $emissions.year1$ and $emissions.year2$"
+      "value": "The [REPLACE value=\"?\"] source exhibited the highest percentage $emissions.change$ in methane emissions between $emissions.year1$ and $emissions.year2$"
     }
   ]
 }

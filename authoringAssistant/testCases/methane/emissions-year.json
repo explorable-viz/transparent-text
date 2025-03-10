@@ -12,7 +12,7 @@
         "peak": "highest"
       },
       {
-        "type":"Energy Sector",
+        "type":"The Energy Sector",
         "year": "2030",
         "peak": "highest"
       },
@@ -41,7 +41,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The $emissions.type$ recorded its $emissions.record$ methane emissions in [REPLACE value=\"?\"]."
+      "value": "$emissions.type$ recorded its $emissions.record$ methane emissions in [REPLACE value=\"?\"]."
     }
   ]
 }
