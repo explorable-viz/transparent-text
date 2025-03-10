@@ -1,6 +1,9 @@
 package explorableviz.transparenttext.paragraph;
 
 import explorableviz.transparenttext.LiteralParts;
+import explorableviz.transparenttext.variable.Variables;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +12,24 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Paragraph extends ArrayList<TextFragment> {
+
+    public Paragraph(JSONArray json_paragraph, Variables variables) {
+        this.addAll(IntStream.range(0, json_paragraph.length())
+                .mapToObj(i -> {
+                    JSONObject paragraphElement = json_paragraph.getJSONObject(i);
+                    String type = paragraphElement.getString("type");
+                    return (switch (type) {
+                        case "literal" -> new Literal(paragraphElement.getString("value"));
+                        case "expression" ->
+                                new Expression(paragraphElement.getString("expression"), paragraphElement.getString("value"));
+                        default -> throw new RuntimeException(STR."\{type} type is invalid");
+                    }).replace(variables);
+                })
+                .toList());
+    }
 
     public String toString() {
         return STR."Paragraph([\{stream().map(e -> {
