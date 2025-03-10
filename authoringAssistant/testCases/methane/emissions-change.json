@@ -2,16 +2,18 @@
   "variables": {
     "emissions": [
       {
-        "type":"Agricultural Waste Burning",
+        "result":"Agricultural Waste Burning",
         "year1": "2015",
         "year2": "2020",
-        "change": "increase"
+        "change": "increase",
+        "type": "?"
       },
       {
-        "type":"Residential Commercial Other",
+        "result":"Residential Commercial Other",
         "year1": "2015",
         "year2": "2020",
-        "change": "decrease"
+        "change": "decrease",
+        "type": "?"
       }
     ]
   },
@@ -24,11 +26,11 @@
   "imports": [
     "methane"
   ],
-  "expected": "\"$emissions.type$\"",
+  "expected": "\"$emissions.result\"",
   "paragraph": [
     {
       "type": "literal",
-      "value": "The [REPLACE value=\"?\"] source exhibited the highest percentage $emissions.change$ in methane emissions between $emissions.year1$ and $emissions.year2$"
+      "value": "The [REPLACE value=\"$emissions.type$\"] source exhibited the highest percentage $emissions.change$ in methane emissions between $emissions.year1$ and $emissions.year2$"
     }
   ]
 }

@@ -3,12 +3,12 @@
     "emissions": [
       {
         "type":"Agriculture",
-        "quantity":"31.05",
+        "result":"31.05",
         "year": "2030"
       },
       {
         "type": "The Energy Sector",
-        "quantity":"52.80",
+        "result":"52.80",
         "year": "2030"
       }
     ]
@@ -24,7 +24,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "$emissions.type$ accounts for total methane emissions of [REPLACE value=\"$emissions.quantity$\"]% in $emissions.year$."
+      "value": "$emissions.type$ accounts for total methane emissions of [REPLACE value=\"$emissions.result$\"]% in $emissions.year$."
     }
   ]
 }

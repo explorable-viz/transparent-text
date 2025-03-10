@@ -3,28 +3,33 @@
     "emissions": [
       {
         "type":"Agricultural Waste Burning",
-        "year": "2030",
-        "peak": "highest"
+        "result": "2030",
+        "peak": "highest",
+        "year": "?"
       },
       {
         "type":"Agriculture",
-        "year": "2020",
-        "peak": "highest"
+        "result": "2020",
+        "peak": "highest",
+        "year": "?"
       },
       {
         "type":"The Energy Sector",
-        "year": "2030",
-        "peak": "highest"
+        "result": "2030",
+        "peak": "highest",
+        "year": "?"
       },
       {
         "type":"Residential Commercial Other",
-        "year": "2030",
-        "peak": "lowest"
+        "result": "2030",
+        "peak": "lowest",
+        "year": "?"
       },
       {
         "type":"Grassland Burning",
-        "year": "2020",
-        "peak": "lowest"
+        "result": "2020",
+        "peak": "lowest",
+        "year": "?"
       }
     ]
   },
@@ -37,11 +42,11 @@
   "imports": [
     "methane"
   ],
-  "expected": "$emissions.year$",
+  "expected": "$emissions.result$",
   "paragraph": [
     {
       "type": "literal",
-      "value": "$emissions.type$ recorded its $emissions.record$ methane emissions in [REPLACE value=\"?\"]."
+      "value": "$emissions.type$ recorded its $emissions.record$ methane emissions in [REPLACE value=\"$emissions.year$\"]."
     }
   ]
 }

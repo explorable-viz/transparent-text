@@ -4,17 +4,20 @@
       {
         "year": "2020",
         "rank": "highest",
-        "type": "Energy Sector"
+        "result": "Energy Sector",
+        "type": "?"
       },
       {
         "year": "2015",
         "rank": "second highest",
-        "type": "Energy Sector"
+        "result": "Energy Sector",
+        "type": "?"
       },
       {
         "year": "2030",
         "rank": "lowest",
-        "type": "Energy Sector"
+        "result": "Energy Sector",
+        "type": "?"
       }
     ]
   },
@@ -25,11 +28,11 @@
     }
   ],
   "imports": ["methane"],
-  "expected": "\"$emissions.type$\"",
+  "expected": "\"$emissions.result$\"",
   "paragraph": [
     {
       "type": "literal",
-      "value": "In $emissions.year$, the [REPLACE value=\"?\"] had the $emissions.rank$ amount in methane emissions."
+      "value": "In $emissions.year$, the [REPLACE value=\"$emissions.type$\"] had the $emissions.rank$ amount in methane emissions."
     }
   ]
 }
