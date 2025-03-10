@@ -4,6 +4,7 @@
       {
         "year1": "2015",
         "year2": "2020",
+        "article": "the",
         "result": "\"Energy Sector\"",
         "change": "increased",
         "extent": "rise"
@@ -11,6 +12,7 @@
       {
         "year1": "2020",
         "year2": "2030",
+        "article": "the",
         "result": "\"Energy Sector\"",
         "change": "increased",
         "extent": "rise"
@@ -18,6 +20,7 @@
       {
         "year1": "2015",
         "year2": "2030",
+        "article": "",
         "result": "\"Residential Commercial Other\"",
         "change": "decreased",
         "extent": "reduction"
@@ -37,7 +40,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "Between $emissions.year1$ and $emissions.year2$, methane emissions $emissions.change$ across most sources, with the largest absolute $emissions.extent$ seen in the [REPLACE value=\"?\"]."
+      "value": "Between $emissions.year1$ and $emissions.year2$, methane emissions $emissions.change$ across most sources, with the largest absolute $emissions.extent$ seen in $emissions.article$ [REPLACE value=\"?\"]."
     }
   ]
 }
