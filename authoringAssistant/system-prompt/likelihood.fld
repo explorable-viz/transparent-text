@@ -1,0 +1,6 @@
+let findLikelihood (min, max) target =
+    if target > max
+    then 0.0
+    else if target < min
+    then 1.0
+    else (target - min)/(max - min);

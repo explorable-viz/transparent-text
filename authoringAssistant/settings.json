@@ -15,12 +15,12 @@
   "agent-limit": 3,
   "base-path-library": "node_modules/@explorable-viz/fluid/dist/fluid/fluid",
   "fluid-common-folder": "./fluid-common",
-  "enable-reasoning": false,
+  "enable-reasoning": true,
   "learning-case-folder": "learningCases",
-  "test-case-folder": "testCases",
+  "test-case-folder": "testCases/methane",
   "threshold": 0.0,
-  "system-prompt-path":"system-prompt.json",
-  "num-test-to-generate":1,
+  "system-prompt-path":"system-prompt/",
+  "num-test-to-generate":5,
   "num-learning-case-to-generate": 1,
   "num-query-to-execute": null
 }

@@ -1,0 +1,2 @@
+let record = getByCategory "$emissions.type$" $emissions.year$ tableData
+in

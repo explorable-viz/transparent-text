@@ -1,0 +1,35 @@
+{
+  "variables": {
+    "emissions": [
+      {
+        "type":"Agricultural Waste Burning",
+        "year1": "2015",
+        "year2": "2020",
+        "change": "increase"
+      },
+      {
+        "type":"Residential Commercial Other",
+        "year1": "2015",
+        "year2": "2020",
+        "change": "decrease"
+      }
+    ]
+  },
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/methane-emissions"
+    }
+  ],
+  "imports": [
+    "methane"
+  ],
+  "expected": "\"$emissions.type$\"",
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "The [REPLACE value=\"?\"] source exhibited the highest percentage $emissions.change$ in methane emissions between $emissions.year1$ and $emissions.year2$"
+    }
+  ]
+}
+
