@@ -3,17 +3,17 @@
     "emissions": [
       {
         "type":"Agriculture source",
-        "quantity":"37.74",
+        "result":"37.74",
         "year": "2030"
       },
       {
         "type": "the Energy Sector",
-        "quantity":"64.186",
+        "result":"64.186",
         "year": "2030"
       },
       {
         "type": "the Energy Sector",
-        "quantity":"?",
+        "result":"?",
         "year": "2030"
       }
     ]
@@ -29,7 +29,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The total methane emissions for the year $emissions.year$ are [REPLACE value=\"$emissions.quantity$\"] for $emissions.type$"
+      "value": "The total methane emissions for the year $emissions.year$ are [REPLACE value=\"$emissions.result$\"] for $emissions.type$"
     }
   ]
 }

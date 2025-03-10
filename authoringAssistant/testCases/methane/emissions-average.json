@@ -3,15 +3,15 @@
     "emissions": [
       {
         "year": "2030",
-        "quantity": "13.51"
+        "result": "13.51"
       },
       {
         "year": "2015",
-        "quantity": "6.09"
+        "result": "6.09"
       },
       {
         "year": "2020",
-        "quantity": "8.71"
+        "result": "8.71"
       }
     ]
   },
@@ -28,7 +28,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The average methane emissions for the year $emissions.year$ is [REPLACE value=\"$emissions.quantity$\"]"
+      "value": "The average methane emissions for the year $emissions.year$ is [REPLACE value=\"$emissions.result$\"]"
     }
   ]
 }
