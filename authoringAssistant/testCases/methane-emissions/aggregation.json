@@ -4,32 +4,38 @@
       {
         "year": "2030",
         "result": "13.51",
-        "operation": "average"
+        "operation": "average",
+        "expected": "(sumEmissions $emissions.year$ tableData / length records)"
       },
       {
         "year": "2015",
         "result": "6.09",
-        "operation": "average"
+        "operation": "average",
+        "expected": "(sumEmissions $emissions.year$ tableData / length records)"
       },
       {
         "year": "2020",
         "result": "8.71",
-        "operation": "average"
+        "operation": "average",
+        "expected": "(sumEmissions $emissions.year$ tableData / length records)"
       },
       {
         "year": "2030",
         "result": "121.57",
-        "operation": "total"
+        "operation": "total",
+        "expected": "sumEmissions $emissions.year$ tableData"
       },
       {
         "year": "2015",
         "result": "54.82",
-        "operation": "total"
+        "operation": "total",
+        "expected": "sumEmissions $emissions.year$ tableData"
       },
       {
         "year": "2020",
         "result": "78.43",
-        "operation": "total"
+        "operation": "total",
+        "expected": "sumEmissions $emissions.year$ tableData"
       }
     ]
   },
@@ -42,7 +48,7 @@
   "imports": [
     "methane"
   ],
-  "expected": "(sumEmissions $emissions.year$ tableData / length records)",
+  "expected": "$emissions.expected$",
   "paragraph": [
     {
       "type": "literal",
