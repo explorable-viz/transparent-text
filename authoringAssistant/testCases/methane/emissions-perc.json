@@ -2,12 +2,14 @@
   "variables": {
     "emissions": [
       {
+        "article": "",
         "type":"Agriculture",
         "result":"31.05",
         "year": "2030"
       },
       {
-        "type": "The Energy Sector",
+        "article": "The",
+        "type": "Energy Sector",
         "result":"52.80",
         "year": "2030"
       }
@@ -24,7 +26,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "$emissions.type$ accounts for total methane emissions of [REPLACE value=\"$emissions.result$\"]% in $emissions.year$."
+      "value": "$emissions.article$ $emissions.type$ accounts for total methane emissions of [REPLACE value=\"$emissions.result$\"]% in $emissions.year$."
     }
   ]
 }
