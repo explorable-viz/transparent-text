@@ -17,7 +17,7 @@
   "fluid-common-folder": "./fluid-common",
   "enable-reasoning": true,
   "learning-case-folder": "learningCases",
-  "test-case-folder": "testCases/methane",
+  "test-case-folder": "testCases/methane-emissions",
   "threshold": 0.0,
   "system-prompt-path":"system-prompt/",
   "num-test-to-generate":5,
