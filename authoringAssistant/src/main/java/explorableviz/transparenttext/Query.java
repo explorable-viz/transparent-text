@@ -32,6 +32,7 @@ public class Query {
     private final String code;
     private final Paragraph paragraph;
     private final String expected;
+    private final String expectedValue;
     private final HashMap<String, String> _loadedDatasets;
     private final String testCaseFileName;
     private final String fluidFileName = "llmTest";
@@ -66,10 +67,7 @@ public class Query {
         this.testCaseFileName = testCaseFileName;
         //Validation of the created object
         writeFluidFiles(this.getExpected());
-        Optional<String> result = this.validate(new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName));
-        if (result.isPresent()) {
-            throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
-        }
+        this.expectedValue = new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName);
     }
 
     public HashMap<String, String> loadDatasets() throws IOException {
@@ -102,29 +100,24 @@ public class Query {
         return object.toString();
     }
 
-    public Optional<String> validate(String output) {
-        logger.info(STR."Validating output: \{output}");
-        Optional<LiteralParts> parts = this.getParagraph().stream().map(Paragraph::splitLiteral).flatMap(Optional::stream).findFirst();
-        if (parts.isEmpty()) {
-            throw new RuntimeException("No REPLACE tag found");
-        }
-        String expectedValue = parts.get().tag().getValue();
-        // Extract and clean the generated expression
-        String[] outputLines = output.split("\n");
+    public Optional<String> validate(String commandLineResponse) {
+        logger.info(STR."Validating command line output: \{commandLineResponse}");
+
+        String[] outputLines = commandLineResponse.split("\n");
         if (outputLines.length < 2) {
             throw new RuntimeException("Output format is invalid");
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
         //interpreter errors detection -
-        if (output.contains("Error: ")) {
+        if (commandLineResponse.contains("Error: ")) {
             logger.info(STR."Validation failed because interpreter error");
             return Optional.of(value);
         }
-        if (value.equals(expectedValue) || roundedEquals(value, expectedValue) || expectedValue.equals("?")) {
+        if (value.equals(this.expectedValue) || roundedEquals(value, this.expectedValue)) {
             logger.info("Validation passed");
             return Optional.empty();
         } else {
-            logger.info(STR."Validation failed: generated=\{value}, expected=\{expectedValue}");
+            logger.info(STR."Validation failed: generated=\{value}, expected=\{this.expectedValue}");
             return Optional.of(value);
         }
     }
