@@ -32,16 +32,26 @@ public class Query {
     private final String code;
     private final Paragraph paragraph;
     private final String expected;
+    private final String expectedValue;
     private final HashMap<String, String> _loadedDatasets;
-    private final Variables variables;
     private final String testCaseFileName;
     private final String fluidFileName = "llmTest";
 
-    public Query(java.util.Map<String, String> datasets, List<String> imports, String code, Paragraph paragraph, Variables variables, String expected, String testCaseFileName) throws IOException {
-        Variables.Flat computedVariables = computeVariables(variables, new Random(0));
-        this.variables = variables;
-        this.datasets = datasets;
-        this.imports = imports;
+    public Query(JSONObject testCase, String testCaseFileName, Random random) throws IOException {
+        JSONArray json_datasets = testCase.getJSONArray("datasets");
+        JSONArray json_imports = testCase.getJSONArray("imports");
+        JSONArray json_paragraph = testCase.getJSONArray("paragraph");
+
+        Variables.Flat computedVariables = computeVariables(Variables.fromJSON(testCase.getJSONObject("variables")), random);
+        this.datasets = IntStream.range(0, json_datasets.length())
+                .boxed()
+                .collect(Collectors.toMap(
+                        i -> json_datasets.getJSONObject(i).getString("var"),
+                        i -> json_datasets.getJSONObject(i).getString("file")
+                ));
+        this.imports = IntStream.range(0, json_imports.length())
+                .mapToObj(json_imports::getString)
+                .collect(Collectors.toList());
         this._loadedDatasets = new HashMap<>(this.loadDatasets()
                 .entrySet()
                 .stream()
@@ -50,19 +60,14 @@ public class Query {
                         entry -> replaceVariables(entry.getValue(), computedVariables)
                 )));
         this._loadedImports = this.loadImports();
-        this.code = replaceVariables(code, computedVariables);
-        this.expected = replaceVariables(expected, computedVariables);
-        this.paragraph = paragraph.stream()
-                .map(t -> t.replace(computedVariables))
-                .collect(Collectors.toCollection(Paragraph::new));
+        this.code = replaceVariables(new String(Files.readAllBytes(Path.of(STR."\{testCaseFileName}.fld"))), computedVariables);
+        this.expected = replaceVariables(testCase.getString("expected"), computedVariables);
+        this.paragraph = new Paragraph(json_paragraph, computedVariables);
+
         this.testCaseFileName = testCaseFileName;
         //Validation of the created object
-//        writeFluidFiles(this.getExpected());
-//        Optional<String> result = this.validate(new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName));
-//        if (result.isPresent()) {
-//            throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{result}");
-//        }
-
+        writeFluidFiles(this.getExpected());
+        this.expectedValue = new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName);
     }
 
     public HashMap<String, String> loadDatasets() throws IOException {
@@ -95,30 +100,24 @@ public class Query {
         return object.toString();
     }
 
-    public Optional<String> validate(String output) {
-        logger.info(STR."Validating output: \{output}");
-        Optional<LiteralParts> parts = this.getParagraph().stream().map(Paragraph::splitLiteral).flatMap(Optional::stream).findFirst();
-        if (parts.isEmpty()) {
-            throw new RuntimeException("No REPLACE tag found");
-        }
-        String expectedValue = parts.get().tag().getValue();
-        // Extract and clean the generated expression
-        String[] outputLines = output.split("\n");
+    public Optional<String> validate(String commandLineResponse) {
+        logger.info(STR."Validating command line output: \{commandLineResponse}");
+
+        String[] outputLines = commandLineResponse.split("\n");
         if (outputLines.length < 2) {
             throw new RuntimeException("Output format is invalid");
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
-
         //interpreter errors detection -
-        if(output.contains("Error: ")) {
+        if (commandLineResponse.contains("Error: ")) {
             logger.info(STR."Validation failed because interpreter error");
             return Optional.of(value);
         }
-        if (value.equals(expectedValue) || roundedEquals(value, expectedValue) || expectedValue.equals("?")) {
+        if (value.equals(this.expectedValue) || roundedEquals(value, this.expectedValue)) {
             logger.info("Validation passed");
             return Optional.empty();
         } else {
-            logger.info(STR."Validation failed: generated=\{value}, expected=\{expectedValue}");
+            logger.info(STR."Validation failed: generated=\{value}, expected=\{this.expectedValue}");
             return Optional.of(value);
         }
     }
@@ -152,45 +151,10 @@ public class Query {
         for (String casePath : casePaths) {
             JSONObject testCase = new JSONObject(new String(Files.readAllBytes(Path.of(STR."\{casePath}.json"))));
             for (int i = 0; i < numInstances; i++) {
-                queries.add(importFromJson(testCase, casePath));
+                queries.add(new Query(testCase, casePath, new Random(i)));
             }
         }
         return queries;
-    }
-
-    public static Query importFromJson(JSONObject testCase, String filePath) throws IOException {
-        JSONArray json_datasets = testCase.getJSONArray("datasets");
-        JSONObject json_variables = testCase.getJSONObject("variables");
-        JSONArray json_imports = testCase.getJSONArray("imports");
-        JSONArray json_paragraph = testCase.getJSONArray("paragraph");
-
-        Paragraph paragraph = IntStream.range(0, json_paragraph.length())
-                .mapToObj(i -> {
-                    JSONObject paragraphElement = json_paragraph.getJSONObject(i);
-                    String type = paragraphElement.getString("type");
-
-                    return switch (type) {
-                        case "literal" -> new Literal(paragraphElement.getString("value"));
-                        case "expression" ->
-                                new Expression(paragraphElement.getString("expression"), paragraphElement.getString("value"));
-                        default -> throw new RuntimeException(STR."\{type} type is invalid");
-                    };
-                })
-                .collect(Collectors.toCollection(Paragraph::new));
-
-        Variables var = Variables.fromJSON(json_variables);
-        Map<String, String> datasets = IntStream.range(0, json_datasets.length())
-                .boxed()
-                .collect(Collectors.toMap(
-                        i -> json_datasets.getJSONObject(i).getString("var"),
-                        i -> json_datasets.getJSONObject(i).getString("file")
-                ));
-
-        List<String> imports = IntStream.range(0, json_imports.length())
-                .mapToObj(json_imports::getString)
-                .collect(Collectors.toList());
-
-        return new Query(datasets, imports, new String(Files.readAllBytes(Path.of(STR."\{filePath}.fld"))), paragraph, var, testCase.getString("expected"), filePath);
     }
 
     public void writeFluidFiles(String response) throws IOException {
@@ -236,10 +200,6 @@ public class Query {
 
     public Paragraph getParagraph() {
         return paragraph;
-    }
-
-    public Variables getVariables() {
-        return variables;
     }
 
     public String getExpected() {
