@@ -1,33 +1,66 @@
 \section{LLM-Based Authoring Assistant}
+\label{sec:llm-based-authoring-assistant}
 
 \subsection{Introduction}
+\label{subsec:introduction}
+
+\subsubsection{Query}
+The Query represents the input provided to the AuthoringAssistant and contains all the necessary information for generating the expression in the Fluid language.
+Formally, a Query is defined as a quintuple $Q = \{D^*, I^*, C, P, E\}$, where:
 
 \begin{itemize}
-    \item \textbf{QueryContext}: Represents the input, containing dataset details (path and variable name), library imports, code, and paragraphs (lists of strings and fluid expressions).
-    \item \textbf{Fluid Generator}: Receives the QueryContext and requests the LLM to generate a Fluid Expression.
-    \item \textbf{Fluid Evaluator}: Verifies the Fluid Expression syntactically and semantically. It runs through the fluid compiler, comparing the output with the expected value. Errors are sent back to the LLM for regeneration if needed.
+    \item $D^*$ denotes the set of datasets, each represented as a pair $D = (K, V)$, where $K$ is the variable name and $V$ is the corresponding value, structured in dictionary format (JSON-like).
+    \item $I^*$ represents the set of modules, where each element $I$ corresponds to a Fluid library required for the expression generation.
+    \item $C$ represents the source code written in the Fluid language, serving as the context for generating the desired expression.
+    \item $P$ represents the paragraph containing the placeholder tag $[REPLACE\ value=x]$, which will be replaced by the generated expression.
+    \item $E$ represents the expected expression, which is necessary for computing the expected value used in result validation.
 \end{itemize}
 
-\subsection{Candidate Research Questions}
+\subsubsection{AuthoringAssistant}
+The AuthoringAssistant, based on a Large Language Model (LLM), processes a given query $Q$ and generates the corresponding Fluid expression, denoted as $E_{candidate}$.
+The computed value of the generated expression $E_{candidate}$ must be equal to the value obtained from the expected expression $E_{query}$, the expression $E$ defined in $Q$.
+This check is verified using the FluidCLI, which executes the Fluid interpreter and parses the command-line output.
 
-\subsubsection{Usability of LLM-based authoring tool vs.~editing purely by hand}
+\subsection{Key Use-cases}
+\label{subsec:key-use-cases}
+
+\subsubsection{Aggregation}
+Operations that summarize data, including sum, average, max, and min.
+Example sentences.
+\begin{itemize}
+    \item The average/total methane emissions for the year \$emissions.year\$ is $[REPLACE value=\$emissions.quantity\$]$
+    \item In \$emissions.year\$, the $[REPLACE value=?]$ had the \$emissions.rank\$ amount in methane emissions.
+\end{itemize}
+
+\subsubsection{Trends}
+Analysis of increasing or decreasing patterns in data.
+Example sentence.
+\begin{itemize}
+    \item Between \$emissions.year1\$ and \$emissions.year2\$, methane emissions increases/decreases across most sources, with the largest absolute rise/reduction seen in  $[REPLACE value=?]$.
+\end{itemize}
+
+\subsubsection{Unknown Value}
+Analyse the ability of the Assistant to generate the correct Fluid Expression without knowing the expected value (? symbol)
+Example sentence.
+\begin{itemize}
+    \item In \$emissions.year\$, the $[REPLACE value=?]$ had the \$emissions.rank\$ amount in methane emissions.
+\end{itemize}
+
+
+\subsection{Candidate Research Questions}
+\label{subsec:candidate-research-questions}
+
+\subsubsection[Usability of LLM-based authoring tool vs. editing purely by hand]{Usability of LLM-based authoring tool vs. editing purely by hand}
 
 \subsubsection{Impact of documentation and naming conventions on the output accuracy}
-Analyze how the use of proper naming conventions and the inclusion of comments in each example of the
+Analyse how the use of proper naming conventions and the inclusion of comments in each example of the
 in-context learning dataset affect the accuracy of the LLM's output. \textbf{RQ}: How do documentation, naming
 conventions, affect performance of LLM?
 
 \subsubsection{Impact of Example Complexity on LLM Generalization in DSLs}
-Analyse the impact of the structure of the in-context learning dataset on the accuracy of responses, with a
-particular focus on the complexity of datasets. By complexity, we mean the number of Fluid elements that the
-in-context learning dataset contains for each example.
+Analyse the impact of the structure of the in-context learning dataset on the accuracy of responses, with a particular focus on the complexity of datasets.
+By complexity, we mean the number of Fluid elements that the in-context learning dataset contains for each example.
 
-\begin{figure}
-    \centering
-    \includegraphics[width=0.95\linewidth]{fig/authoring-assistant-architecture.png}
-    \caption{Draft architecture of the LLM-based code generation}
-    \label{fig:authoring-assistant-architecture}
-\end{figure}
 
 \textbf{Related work (links)}
 \begin{itemize}
