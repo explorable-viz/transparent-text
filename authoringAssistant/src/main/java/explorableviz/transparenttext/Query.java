@@ -1,7 +1,5 @@
 package explorableviz.transparenttext;
 
-import explorableviz.transparenttext.paragraph.Expression;
-import explorableviz.transparenttext.paragraph.Literal;
 import explorableviz.transparenttext.paragraph.Paragraph;
 import explorableviz.transparenttext.variable.ValueOptions;
 import explorableviz.transparenttext.variable.Variables;
@@ -31,8 +29,8 @@ public class Query {
     private final ArrayList<String> _loadedImports;
     private final String code;
     private final Paragraph paragraph;
-    private final String expected;
-    private final String expectedValue;
+    private final java.util.Map<String, String> expected;
+    private final java.util.Map<String, String> expectedValue;
     private final HashMap<String, String> _loadedDatasets;
     private final String testCaseFileName;
     private final String fluidFileName = "llmTest";
@@ -61,13 +59,25 @@ public class Query {
                 )));
         this._loadedImports = this.loadImports();
         this.code = replaceVariables(new String(Files.readAllBytes(Path.of(STR."\{testCaseFileName}.fld"))), computedVariables);
-        this.expected = replaceVariables(testCase.getString("expected"), computedVariables);
+
+        this.expected = new HashMap<>();
+        testCase.getJSONObject("expected").keySet().forEach(k -> this.expected.put(k, testCase.getJSONObject("expected").getString(k)));
+
         this.paragraph = new Paragraph(json_paragraph, computedVariables);
 
         this.testCaseFileName = testCaseFileName;
+        this.expectedValue = new HashMap<>();
         //Validation of the created object
-        writeFluidFiles(this.getExpected());
-        this.expectedValue = new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName);
+
+        for (Map.Entry<String, String> entry : this.expected.entrySet()) {
+            writeFluidFiles(entry.getValue());
+            String commandLineResult = new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName);
+            this.expectedValue.put(entry.getKey(), computeValue(commandLineResult));
+            if (this.validate(commandLineResult, entry.getKey()).isPresent()) {
+                throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{this.validate(this.expectedValue.get(entry.getKey()), entry.getKey())}");
+            }
+        }
+
     }
 
     public HashMap<String, String> loadDatasets() throws IOException {
@@ -100,20 +110,23 @@ public class Query {
         return object.toString();
     }
 
-    public Optional<String> validate(String commandLineResponse) {
-        logger.info(STR."Validating command line output: \{commandLineResponse}");
-
+    public String computeValue(String commandLineResponse) {
         String[] outputLines = commandLineResponse.split("\n");
         if (outputLines.length < 2) {
             throw new RuntimeException("Output format is invalid");
         }
-        String value = outputLines[1].replaceAll("^\"|\"$", "");
+        return outputLines[1].replaceAll("^\"|\"$", "");
+    }
+
+    public Optional<String> validate(String commandLineResponse, String expectedVarName) {
+        logger.info(STR."Validating command line output: \{commandLineResponse}");
+        String value = computeValue(commandLineResponse);
         //interpreter errors detection -
         if (commandLineResponse.contains("Error: ")) {
             logger.info(STR."Validation failed because interpreter error");
             return Optional.of(value);
         }
-        if (value.equals(this.expectedValue) || roundedEquals(value, this.expectedValue)) {
+        if (value.equals(this.expectedValue.get(expectedVarName)) || roundedEquals(value, this.expectedValue.get(expectedVarName))) {
             logger.info("Validation passed");
             return Optional.empty();
         } else {
@@ -202,7 +215,7 @@ public class Query {
         return paragraph;
     }
 
-    public String getExpected() {
+    public java.util.Map<String, String> getExpected() {
         return expected;
     }
 
