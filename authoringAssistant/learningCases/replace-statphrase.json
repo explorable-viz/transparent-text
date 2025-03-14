@@ -1,14 +1,19 @@
 {
   "variables": {},
-  "datasets": [{
-    "var": "tableData",
-    "file": "datasets/test-dataset"
-  }],
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/test-dataset"
+    }
+  ],
   "imports": [],
-  "expected": "likelihoodMap(findLikelihood(stressedScenario.low81100, stressedScenario.high81100) 0.6)",
+  "expected": {
+    "result1": "[\"likelihoodMap(findLikelihood(stressedScenario.low81100, stressedScenario.high81100) 0.6)\"]"
+  },
   "paragraph": [
     {
       "type": "literal",
-      "value":"In the SSP3-7.0 framework, there's a [REPLACE value=\"virtually certain\"] chance of temperatures surpassing 2°C. Meanwhile, the high-emission SSP5-8.5 scenario significantly elevates the risk of exceeding this critical temperature threshold."
-    }]
+      "value": "In the SSP3-7.0 framework, there's a [REPLACE id=\"result1\" value=\"virtually certain\"] chance of temperatures surpassing 2°C. Meanwhile, the high-emission SSP5-8.5 scenario significantly elevates the risk of exceeding this critical temperature threshold."
+    }
+  ]
 }
