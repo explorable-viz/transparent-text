@@ -17,6 +17,6 @@ public class LLMDummyAgent extends LLMEvaluatorAgent {
     @Override
     public String evaluate(List<Prompt> list, String s) throws IOException {
         logger.info("Execution of the DummyAgent");
-        return "__dummy response__";
+        return "{\"key\":\"__dummy response__\"}";
     }
 }
