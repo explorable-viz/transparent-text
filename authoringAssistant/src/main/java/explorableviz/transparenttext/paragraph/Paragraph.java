@@ -59,7 +59,7 @@ public class Paragraph extends ArrayList<TextFragment> {
     }
 
     public static Optional<LiteralParts> splitLiteral(TextFragment literal) {
-        Matcher valueReplaceMatcher = Pattern.compile("(.*)\\[REPLACE value=\"(.*?)\"](.*)").matcher(literal.getValue());
+        Matcher valueReplaceMatcher = Pattern.compile("(.*)\\[REPLACE id=\".*?\" value=\"(.*?)\"](.*)").matcher(literal.getValue());
         if (!valueReplaceMatcher.find()) {
             return Optional.empty();
         }
