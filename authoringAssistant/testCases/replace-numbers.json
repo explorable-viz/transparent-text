@@ -10,7 +10,10 @@
     }
   ],
   "imports": [],
-  "expected": "scenarioI.bE2140",
+  "expected": {
+    "result1":"scenarioI.bE2140",
+    "result2": "scenarioI.high4160"
+  },
   "paragraph": [
     {
       "type": "literal",
@@ -22,7 +25,7 @@
     },
     {
       "type": "literal",
-      "value":"charts a restricted temperature elevation up to [REPLACE value=\"1.5\"], ensuring an unlikely breach of the established 2°C limit. Contrastively, SSP5-8.5 exacerbates the potential for significant warming, making such an event practically certain."
+      "value":"charts a restricted temperature elevation up to [REPLACE id=\"result1\" value=\"1.5\"], ensuring an unlikely breach of the established [REPLACE id=\"result2\" value=\"2\"]°C limit. Contrastively, SSP5-8.5 exacerbates the potential for significant warming, making such an event practically certain."
     }
   ]
 }
