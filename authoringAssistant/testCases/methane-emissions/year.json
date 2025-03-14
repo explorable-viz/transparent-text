@@ -42,11 +42,13 @@
   "imports": [
     "methane"
   ],
-  "expected": "$emissions.result$",
+  "expected": {
+    "result1":"$emissions.result$"
+  },
   "paragraph": [
     {
       "type": "literal",
-      "value": "$emissions.type$ recorded its $emissions.record$ methane emissions in [REPLACE value=\"$emissions.year$\"]."
+      "value": "$emissions.type$ recorded its $emissions.record$ methane emissions in [REPLACE id=\"result1\" value=\"$emissions.year$\"]."
     }
   ]
 }

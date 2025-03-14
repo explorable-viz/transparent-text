@@ -22,11 +22,13 @@
     }
   ],
   "imports": ["methane"],
-  "expected": "(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100",
+  "expected": {
+    "result1":"(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100"
+  },
   "paragraph": [
     {
       "type": "literal",
-      "value": "$emissions.article$ $emissions.type$ accounts for total methane emissions of [REPLACE value=\"$emissions.result$\"]% in $emissions.year$."
+      "value": "$emissions.article$ $emissions.type$ accounts for total methane emissions of [REPLACE id=\"result1\" value=\"$emissions.result$\"]% in $emissions.year$."
     }
   ]
 }
