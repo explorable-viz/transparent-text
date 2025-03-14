@@ -61,7 +61,7 @@ public class Query {
         this.code = replaceVariables(new String(Files.readAllBytes(Path.of(STR."\{testCaseFileName}.fld"))), computedVariables);
 
         this.expected = new HashMap<>();
-        testCase.getJSONObject("expected").keySet().forEach(k -> this.expected.put(k, testCase.getJSONObject("expected").getString(k)));
+        testCase.getJSONObject("expected").keySet().forEach(k -> this.expected.put(k, replaceVariables(testCase.getJSONObject("expected").getString(k), computedVariables)));
 
         this.paragraph = new Paragraph(json_paragraph, computedVariables);
 
