@@ -141,6 +141,7 @@ public class Query {
         return textToReplace;
     }
 
+    // TODO: maybe loadQueries?
     public static ArrayList<Query> loadQuery(String casesFolder, int numInstances) throws IOException {
         ArrayList<Query> queries = new ArrayList<>();
         Set<String> casePaths = Files.list(Paths.get(casesFolder))
@@ -151,6 +152,7 @@ public class Query {
         for (String casePath : casePaths) {
             JSONObject testCase = new JSONObject(new String(Files.readAllBytes(Path.of(STR."\{casePath}.json"))));
             for (int i = 0; i < numInstances; i++) {
+                // TODO: if we want to fix the seed here, shouldn't we just use a single one? Why one per query?
                 queries.add(new Query(testCase, casePath, new Random(i)));
             }
         }

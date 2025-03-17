@@ -25,6 +25,7 @@ public class InContextLearning {
         this.cases = cases;
     }
 
+    // TODO Maybe loadLearningCases? "JSON" seems redundant, and we "load" (rather than "importing") queries
     public static InContextLearning importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
         ArrayList<Query> learningCases = loadQuery(Settings.getLearningCaseFolder(), numCasesToGenerate);
         return new InContextLearning(loadSystemPrompt(jsonLearningCasePath), learningCases);
