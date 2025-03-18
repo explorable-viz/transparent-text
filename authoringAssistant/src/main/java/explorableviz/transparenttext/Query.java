@@ -108,9 +108,9 @@ public class Query {
             throw new RuntimeException("Output format is invalid");
         }
         String value = outputLines[1].replaceAll("^\"|\"$", "");
-        //interpreter errors detection -
+        // interpreter error detection
         if (commandLineResponse.contains("Error: ")) {
-            logger.info(STR."Validation failed because interpreter error");
+            logger.info("Validation failed because interpreter error");
             return Optional.of(value);
         }
         if (value.equals(this.expectedValue) || roundedEquals(value, this.expectedValue)) {

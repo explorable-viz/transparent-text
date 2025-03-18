@@ -1,18 +1,9 @@
 \section{Introduction}
 
-In data analytics and other forms of science communication, reader understanding can be greatly improved by
-providing the reader with information about ``data provenance'': where did this data come from, how was it
-used, and how did that lead to the conclusions being presented to me? Collecting information for this purpose
-requires a lot of effort, and so work has gone into automatic its collection, by integrating data provenance
-features into programming languages themselves \cite{fehrenbach16}. More recently, this idea has been extended
-to work with data visualizations \cite{perera22,bond24}, further aiding reader comprehension. The utility of this
-information is clear: good science  is \emph{reproducible}, and good science communication should give the
-layperson as many tools as possible to verify or reproduce conclusions made from data.
-
-Communication is often done through combining the mediums of text, data visualizations, and code. The idea of
-literate programming \cite{knuth84} has been influential, and in data analytics the ``notebook interface''
-\cite{kluyver16} has become the de facto standard for communication, allowing a data scientist to interleave
-code with its own results, and expository text.
+\begin{itemize}
+\item Making sense of data-driven claims is hard, even if the evidence base (code/data) is open
+\item We see this in peer review, misinformation, retracted papers, …
+\end{itemize}
 
 \begin{figure}[h]
    \includegraphics[width=0.9\textwidth]{fig/ipcc-mockup.png}
@@ -20,66 +11,47 @@ code with its own results, and expository text.
    \label{fig:ipcc-mockup}
 \end{figure}
 
-Whilst these solutions provide some level of transparency, they come with limitations. Users do not want to
-install bespoke software in order to read articles, and notebooks do not necessarily provide complete
-transparency by themselves; the code is often highly abstract, providing wrappers for complex models which
-have often been applied as black-boxes.
-
-More recently, \citet{dragicevic19} proposed the idea of an \emph{explorable multiverse} as a mechanism for
-improving transparency. The idea is that during data analysis, choices made by the analyst can significantly
-impact results; and that analysis should be run multiple times using different methods. The user should then
-be allowed to toggle between different choices and see how a change in the method impacts the conclusions that
-can be drawn from the data.
-
-\citet{psallidas18} have done work on applying techniques of data lineage to interactive visualizations based on
-in-memory databases. Their work allows for fine-grained provenance queries at high-speed, but does not extend
-this work to supporting text. In general it is unclear what a data provenance query on text looks like, or how
-one might write an article as a program that allows for interactive provenance queries on text.
-
-Whilst we do not propose to solve the problem of deliberate misinformation, interactive features, which allow
-readers to interrogate where data came from and how it was used to support an argument, allow both laypeople
-and policymakers to make more informed decisions. Increased data transparency is a good thing. Transparency
-should not be considered a binary quantity. Instead it is helpful to think of it as a continuum.
-
-In the mock-up shown in \figref{ipcc-mockup}, the explanation attached to the text in green provides code
-which helps explain the text. We can immediately see the continuum of transparency: if the explanation simply
-provided the first line -- the final expression which produced the text -- one could argue that we have made
-some improvement on the transparency of the example. The context added underneath, the definitions of the task
-specific functions used to construct the final expression, makes it \emph{more transparent}, than just
-providing a single source expression.
-
-To meet this goal, we need to allow authors to introduce a richer kind of reference into supporting text.
-Making reference to visual marks or underlying data can be thought of as a \emph{query}, interacting with a
-textual reference should query the underlying data, and provide the user with immediate visual feedback,
-perhaps by highlighting elements of relevant visualizations, perhaps by showing the user how a given result
-was computed. We stress that generic tooling for this sort of thing does not yet exist. We call text that
-comes with an account of how it was generated \emph{self-certifying text}.
-
 \subsection{Self-Certifying Text}
-Examples of text we might want to link or interpret semi-formally/quantitatively:
 
 \begin{itemize}
-\item Quantitative expressions
+\item Introduce basic idea, as complementary to transparent visualisations
+\end{itemize}
+
+\subsubsection{Use cases}
+Two potential scenarios for this sort of technology:
+
+\paragraph{Authoring transparent text.} Someone authoring content for an online article, wants to create text
+linked to raw data (and derivative data such as charts or tabular summaries), so that the evidence base for
+the claims made in the text can be explored \emph{in situ}, by interacting with the text.
+
+\paragraph{Interpreting text after the fact.} Someone reading textual claims derived from open data (e.g. a
+scientific paper or climate report), wants to retroactively link the text to queries over the available data
+and gradually ``rationally reconstruct'' the relationship between the claims in the paper and the evidence
+base. Perhaps just to aid their own comprehension, or to provide some kind of justified peer review.
+
+\vspace{2mm}
+\noindent Here we focus on the first one because the second one requires a certain amount of additional setup.
+
+\subsubsection{Target idioms of natural language}
+
+NLP aspect of the problem is potentially a big problem space in itself. We will restrict interest to certain
+idiomatic uses of natural language in making/justifying scientific claims. Examples:
+
+\begin{itemize}
+\item quantitative expressions
 \begin{itemize}
    \item pure numerical values
    \item percentages
    \item rounded or normalised numbers
 \end{itemize}
-\item Graded Adjectives (e.g.~\emph{virtually certain}, \emph{exceptionally unlikely})
-\item References to visual elements and their parts (mereology)
+\item graded Adjectives (e.g.~\emph{virtually certain}, \emph{exceptionally unlikely})
+\item references to visual elements and their parts (mereology)
 \end{itemize}
 
-% This illustrative example showcases several sub-problems our system will need to be able to handle. First
-% is that of creating an iterative scope for the references that follow. We can imagine that the orange-highlighted
-% text effectively creates an iterable, which the green highlighted text maps over. The purple-highlighted text
-% then maps over the iterable created by the green highlighted text. This sort of iteration is a common feature of natural language,
-% and any well-designed system should allow for such expressions to be written by the author, and linked appropriately.
+\subsection{Contributions}
 
-% In order to reference common substructures that appear within the 5 charts, the system must be able to walk arbitrarily
-% into structured data objects. In linguistics this is referred to as ``mereology'', the study of relationships
-% between parts and wholes. In our case, one could imagine the collection of 5 charts as the whole, with each
-% individual bar-chart being a part of that whole. Because all 5 charts are structurally the same (of the same type),
-% we can apply the same walk to each of them: bar-charts in our language have a field called \kw{bars}, a list
-% of the various bars. In this light, we can imagine the green-highlighted text as walking into the \kw{bars} field
-% of the charts, and the purple-highlighted text as walking into this list, and selecting the bar with the label "total warming".
-
+\begin{itemize}
+\item Design and proof-of-concept implementation of AI-assisted workflow for authoring transparent text
+(\secref{authoring-workflow})
+\item Empirical evaluation of how effective current LLMs are at providing the ``AI-assisted'' part
+\end{itemize}
