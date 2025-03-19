@@ -1,6 +1,7 @@
 package explorableviz.transparenttext.paragraph;
 
 import explorableviz.transparenttext.LiteralParts;
+import explorableviz.transparenttext.Settings;
 import explorableviz.transparenttext.variable.Variables;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,9 +21,15 @@ public class Paragraph extends ArrayList<TextFragment> {
                     String type = paragraphElement.getString("type");
                     String value = expectedValue.entrySet().stream()
                             .reduce(paragraphElement.getString("value"),
-                                    (acc, entry) -> acc.replaceAll(STR."\\[ADD_VAL id=\"\{entry.getKey()}\"]", entry.getValue()),
+                                    (acc, entry) -> {
+                                        if(Settings.isAddExpectedValueEnabled()) {
+                                            acc = acc.replaceAll(Pattern.quote(STR."[REPLACE id=\"\{entry.getKey()}\"]"), Matcher.quoteReplacement(STR."[REPLACE id=\"\{entry.getKey()}\" value=\"\{entry.getValue()}\"]"));
+                                        }
+                                        return acc.replaceAll(Pattern.quote(STR."[ADD_VAL id=\"\{entry.getKey()}\"]"), Matcher.quoteReplacement(entry.getValue()));
+                                    },
                                     (a, _) -> a
                             );
+
                     return (switch (type) {
                         case "literal" -> new Literal(value);
                         case "expression" ->

@@ -68,6 +68,8 @@ public class Settings {
     }
     public static boolean isSplitMultipleTagEnabled() {
         return getSettings().getBoolean("split-multiple-replace-tag");
+    }public static boolean isAddExpectedValueEnabled() {
+        return getSettings().getBoolean("add-expected-value");
     }
 
     public static String getLearningCaseFolder() {
