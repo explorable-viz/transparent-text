@@ -21,4 +21,4 @@ let ordinal n =
  if n == 1 then "lowest"
  else if n == 2 then "2nd-lowest"
  else if n == 3 then "3rd-lowest"
- else numToStr n ++ "nth-lowest";
+ else numToStr n ++ "th-lowest";
