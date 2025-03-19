@@ -34,7 +34,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "In $emissions.year$, the [REPLACE id=\"result1\" value=\"$emissions.type$\"] had the $emissions.rank$ amount in methane emissions."
+      "value": "In $emissions.year$, the [REPLACE id=\"result1\"] had the $emissions.rank$ amount in methane emissions."
     }
   ]
 }
