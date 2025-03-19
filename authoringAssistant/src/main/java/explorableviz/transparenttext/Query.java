@@ -61,8 +61,6 @@ public class Query {
         this.expected = new HashMap<>();
         expected.keySet().forEach(k -> this.expected.put(k, replaceVariables(expected.getString(k), variables)));
 
-        this.paragraph = new Paragraph(paragraph, variables);
-
         this.testCaseFileName = testCaseFileName;
         this.expectedValue = new HashMap<>();
         //Validation of the created object
@@ -74,6 +72,8 @@ public class Query {
                 throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{this.validate(this.expectedValue.get(entry.getKey()), entry.getKey())}");
             }
         }
+        //Generate the paragraph replacing the value in ADD_VAL tag
+        this.paragraph = new Paragraph(paragraph, variables, expectedValue);
     }
 
     public HashMap<String, String> loadDatasets() throws IOException {
@@ -151,8 +151,7 @@ public class Query {
         return textToReplace;
     }
 
-    // TODO: maybe loadQueries?
-    public static ArrayList<Query> loadQuery(String casesFolder, int numInstances) throws IOException {
+    public static ArrayList<Query> loadQueries(String casesFolder, int numInstances) throws IOException {
         if (numInstances == 0) return new ArrayList<>();
         ArrayList<Query> queries = new ArrayList<>();
         Set<String> casePaths = Files.list(Paths.get(casesFolder))
@@ -192,17 +191,12 @@ public class Query {
                         Map.Entry::getKey,
                         entry -> {
                             String value = entry.getValue().getString("value");
-                            Map<String, String> replacements = Pattern.compile("\\[REPLACE id=\"(.*?)\" value=\"(.*?)\"]")
+                            List<String> replacements = Pattern.compile("\\[REPLACE id=\"(.*?)\"]")
                                     .matcher(value)
                                     .results()
-                                    .collect(Collectors.toMap(
-                                            match -> match.group(1),
-                                            match -> match.group(2),
-                                            (a, b) -> a,
-                                            LinkedHashMap::new
-                                    ));
-
-                            return replacements.keySet().stream()
+                                    .map(match -> match.group(1))
+                                    .collect(Collectors.toList());
+                            return replacements.stream()
                                     .map(keepId -> {
                                         JSONObject obj = new JSONObject();
                                         obj.put("type", "literal");
@@ -216,11 +210,12 @@ public class Query {
                 ));
     }
 
-    private static String generateJSONParagraph(String keepId, String input, Map<String, String> replacements) {
+    private static String generateJSONParagraph(String keepId, String input, List<String> ids) {
         String modifiedText = input;
-        for (Map.Entry<String, String> entry : replacements.entrySet()) {
-            if (!entry.getKey().equals(keepId))
-                modifiedText = modifiedText.replaceAll(STR."\\[REPLACE id=\"\{entry.getKey()}\" value=\"(.*?)\"]", entry.getValue());
+        for (String id : ids) {
+            if (!id.equals(keepId))
+                //[ADD_VAL] will be replaced by the value at the Paragraph instantiation time
+                modifiedText = modifiedText.replaceAll(STR."\\[REPLACE id=\"\{id}\"]", STR."[ADD_VAL id=\"\{id}\"]");
         }
         return modifiedText;
     }
