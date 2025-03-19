@@ -154,7 +154,7 @@ public class Query {
     public static ArrayList<Query> loadQueries(String casesFolder, int numInstances) throws IOException {
         if (numInstances == 0) return new ArrayList<>();
         ArrayList<Query> queries = new ArrayList<>();
-        Set<String> casePaths = Files.list(Paths.get(casesFolder))
+        Set<String> casePaths = Files.walk(Paths.get(casesFolder))
                 .filter(Files::isRegularFile) // Only process files, not directories
                 .map(path -> path.toAbsolutePath().toString()) // Get file name
                 .map(name -> name.contains(".") ? name.substring(0, name.lastIndexOf('.')) : name)
