@@ -16,11 +16,12 @@
   "base-path-library": "node_modules/@explorable-viz/fluid/dist/fluid/fluid",
   "fluid-common-folder": "./fluid-common",
   "enable-reasoning": true,
+  "split-multiple-replace-tag": true,
   "learning-case-folder": "learningCases",
-  "test-case-folder": "testCases/methane-emissions",
+  "test-case-folder": "testCases/scigen",
   "threshold": 0.0,
   "system-prompt-path":"system-prompt/",
-  "num-test-to-generate":5,
+  "num-test-to-generate":1,
   "num-learning-case-to-generate": 1,
-  "num-query-to-execute": null
+  "num-query-to-execute": 2
 }
