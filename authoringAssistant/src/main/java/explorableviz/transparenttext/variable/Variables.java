@@ -35,7 +35,7 @@ public class Variables extends HashMap<String, ValueOptions> {
     }
 
     public static class Flat extends Variables {
-        public static Variables.Flat computeVariables(Variables variables, Random random) {
+        public static Variables.Flat expandVariables(Variables variables, Random random) {
             return variables.entrySet().stream()
                     .map(entry -> entry.getValue().expandVariable(random, entry.getKey()))
                     .reduce(new Variables.Flat(), (acc, map) -> {
