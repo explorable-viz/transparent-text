@@ -3,9 +3,12 @@
 
 ## AuthoringAssistant
 
-AuthoringAssistant is a command line tool which allows to execute the prompts into a Large Language Model. At this time the only supported model is llama3, but further versions will offer the possibility to use also other models.
+### GitHub Actions setup
 
-### Prerequisites
+Ensure the `LLM_PROMPT_EXECUTOR_TOKEN` secret is set to a personal access token which has been granted the
+`read:packages` permission.
+
+### Developer setup
 
 Before setting up the project, ensure you have the following dependencies installed:
 
@@ -41,16 +44,16 @@ Copy and paste the following content into the `settings.xml` file:
         <server>
             <id>github</id>
             <username>{GITHUB_USERNAME}</username>
-            <password>{GITHUB_PERSONAL_ACCESS_TOKEN}</password>
+            <password>{GITHUB_TOKEN}</password>
         </server>
     </servers>
 </settings>
 ```
-The `{GITHUB_TOKEN}` must be granted the `read:packages` permission.
+The `{GITHUB_TOKEN}` must be set as per `LLM_PROMPT_EXECUTOR_TOKEN` above.
 
 ### The Java Application
 
-The folder jar, host the java application. It is possible to run the app through the command
+The folder `jar` contains the built Java application, which is run through the command:
 
 `java -jar jar/prompt-executor.jar agent=string threshold=float systemPromptPath=string settings=string testPath=string  numTestToGenerate=int numLearningCaseToGenerate=int numQueryToExecute=int`
 

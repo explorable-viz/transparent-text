@@ -120,7 +120,7 @@ public class Query {
         String value = computeValue(commandLineResponse);
         //interpreter errors detection -
         if (commandLineResponse.contains("Error: ")) {
-            logger.info(STR."Validation failed because interpreter error");
+            logger.info("Validation failed because interpreter error");
             return Optional.of(value);
         }
         if (value.equals(this.expectedValue.get(expectedVarName)) || roundedEquals(value, this.expectedValue.get(expectedVarName))) {
@@ -151,6 +151,7 @@ public class Query {
         return textToReplace;
     }
 
+    // TODO: maybe loadQueries?
     public static ArrayList<Query> loadQuery(String casesFolder, int numInstances) throws IOException {
         if (numInstances == 0) return new ArrayList<>();
         ArrayList<Query> queries = new ArrayList<>();
