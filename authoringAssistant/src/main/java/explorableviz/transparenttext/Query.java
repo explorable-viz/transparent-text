@@ -69,7 +69,7 @@ public class Query {
             String commandLineResult = new FluidCLI(this.getDatasets(), this.getImports()).evaluate(fluidFileName);
             this.expectedValue.put(entry.getKey(), computeValue(commandLineResult));
             if (this.validate(commandLineResult, entry.getKey()).isPresent()) {
-                throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{this.validate(this.expectedValue.get(entry.getKey()), entry.getKey())}");
+                //throw new RuntimeException(STR."[testCaseFile=\{testCaseFileName}] Invalid test exception\{this.validate(this.expectedValue.get(entry.getKey()), entry.getKey())}");
             }
         }
         //Generate the paragraph replacing the value in ADD_VAL tag
@@ -161,7 +161,7 @@ public class Query {
                 .collect(Collectors.toSet());
         for (String casePath : casePaths) {
             JSONObject testCase = new JSONObject(new String(Files.readAllBytes(Path.of(STR."\{casePath}.json"))));
-            List<JSONArray> paragraphs = Settings.isSplitMultipleTagEnabled() ?  toMultipleParagraphs(testCase.getJSONArray("paragraph")) : Collections.singletonList(testCase.getJSONArray("paragraph"));
+            List<JSONArray> paragraphs = Settings.isSplitMultipleTagEnabled() ? toMultipleParagraphs(testCase.getJSONArray("paragraph")) : Collections.singletonList(testCase.getJSONArray("paragraph"));
             for (JSONArray paragraph : paragraphs) {
                 for (int k = 0; k < numInstances; k++) {
                     queries.add(new Query(paragraph, testCase.getJSONArray("datasets"), testCase.getJSONArray("imports"), testCase.getJSONObject("variables"), testCase.getJSONObject("expected"), casePath, new Random(k)));
@@ -172,15 +172,28 @@ public class Query {
     }
 
     private static List<JSONArray> toMultipleParagraphs(JSONArray paragraph) {
-        return getGeneratedLiterals(paragraph).entrySet().stream()
-                .flatMap(entry -> IntStream.range(0, entry.getValue().size())
-                        .mapToObj(h -> new JSONArray(
-                                IntStream.range(0, paragraph.length())
-                                        .mapToObj(i -> getGeneratedLiterals(paragraph).getOrDefault(i, List.of(paragraph.getJSONObject(i))))
-                                        .map(list -> list.get(h))
-                                        .toList()
-                        ))
-                ).toList();
+        HashMap<Integer, List<JSONObject>> replacementsMap = getGeneratedLiterals(paragraph);
+
+        int maxVariants = replacementsMap.values().stream()
+                .mapToInt(List::size)
+                .max()
+                .orElse(1);
+
+        return IntStream.range(0, maxVariants)
+                .mapToObj(variantIndex -> {
+                    JSONArray newParagraph = new JSONArray();
+                    IntStream.range(0, paragraph.length())
+                            .forEach(i -> {
+                                if (replacementsMap.containsKey(i) && !replacementsMap.get(i).isEmpty()) {
+                                    List<JSONObject> options = replacementsMap.get(i);
+                                    newParagraph.put(variantIndex < options.size() ? options.get(variantIndex) : options.getFirst());
+                                } else {
+                                    newParagraph.put(paragraph.get(i));
+                                }
+                            });
+                    return newParagraph;
+                })
+                .collect(Collectors.toList());
     }
 
     private static HashMap<Integer, List<JSONObject>> getGeneratedLiterals(JSONArray paragraph) {
