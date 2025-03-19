@@ -66,6 +66,9 @@ public class Settings {
     public static boolean isReasoningEnabled() {
         return getSettings().getBoolean("enable-reasoning");
     }
+    public static boolean isSplitMultipleTagEnabled() {
+        return getSettings().getBoolean("split-multiple-replace-tag");
+    }
 
     public static String getLearningCaseFolder() {
         return getSettings().getString("learning-case-folder");

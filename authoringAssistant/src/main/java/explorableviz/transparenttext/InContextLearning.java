@@ -1,6 +1,7 @@
 package explorableviz.transparenttext;
 
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -35,7 +36,7 @@ public class InContextLearning {
         PromptList inContextLearning = new PromptList();
         inContextLearning.addSystemPrompt(this.systemPrompt);
         for (Query query : this.cases) {
-            inContextLearning.addPairPrompt(query.toUserPrompt(), query.getExpected());
+            inContextLearning.addPairPrompt(query.toUserPrompt(), new JSONObject(query.getExpected()).toString());
         }
         return inContextLearning;
     }

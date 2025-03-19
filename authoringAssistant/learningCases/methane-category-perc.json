@@ -20,11 +20,13 @@
     }
   ],
   "imports": [],
-  "expected": "(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100",
+  "expected": {
+    "result1": "(record.emissions / sum(map (fun x -> x.emissions) (getByYear year tableData))) * 100"
+  },
   "paragraph": [
     {
       "type": "literal",
-      "value": "The $emissions.source$ sector accounts for [REPLACE value=\"$emissions.quantity$\"]% of total methane emissions in $emissions.year$."
+      "value": "The $emissions.source$ sector accounts for [REPLACE id=\"result1\" value=\"$emissions.quantity$\"]% of total methane emissions in $emissions.year$."
     }
   ]
 }

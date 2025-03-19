@@ -2,9 +2,11 @@ package explorableviz.transparenttext;
 
 import it.unisa.cluelab.lllm.llm.LLMEvaluatorAgent;
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Logger;
 
@@ -20,7 +22,6 @@ public class AuthoringAssistant {
     }
 
     public QueryResult execute(Query query) throws Exception {
-        String response = null;
         int limit = Settings.getLimit();
         // Add the input query to the KB that will be sent to the LLM
         PromptList sessionPrompt = (PromptList) prompts.clone();
@@ -31,26 +32,35 @@ public class AuthoringAssistant {
         } else {
             sessionPrompt.addUserPrompt(query.toUserPrompt());
         }
+        String response = null;
         for (attempts = 0; response == null && attempts <= limit; attempts++) {
             logger.info(STR."Attempt #\{attempts}");
             // Send the query to the LLM to be processed
             String candidateExpr = llm.evaluate(sessionPrompt, "");
-            logger.info(STR."Received response: \{candidateExpr}");
-            query.writeFluidFiles(candidateExpr);
-            Optional<String> result = query.validate(new FluidCLI(query.getDatasets(), query.getImports()).evaluate(query.getFluidFileName()));
             sessionPrompt.addAssistantPrompt(candidateExpr);
-            if (result.isPresent()) {
+            JSONObject llmExpressions = new JSONObject(candidateExpr);
+            String errorMessage ="";
+            //Check each generated expressions
+            for(String key : llmExpressions.keySet()) {
+                logger.info(STR."Received response: \{candidateExpr}");
+                query.writeFluidFiles(llmExpressions.getString(key));
+                Optional<String> errors = query.validate(new FluidCLI(query.getDatasets(), query.getImports()).evaluate(query.getFluidFileName()), key);
+                if (errors.isPresent()) {
+                    errorMessage += (generateLoopBackMessage(candidateExpr, errors.get()));
+                }
+            }
+            if(!errorMessage.isEmpty()) {
                 //Add the prev. expression to the SessionPrompt to say to the LLM that the response is wrong.
-                sessionPrompt.addUserPrompt(generateLoopBackMessage(candidateExpr, result.get()));
+                sessionPrompt.addUserPrompt(errorMessage);
             } else {
-                response = (candidateExpr);
+                response = candidateExpr;
             }
         }
         long end = System.currentTimeMillis();
         if (response == null) {
             logger.warning(STR."Expression validation failed after \{limit} attempts");
         } else {
-            query.getParagraph().spliceExpression(response);
+            //query.getParagraph().spliceExpression(response);
             logger.info(query.getParagraph().toString());
         }
         return new QueryResult(response, attempts, query, end - start);

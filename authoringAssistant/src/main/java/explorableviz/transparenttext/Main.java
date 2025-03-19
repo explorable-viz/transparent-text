@@ -61,7 +61,7 @@ public class Main {
                                 String.valueOf(result.attempt()),
                                 result.response() != null ? "OK" : "KO",
                                 String.valueOf(result.response()),
-                                result.query().getExpected(),
+                                result.query().getExpected().toString(),
                                 String.valueOf(result.duration())
                         };
                         return String.join(";", values);

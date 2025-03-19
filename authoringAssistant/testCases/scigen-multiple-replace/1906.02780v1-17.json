@@ -1,0 +1,24 @@
+{
+  "datasets": [
+    {
+      "var": "tableData",
+      "file": "datasets/scigen/1906.02780v1-17"
+    }
+  ],
+  "imports": [],
+  "variables": {},
+  "expected": {
+    "num_1": "last (map (fun x -> x.bleu) (filter (fun x -> (x.layers == 5) `and` (x.max_chunk_size == \"k=6\")) tableData)) - head (map (fun x -> x.bleu) (filter (fun x -> (x.layers == 1) `and` (x.max_chunk_size == \"k=6\")) tableData))",
+    "num_2": "head (map (fun x -> x.speedup) (filter (fun x -> (x.layers == 1) `and` (x.max_chunk_size == \"k=6\")) tableData))",
+    "num_3": "last (map (fun x -> x.speedup) (filter (fun x -> x.layers == 5) tableData))",
+    "num_4": "head (map (fun x -> x.bleu) (filter (fun x -> (x.max_chunk_size == \"k in {1...6}\")) tableData)) - head (map (fun x -> x.bleu) (filter (fun x -> (x.layers == 1) `and` (x.max_chunk_size == \"k=6\")) tableData))",
+    "num_5": "head (map (fun x -> x.speedup) (filter (fun x -> (x.layers == 1) `and` (x.max_chunk_size == \"k=6\")) tableData))",
+    "num_6": "head (map (fun x -> x.speedup) (filter (fun x -> (x.max_chunk_size == \"k in {1...6}\")) tableData))"
+  },
+  "paragraph": [
+    {
+      "type": "literal",
+      "value": "Table 4 shows that increasing the number of layers from 1 to 5 results in a BLEU increase of only [REPLACE id=\"num_1\" value=\"0.5\"], while the speedup drops from [REPLACE id=\"num_2\" value=\"3.8] to [REPLACE id=\"num_3\" value=\"1.4\"].  The final row of Table 4 shows that exposing the parse decoder to multiple possible chunking of the same sentence during training allows it to choose a sequence of chunks that has a higher likelihood at test time, improving BLEU by [REPLACE id=\"num_4\" value=\"1.5\"] while decreasing the speedup from [REPLACE id=\"num_5\" value=\"3.8] to [REPLACE id=\"num_6\" value=\"3.1\"];"
+    }
+  ]
+}
