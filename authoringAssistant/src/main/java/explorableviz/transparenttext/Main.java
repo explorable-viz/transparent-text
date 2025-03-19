@@ -23,7 +23,7 @@ public class Main {
         try {
             Settings.init("settings.json");
             inContextLearning = InContextLearning.importLearningCaseFromJSON(Settings.getSystemPromptPath(), Settings.getNumLearningCaseToGenerate());
-            queries = Query.loadQuery(Settings.getTestCaseFolder(), Settings.getNumTestToGenerate());
+            queries = Query.loadQueries(Settings.getTestCaseFolder(), Settings.getNumTestToGenerate());
             final int queryLimit = Settings.getNumQueryToExecute().orElseGet(queries::size);
             final ArrayList<QueryResult> results = execute(inContextLearning, agent, queryLimit, queries);
             float accuracy = computeAccuracy(results, queries, queryLimit);
