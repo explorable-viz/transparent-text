@@ -1,14 +1,12 @@
 package explorableviz.transparenttext.paragraph;
 
 import explorableviz.transparenttext.LiteralParts;
+import explorableviz.transparenttext.Settings;
 import explorableviz.transparenttext.variable.Variables;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -16,15 +14,26 @@ import java.util.stream.IntStream;
 
 public class Paragraph extends ArrayList<TextFragment> {
 
-    public Paragraph(JSONArray json_paragraph, Variables variables) {
+    public Paragraph(JSONArray json_paragraph, Variables variables, Map<String, String> expectedValue) {
         this.addAll(IntStream.range(0, json_paragraph.length())
                 .mapToObj(i -> {
                     JSONObject paragraphElement = json_paragraph.getJSONObject(i);
                     String type = paragraphElement.getString("type");
+                    String value = expectedValue.entrySet().stream()
+                            .reduce(paragraphElement.getString("value"),
+                                    (acc, entry) -> {
+                                        if(Settings.isAddExpectedValueEnabled()) {
+                                            acc = acc.replaceAll(Pattern.quote(STR."[REPLACE id=\"\{entry.getKey()}\"]"), Matcher.quoteReplacement(STR."[REPLACE id=\"\{entry.getKey()}\" value=\"\{entry.getValue()}\"]"));
+                                        }
+                                        return acc.replaceAll(Pattern.quote(STR."[ADD_VAL id=\"\{entry.getKey()}\"]"), Matcher.quoteReplacement(entry.getValue()));
+                                    },
+                                    (a, _) -> a
+                            );
+
                     return (switch (type) {
-                        case "literal" -> new Literal(paragraphElement.getString("value"));
+                        case "literal" -> new Literal(value);
                         case "expression" ->
-                                new Expression(paragraphElement.getString("expression"), paragraphElement.getString("value"));
+                                new Expression(paragraphElement.getString("expression"), value);
                         default -> throw new RuntimeException(STR."\{type} type is invalid");
                     }).replace(variables);
                 })

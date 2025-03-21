@@ -1,20 +1,17 @@
 package explorableviz.transparenttext;
 
 import it.unisa.cluelab.lllm.llm.prompt.PromptList;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static explorableviz.transparenttext.Query.loadQuery;
+import static explorableviz.transparenttext.Query.loadQueries;
 
 public class InContextLearning {
     private final String systemPrompt;
@@ -28,7 +25,7 @@ public class InContextLearning {
 
     // TODO Maybe loadLearningCases? "JSON" seems redundant, and we "load" (rather than "importing") queries
     public static InContextLearning importLearningCaseFromJSON(String jsonLearningCasePath, int numCasesToGenerate) throws Exception {
-        ArrayList<Query> learningCases = loadQuery(Settings.getLearningCaseFolder(), numCasesToGenerate);
+        ArrayList<Query> learningCases = loadQueries(Settings.getLearningCaseFolder(), numCasesToGenerate);
         return new InContextLearning(loadSystemPrompt(jsonLearningCasePath), learningCases);
     }
 

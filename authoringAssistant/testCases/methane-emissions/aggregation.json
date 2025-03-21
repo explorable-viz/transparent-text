@@ -54,7 +54,7 @@
   "paragraph": [
     {
       "type": "literal",
-      "value": "The $emissions.operation$ methane emissions for the year $emissions.year$ is [REPLACE id=\"result1\" value=\"$emissions.result$\"]"
+      "value": "The $emissions.operation$ methane emissions for the year $emissions.year$ is [REPLACE id=\"result1\"]"
     }
   ]
 }
